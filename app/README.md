@@ -1,31 +1,8 @@
-# IT Support App
-
-A simple internal IT support app where employees can submit IT problems or service requests and track their progress.
-
----
-
-## server
-
-To install dependencies:
-
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.3.14. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
-
-
-## app
+# app
 
 A new Flutter project.
 
-### Getting Started
+## Getting Started
 
 This project is a starting point for a Flutter application.
 
