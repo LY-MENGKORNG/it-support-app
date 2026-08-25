@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-cd ./app
+cd ./client
 flutter run
