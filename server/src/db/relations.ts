@@ -1,9 +1,9 @@
-import { defineRelations } from "drizzle-orm";
-import { user } from "./schema/user";
-import { category } from "./schema/category";
-import { comment } from "./schema/comment";
-import { requestHistory } from "./schema/request-history";
-import { request } from "./schema/request";
+import { defineRelations } from 'drizzle-orm';
+import { user } from './schema/user';
+import { category } from './schema/category';
+import { comment } from './schema/comment';
+import { requestHistory } from './schema/request-history';
+import { request } from './schema/request';
 
 export const schema = { category, comment, requestHistory, request, user };
 export const relations = defineRelations(schema, (r) => ({
@@ -43,14 +43,14 @@ export const relations = defineRelations(schema, (r) => ({
       from: r.request.requesterId,
       to: r.user.id,
 
-      alias: "request_requester",
+      alias: 'request_requester',
     }),
 
     assignee: r.one.user({
       from: r.request.assigneeId,
       to: r.user.id,
 
-      alias: "request_assignee",
+      alias: 'request_assignee',
     }),
 
     category: r.one.category({
@@ -90,4 +90,4 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.requestHistory.userId,
     }),
   },
-}))
+}));

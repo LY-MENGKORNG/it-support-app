@@ -2,7 +2,7 @@ CREATE TABLE `category` (
 	`id` integer PRIMARY KEY AUTOINCREMENT,
 	`name` text NOT NULL UNIQUE,
 	`description` text,
-	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL
+	`createdAt` integer DEFAULT (unixepoch() * 1000) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `comment` (
@@ -37,7 +37,7 @@ CREATE TABLE `request` (
 	`status` text DEFAULT 'open' NOT NULL,
 	`requester_id` integer NOT NULL,
 	`assignee_id` integer,
-	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`createdAt` integer DEFAULT (unixepoch() * 1000) NOT NULL,
 	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
 	`resolved_at` integer,
 	`closed_at` integer,
@@ -48,7 +48,7 @@ CREATE TABLE `request` (
 --> statement-breakpoint
 CREATE TABLE `user` (
 	`id` integer PRIMARY KEY AUTOINCREMENT,
-	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`createdAt` integer DEFAULT (unixepoch() * 1000) NOT NULL,
 	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
 	`name` text NOT NULL,
 	`email` text NOT NULL UNIQUE,
@@ -67,4 +67,4 @@ CREATE INDEX `request_assignee_idx` ON `request` (`assignee_id`);--> statement-b
 CREATE INDEX `request_category_idx` ON `request` (`category_id`);--> statement-breakpoint
 CREATE INDEX `request_status_idx` ON `request` (`status`);--> statement-breakpoint
 CREATE INDEX `request_priority_idx` ON `request` (`priority`);--> statement-breakpoint
-CREATE INDEX `request_created_at_idx` ON `request` (`created_at`);
+CREATE INDEX `request_created_at_idx` ON `request` (`createdAt`);

@@ -7,4 +7,4 @@ bun db:migrate
 
 echo "all tasks completed"
 
-bun dev
+bun start:dev

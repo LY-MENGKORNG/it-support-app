@@ -1,7 +1,7 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "e970f1da-59e7-4265-bd83-9c0e38b5631b",
+  "id": "585404cd-8d53-4762-8843-589358a949f7",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
@@ -62,7 +62,7 @@
       "autoincrement": false,
       "default": "(unixepoch() * 1000)",
       "generated": null,
-      "name": "created_at",
+      "name": "createdAt",
       "entityType": "columns",
       "table": "category"
     },
@@ -282,7 +282,7 @@
       "autoincrement": false,
       "default": "(unixepoch() * 1000)",
       "generated": null,
-      "name": "created_at",
+      "name": "createdAt",
       "entityType": "columns",
       "table": "request"
     },
@@ -332,7 +332,7 @@
       "autoincrement": false,
       "default": "(unixepoch() * 1000)",
       "generated": null,
-      "name": "created_at",
+      "name": "createdAt",
       "entityType": "columns",
       "table": "user"
     },
@@ -689,7 +689,7 @@
     {
       "columns": [
         {
-          "value": "created_at",
+          "value": "createdAt",
           "isExpression": false
         }
       ],
