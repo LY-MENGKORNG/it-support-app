@@ -1,8 +1,6 @@
-import 'package:app/core/network/api_client.dart';
-import 'package:app/data/repositories/user_repository.dart';
-import 'package:app/data/services/api/user_api.dart';
+import 'package:app/src/data/repositories/user_repository.dart';
+import 'package:app/src/data/services/api/user_api.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 import '../view_models/home_view_model.dart';
 
@@ -22,27 +20,28 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    final apiClient = ApiClient(client: http.Client());
-    final apiService = UserApiService(apiClient: apiClient);
-
-    final repository = UserRepository(apiService: apiService);
+    final repository = UserRepository(apiService: UserApiService());
 
     viewModel = HomeViewModel(userRepository: repository);
 
     viewModel.loadUsers();
   }
 
-  @override
-  void dispose() {
-    viewModel.dispose();
-
-    super.dispose();
-  }
+  static const IconData ticket = IconData(0xf916);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Users')),
+      appBar: AppBar(
+        title: const Text('User list'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_alert),
+            tooltip: 'Show Snackbar',
+            onPressed: () {},
+          ),
+        ],
+      ),
       body: ListenableBuilder(
         listenable: viewModel,
         builder: (context, child) {
@@ -68,6 +67,33 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
       ),
+      bottomNavigationBar: NavigationBar(
+        destinations: const <Widget>[
+          NavigationDestination(
+            selectedIcon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(ticket),
+            icon: Icon(ticket),
+            label: 'Requests',
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.settings),
+            icon: Icon(Icons.settings_outlined),
+            label: 'Settings',
+          ),
+        ],
+      ),
     );
+  }
+
+  // Called when this object is removed from the tree permanently.
+  @override
+  void dispose() {
+    viewModel.dispose();
+
+    super.dispose();
   }
 }

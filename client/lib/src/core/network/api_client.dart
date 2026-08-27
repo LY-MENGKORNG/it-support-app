@@ -10,6 +10,7 @@ class ApiClient {
   ApiClient({required this._client});
 
   Future<http.Response> get(String path, {Headers? headers}) {
+    // TODO: using Result + Option type instead.
     return _client.get(Uri.parse('$baseUrl$path'), headers: headers);
   }
 

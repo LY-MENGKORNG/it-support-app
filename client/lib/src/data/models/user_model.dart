@@ -26,18 +26,25 @@ class UserModel {
       id: json['id'] as int,
       name: json['name'] as String,
       email: json['email'] as String,
-      role: json['role'] as UserRole,
+      role: UserRole.values.byName(json['role'] as String),
       isActive: json['isActive'] as bool,
-      createdAt: json['createdAt'] as DateTime,
-      updatedAt: json['updatedAt'] as DateTime,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
   }
 
-  static List<UserModel> parseUsers(String body) {
+  static List<UserModel> parseMany(String body) {
     final decoded = jsonDecode(body) as List<Object?>;
 
     final parsed = decoded.cast<Map<String, Object?>>();
 
     return parsed.map<UserModel>(UserModel.fromJson).toList();
+  }
+
+  static UserModel parseOne(String body) {
+    final decoded = jsonDecode(body) as Object?;
+
+    final parsed = decoded as UserModel;
+    return parsed;
   }
 }

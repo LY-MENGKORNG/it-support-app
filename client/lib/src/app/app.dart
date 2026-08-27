@@ -1,4 +1,5 @@
-import 'package:app/features/home/presentation/screens/home_screen.dart';
+import 'package:app/src/app/theme.dart';
+import 'package:app/src/features/home/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class ITSupportApp extends StatelessWidget {
@@ -10,13 +11,9 @@ class ITSupportApp extends StatelessWidget {
     return MaterialApp(
       title: appTitle,
       debugShowCheckedModeBanner: false,
-
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Color.fromRGBO(0, 0, 0, 10),
-        ),
-      ),
+      theme: AppTheme.dark(),
       home: const HomeScreen(title: appTitle),
+      routes: const {},
     );
   }
 }

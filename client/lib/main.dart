@@ -1,4 +1,5 @@
-import 'package:app/app/app.dart';
+import 'package:app/src/app/app.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() => runApp(const ITSupportApp());
+void main() => runApp(const ProviderScope(child: ITSupportApp()));

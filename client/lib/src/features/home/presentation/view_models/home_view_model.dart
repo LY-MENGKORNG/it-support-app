@@ -1,11 +1,10 @@
-import 'package:app/data/models/user_model.dart';
-import 'package:app/data/repositories/user_repository.dart';
+import 'package:app/src/data/models/user_model.dart';
+import 'package:app/src/data/repositories/user_repository.dart';
 import 'package:flutter/material.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final UserRepository _userRepository;
-  HomeViewModel({required UserRepository userRepository})
-    : _userRepository = userRepository;
+  HomeViewModel({required this._userRepository});
 
   List<UserModel> _users = [];
   bool _isLoading = false;
