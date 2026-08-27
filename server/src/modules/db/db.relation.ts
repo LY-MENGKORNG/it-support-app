@@ -1,4 +1,3 @@
-
 import { defineRelations } from 'drizzle-orm';
 import { category } from '../categories/category.schema';
 import { comment } from '../comments/comment.schema';
@@ -8,7 +7,13 @@ import { user } from '../users/user.schema';
 
 export type Relations = typeof relations;
 
-export const schema = { category, comment, requestHistory, request, user } as const;
+export const schema = {
+  category,
+  comment,
+  requestHistory,
+  request,
+  user,
+} as const;
 
 export const relations = defineRelations(schema, (r) => ({
   category: {
@@ -95,4 +100,3 @@ export const relations = defineRelations(schema, (r) => ({
     }),
   },
 }));
-

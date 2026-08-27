@@ -1,11 +1,19 @@
-import { Body, Controller, Get, ParseIntPipe, Post, Query, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  ParseIntPipe,
+  Post,
+  Query,
+  UsePipes,
+} from '@nestjs/common';
 import { ZodValidationPipe } from 'src/common/zod-validation.pipe';
 import { type CreateUserDto, createUserSchema } from './user.schema';
 import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly user: UserService) { }
+  constructor(private readonly user: UserService) {}
 
   @Get()
   list(

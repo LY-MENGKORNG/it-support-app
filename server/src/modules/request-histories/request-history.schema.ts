@@ -9,12 +9,18 @@ export const requestHistory = snakeCase.table(
   'request_history',
   {
     id: commonColumns.id,
-    requestId: integer().notNull().references(() => request.id, { onDelete: 'cascade' }),
-    userId: integer().notNull().references(() => user.id),
+    requestId: integer()
+      .notNull()
+      .references(() => request.id, { onDelete: 'cascade' }),
+    userId: integer()
+      .notNull()
+      .references(() => user.id),
     action: text({ enum: REQUEST_HISTORY_STATUS }).notNull(),
     oldValue: text(),
     newValue: text(),
-    createdAt: integer({ mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    createdAt: integer({ mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
   },
   (table) => [
     index('request_history_request_idx').on(table.requestId),

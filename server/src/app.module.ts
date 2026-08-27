@@ -3,6 +3,7 @@ import { UserModule } from './modules/users/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { envSchema } from './config/env.config';
 import { DBModule } from './modules/db/db.module';
+import { RequestModule } from './modules/requests/request.module';
 
 @Module({
   imports: [
@@ -10,12 +11,13 @@ import { DBModule } from './modules/db/db.module';
       isGlobal: true,
       cache: true,
       ignoreEnvFile: true,
-      validate: (raw) => envSchema.parse(raw)
+      validate: (raw) => envSchema.parse(raw),
     }),
     UserModule,
-    DBModule
+    DBModule,
+    RequestModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

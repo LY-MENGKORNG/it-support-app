@@ -15,7 +15,7 @@ export const user = snakeCase.table('user', {
 });
 
 export const createUserSchema = createInsertSchema(user)
-  .omit({ id: true, createdAt: true, })
+  .omit({ id: true, createdAt: true })
   .extend({ email: z.email() });
 
 export const updateUserSchema = createUserSchema.partial();

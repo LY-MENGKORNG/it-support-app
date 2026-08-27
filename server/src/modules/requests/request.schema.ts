@@ -10,7 +10,9 @@ export const request = snakeCase.table(
     id: commonColumns.id,
     title: text().notNull(),
     description: text().notNull(),
-    categoryId: integer().notNull().references(() => category.id),
+    categoryId: integer()
+      .notNull()
+      .references(() => category.id),
     priority: text({ enum: PRIORITY }).notNull().default('medium'),
     status: text({ enum: REQUEST_STATUS }).notNull().default('open'),
 
@@ -45,4 +47,3 @@ export const request = snakeCase.table(
 
 export type Request = typeof request.$inferSelect;
 export type NewRequest = typeof request.$inferSelect;
-

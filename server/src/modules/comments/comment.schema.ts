@@ -8,10 +8,16 @@ export const comment = snakeCase.table(
   'comment',
   {
     id: commonColumns.id,
-    requestId: integer().notNull().references(() => request.id, { onDelete: 'cascade' }),
-    userId: integer().notNull().references(() => user.id),
+    requestId: integer()
+      .notNull()
+      .references(() => request.id, { onDelete: 'cascade' }),
+    userId: integer()
+      .notNull()
+      .references(() => user.id),
     content: text().notNull(),
-    createdAt: integer({ mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    createdAt: integer({ mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
     updatedAt: integer({ mode: 'timestamp' }),
   },
   (table) => [
