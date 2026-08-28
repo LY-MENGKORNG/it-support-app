@@ -16,7 +16,7 @@ export type DrizzleDB = SQLiteBunDatabase<Relations> & { $client: Database };
       provide: DRIZZLE,
       inject: [ConfigService],
       useFactory: (_config: ConfigService): DrizzleDB => {
-        const client = new Database(Bun.env.DATABASE_URL);
+        const client = new Database("db.sqlite");
 
         client.run('PRAGMA journal_mode = WAL;'); // concurrent readers
         client.run('PRAGMA foreign_keys = ON;'); // OFF by default in SQLite
@@ -30,7 +30,7 @@ export type DrizzleDB = SQLiteBunDatabase<Relations> & { $client: Database };
   exports: [DRIZZLE],
 })
 export class DBModule {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
 
   onApplicationShutdown() {
     this.db.$client.close();
