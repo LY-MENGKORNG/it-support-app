@@ -27,8 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
     viewModel.loadUsers();
   }
 
-  static const IconData ticket = IconData(0xf916);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,8 +73,8 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Home',
           ),
           NavigationDestination(
-            selectedIcon: Icon(ticket),
-            icon: Icon(ticket),
+            selectedIcon: Icon(Icons.home),
+            icon: Icon(Icons.home),
             label: 'Requests',
           ),
           NavigationDestination(

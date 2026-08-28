@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-enum UserRole { employee, staff, admin }
+import 'package:app/src/core/constant/role.dart';
 
 class UserModel {
   final int id;

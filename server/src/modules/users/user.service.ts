@@ -5,7 +5,7 @@ import { type DrizzleDB } from '../db/db.module';
 
 @Injectable()
 export class UserService {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
 
   list({ limit, offset }: { limit: number; offset: number }) {
     return this.db.query.user.findMany({

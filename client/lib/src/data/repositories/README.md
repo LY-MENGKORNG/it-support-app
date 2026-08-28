@@ -1,3 +1,3 @@
 # Repository
 
-The connector between `Views` & `Services`
+The connector between `ViewModels` & `Services`

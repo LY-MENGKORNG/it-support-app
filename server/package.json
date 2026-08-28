@@ -22,7 +22,7 @@
     "db:migrate": "bun --bun run drizzle-kit migrate --config=./src/config/drizzle.config.ts",
     "db:push": "bun --bun run drizzle-kit push --config=./src/config/drizzle.config.ts",
     "db:studio": "bun --bun run drizzle-kit studio --config=./src/config/drizzle.config.ts",
-    "db:seed": "bun --bun run ./src/config/db/seed.config.ts"
+    "db:seed": "bun ./src/config/db/seed.config.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -30,7 +30,7 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "drizzle-orm": "^1.0.0-rc.4",
-    "drizzle-seed": "^0.3.1",
+    "drizzle-seed": "^1.0.0-rc.4",
     "drizzle-zod": "^0.8.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",

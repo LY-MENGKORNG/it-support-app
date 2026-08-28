@@ -5,8 +5,6 @@ import { requestHistory } from 'src/modules/request-histories/request-history.sc
 import { request } from 'src/modules/requests/request.schema';
 import { user } from 'src/modules/users/user.schema';
 
-export type Relation = typeof relations;
-
 export const schema = {
   category,
   comment,
@@ -100,3 +98,5 @@ export const relations = defineRelations(schema, (r) => ({
     }),
   },
 }));
+
+export type Relation = typeof relations;

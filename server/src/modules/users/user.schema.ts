@@ -10,7 +10,7 @@ export const user = snakeCase.table('user', {
   name: text().notNull(),
   email: text().notNull().unique(),
   password_hash: text().notNull(),
-  role: text({ enum: ROLES }).notNull().default('employee'),
+  role: text({ enum: ROLES }).default('employee'),
   isActive: integer({ mode: 'boolean' }).notNull().default(true),
 });
 
