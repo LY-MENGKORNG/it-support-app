@@ -21,7 +21,8 @@
     "db:generate": "bun --bun run drizzle-kit generate --config=./src/config/drizzle.config.ts",
     "db:migrate": "bun --bun run drizzle-kit migrate --config=./src/config/drizzle.config.ts",
     "db:push": "bun --bun run drizzle-kit push --config=./src/config/drizzle.config.ts",
-    "db:studio": "bun --bun run drizzle-kit studio --config=./src/config/drizzle.config.ts"
+    "db:studio": "bun --bun run drizzle-kit studio --config=./src/config/drizzle.config.ts",
+    "db:seed": "bun --bun run ./src/config/db/seed.config.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

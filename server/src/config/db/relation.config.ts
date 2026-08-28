@@ -1,11 +1,11 @@
 import { defineRelations } from 'drizzle-orm';
-import { category } from '../categories/category.schema';
-import { comment } from '../comments/comment.schema';
-import { requestHistory } from '../request-histories/request-history.schema';
-import { request } from '../requests/request.schema';
-import { user } from '../users/user.schema';
+import { category } from 'src/modules/categories/category.schema';
+import { comment } from 'src/modules/comments/comment.schema';
+import { requestHistory } from 'src/modules/request-histories/request-history.schema';
+import { request } from 'src/modules/requests/request.schema';
+import { user } from 'src/modules/users/user.schema';
 
-export type Relations = typeof relations;
+export type Relation = typeof relations;
 
 export const schema = {
   category,
