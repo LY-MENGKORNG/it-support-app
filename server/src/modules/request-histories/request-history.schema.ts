@@ -18,9 +18,9 @@ export const requestHistory = snakeCase.table(
     action: text({ enum: REQUEST_HISTORY_STATUS }).notNull(),
     oldValue: text(),
     newValue: text(),
-    createdAt: integer({ mode: 'timestamp' })
+    createdAt: integer({ mode: 'timestamp_ms' })
       .notNull()
-      .default(sql`(unixepoch())`),
+      .default(sql`(unixepoch() * 1000)`),
   },
   (table) => [
     index('request_history_request_idx').on(table.requestId),
@@ -31,3 +31,14 @@ export const requestHistory = snakeCase.table(
 
 export type RequestHistory = typeof requestHistory.$inferSelect;
 export type NewRequestHistory = typeof requestHistory.$inferInsert;
+
+/**
+ * A history row before it knows which request it belongs to.
+ *
+ * `RequestService` computes these from a diff, and `RequestRepository` writes
+ * them alongside the change itself — so the two can never disagree.
+ */
+export type RequestHistoryDraft = Omit<
+  NewRequestHistory,
+  'id' | 'requestId' | 'createdAt'
+>;

@@ -1,21 +1,35 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { DRIZZLE } from 'src/common/constants';
-import { CreateUserDto, user } from './user.schema';
-import { type DrizzleDB } from '../db/db.module';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateUserDto, ListUserQuery } from './user.dto';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+  constructor(private readonly repository: UserRepository) {}
 
-  list({ limit, offset }: { limit: number; offset: number }) {
-    return this.db.query.user.findMany({
-      columns: { password_hash: false },
-      limit,
-      offset,
-    });
+  list(query: ListUserQuery) {
+    return this.repository.findMany(query);
   }
 
-  create(newUser: CreateUserDto) {
-    return this.db.insert(user).values(newUser).returning().get();
+  /** IT staff who can be assigned to a request — the assignee dropdown. */
+  listAssignable() {
+    return this.repository.findAssignable();
+  }
+
+  async findOne(id: number) {
+    const found = await this.repository.findById(id);
+    if (!found) throw new NotFoundException(`User ${id} not found`);
+    return found;
+  }
+
+  /**
+   * The plaintext password never reaches the repository. Hashing is a policy
+   * decision, so it happens here and the DTO's `password` key is dropped —
+   * meaning the only way into `password_hash` is through this method.
+   */
+  async create({ password, ...rest }: CreateUserDto) {
+    return this.repository.insert({
+      ...rest,
+      password_hash: await Bun.password.hash(password),
+    });
   }
 }

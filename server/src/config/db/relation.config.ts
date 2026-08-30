@@ -98,5 +98,3 @@ export const relations = defineRelations(schema, (r) => ({
     }),
   },
 }));
-
-export type Relation = typeof relations;

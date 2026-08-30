@@ -1,5 +1,13 @@
-import 'package:app/src/app/app.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 
-void main() => runApp(const ProviderScope(child: ITSupportApp()));
+import 'package:app/config/dependencies.dart';
+import 'package:app/main_app.dart';
+
+void main() {
+  // Building the dependency graph touches plugin channels (shared_preferences),
+  // so the binding has to exist first.
+  WidgetsFlutterBinding.ensureInitialized();
+
+  runApp(MultiProvider(providers: providersRemote, child: const MainApp()));
+}

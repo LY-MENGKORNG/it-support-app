@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
 import { RequestService } from './request.service';
+import { RequestRepository } from './request.repository';
 import { RequestController } from './request.controller';
 
 @Module({
-  imports: [],
-  providers: [RequestService],
+  providers: [RequestService, RequestRepository],
   controllers: [RequestController],
-  exports: [],
+  // `RequestRepository` is exported so `CommentService` can check that a
+  // request exists without reaching for the database itself.
+  exports: [RequestService, RequestRepository],
 })
 export class RequestModule {}

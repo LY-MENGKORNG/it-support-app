@@ -1,126 +1,253 @@
 # IT Support App
 
-A simple internal IT support app where employees can submit IT problems or service requests and track their progress.
+An internal IT support app: employees submit problems or service requests, IT
+staff triage, assign, comment and resolve them.
+
+```
+it-support-app/
+├── server/   NestJS + Drizzle + SQLite, run on Bun
+└── client/   Flutter
+```
 
 ---
 
-## server
+## Running it
 
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+Two terminals. **The server must be running before the app starts** — the app
+has no offline mode.
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+### 1. Server
 
 ```bash
-$ npm install
+cd server
+bun install
+bun run db:migrate   # create / update the SQLite schema
+bun run db:seed      # ~54 realistic requests, 20 people, 8 categories
+bun run start:dev    # http://localhost:3000
 ```
 
-## Compile and run the project
+Every seeded account uses the password `password-123`. Re-running `db:seed`
+wipes and rebuilds the data, and is deterministic — you get the same database
+each time. Note that some seeded accounts are deactivated on purpose and cannot
+sign in.
+
+Access tokens are signed with `JWT_SECRET`, which falls back to a value
+committed in `config/env.config.ts` for local work. **The server refuses to
+start in production without a real one:**
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+JWT_SECRET=$(openssl rand -base64 32) NODE_ENV=production bun run start:prod
 ```
 
-## Run tests
+### 2. Client
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cd client
+flutter pub get
+flutter run
 ```
 
-## Deployment
+Sign in with any active seeded account and the password `password-123`. The
+access token is stored on the device with `shared_preferences` and sent as a
+bearer token on every request; the server derives the requester and actor from
+it. Sign out under **Settings → Sign out**.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+The base URL is chosen in `ApiClient.defaultBaseUrl`: `10.0.2.2` on an Android
+emulator (the emulator's alias for the host machine), `localhost` everywhere
+else. Override it for a physical device:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+flutter run --dart-define=API_BASE_URL=http://192.168.1.20:3000
 ```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
 ---
 
-## app
+## API
 
-A new Flutter project.
+Interactive docs are served at **http://localhost:3000/api** once the server is
+running, with the raw OpenAPI spec at `/api-json`.
 
-### Getting Started
 
-This project is a starting point for a Flutter application.
+Every route needs an `Authorization: Bearer <token>` header except
+`POST /auth/login`.
 
-A few resources to get you started if this is your first Flutter project:
+| Method   | Path                          | Notes                                        |
+| -------- | ----------------------------- | -------------------------------------------- |
+| `POST`   | `/auth/login`                 | `{ email, password }` → `{ accessToken, user }`. The only public route. |
+| `GET`    | `/auth/me`                    | The signed-in user; how a stored token is restored. |
+| `GET`    | `/request`                    | Paged list. See query parameters below.       |
+| `GET`    | `/request/:id`                | Full record + comments + history.             |
+| `POST`   | `/request`                    | Records a `created` history entry.            |
+| `PATCH`  | `/request/:id`                | Partial update; records one entry per change. |
+| `GET`    | `/request/:id/comment`        | Comment thread, oldest first.                 |
+| `POST`   | `/request/:id/comment`        |                                               |
+| `GET`    | `/request/:id/history`        | Audit trail, newest first.                    |
+| `GET`    | `/user`                       | `q`, `role`, `limit`, `offset`.               |
+| `GET`    | `/user/assignable`            | Staff and admins — the assignee list. **Staff/admin only.** |
+| `GET`    | `/user/:id`                   |                                               |
+| `POST`   | `/user`                       | Takes a plaintext `password`; hashes it. **Admin only.** |
+| `GET`    | `/category`                   |                                               |
+| `POST`   | `/category`                   | **Admin only.**                               |
+| `DELETE` | `/category/:id`               | 409 if any request still uses it. **Admin only.** |
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+`GET /request` accepts `q` (searches title and description), `status`,
+`priority`, `categoryId`, `requesterId`, `assigneeId`, `unassigned=true`,
+`sort` (`newest` | `oldest` | `priority`), `limit`, `offset`, and answers with:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```jsonc
+{ "items": [...], "total": 54, "limit": 20, "offset": 0, "hasMore": true }
+```
+
+### Who did what
+
+Writes carry no `requesterId`, `actorId` or `userId`. Every mutation is recorded
+in `request_history`, and the person it is recorded against comes from the
+verified access token — a field a client can type is a field a client can lie
+about, and "who did this" is exactly the claim that must not be forgeable.
+
+Authorisation comes in two layers, because they answer different questions:
+
+- **`AuthGuard`** is registered globally, so *every* route requires a token
+  unless it says `@Public()`. It also enforces `@Roles(...)`, which is a
+  statement about the route: only staff can list assignable users at all.
+- **The services** decide what a caller may do to a *particular record*, which a
+  guard cannot know. An employee may correct the wording or urgency of their own
+  request; only staff may change its `status` or `assigneeId`. Touching someone
+  else's request answers 404 rather than 403 — a request you cannot see is one
+  you have no business knowing exists.
+
+The client mirrors these rules to hide controls that would only fail
+(`SessionRepository.canManageRequests`), but that is a courtesy: the server is
+the check that counts.
+
+### Status and history
+
+`resolvedAt` and `closedAt` are derived from `status` by the server and are never
+accepted from the client, so reopening a request clears them rather than leaving
+a stale resolution date behind. Each update writes its history rows inside the
+same transaction as the change itself, so the audit trail cannot drift from the
+record it describes.
+
+---
+
+## Tests
+
+```bash
+cd client && flutter test    # enums, models, API layer, session, view models, widgets
+cd server && bun run test    # service-level rules, with no database in sight
+```
+
+The repository split also makes the server testable: a service can be given a
+fake repository with no database in sight.
+
+The client's API tests run the real `ApiClient`, services and repositories over
+`MockClient`, so URL building, status handling and JSON parsing are covered
+together without touching the network.
+
+---
+
+## Project layout
+
+### Server
+
+```
+src/
+├── common/          constants, zod pipe, SQLite exception filter, HTTP logger
+├── config/          env, drizzle config, docs (Swagger), db client + relations, seed
+└── modules/
+    ├── auth/        auth.schema.ts       ← zod DTOs + the token payload
+    │                auth.guard.ts        ← the global gate on every route
+    │                auth.decorator.ts    ← @Public, @Roles, @CurrentUser
+    │                auth.service.ts      ← issues and verifies tokens
+    │                auth.controller.ts
+    ├── users/       user.schema.ts
+    │                user.repository.ts   ← all Drizzle access
+    │                user.service.ts      ← business rules
+    │                user.controller.ts   ← HTTP
+    │                user.module.ts
+    ├── categories/
+    ├── requests/
+    ├── comments/
+    └── request-histories/
+```
+
+Each module owns its Drizzle table, its zod DTOs, and one file per layer.
+Cross-table relations live in `config/db/relation.config.ts`.
+
+**controller → service → repository → Drizzle**, and the boundaries are strict:
+
+- **Repositories** are the only place that touches `db`. They take plain
+  arguments, return plain rows, and return `undefined` for "not there" — they
+  never throw HTTP exceptions.
+- **Services** hold the rules: what a change *means* (which edits are worth an
+  audit entry), what a status *implies* (`resolvedAt` / `closedAt`), and that a
+  missing row is a `404`.
+- **Controllers** parse and validate input, then delegate.
+
+Two consequences worth knowing. `UserRepository` reads exclusively through
+`publicUserColumns`, so `password_hash` cannot leak out of that file by
+accident — while hashing stays in `UserService`, because it is a policy
+decision. And `RequestRepository` owns the request↔history transaction: a
+change and the history row describing it are written together or not at all, so
+the audit trail can never drift from the record.
+
+### Client
+
+Follows the [official Flutter app architecture guide](https://docs.flutter.dev/app-architecture),
+including the `Result` and `Command` patterns and `package:provider` for
+dependency injection.
+
+```
+lib/
+├── main.dart          entry point: builds the provider tree
+├── main_app.dart      MaterialApp.router
+├── config/            dependencies.dart — the whole object graph
+├── routing/           routes.dart, router.dart (go_router + session guard)
+├── domain/models/     the app's data types — no Flutter imports at all
+├── data/
+│   ├── services/      one per external source: api/api_client.dart, shared_preferences_service.dart
+│   └── repositories/  <name>/<name>_repository.dart (abstract) + _remote.dart
+├── ui/
+│   ├── auth/          login + splash screens, and the login view model
+│   ├── core/          themes/ and ui/ — shared widgets, layout breakpoints
+│   └── <feature>/     view_models/ + widgets/
+└── utils/             result.dart, command.dart, json.dart, date_format.dart
+```
+
+**MVVM, one ViewModel per screen.** Widgets hold no logic: they receive a
+ViewModel, read its state, and call its commands.
+
+**`Result<T>` instead of exceptions.** Dart's exceptions are unchecked — nothing
+forces a caller to handle them and nothing documents which ones a function
+throws. Every service and repository method returns `Ok` or `Error`, so failure
+is part of the signature and a `switch` will not compile unless both cases are
+handled.
+
+**`Command` objects for actions.** Each user action (`load`, `changeStatus`,
+`addComment`) is a `Command` exposing `running` / `completed` / `error`. This
+replaces the hand-rolled `isLoading` + `error` field pairs that used to drift
+out of sync, and a command refuses to run twice at once — so a double-tap
+cannot fire two writes.
+
+**Abstract repositories.** ViewModels depend on `RequestRepository`, not
+`RequestRepositoryRemote`. Swapping the implementation — remote, local, or a
+fake in a test — is a change to `config/dependencies.dart` alone.
+
+**One adaptive shell.** `HomeShell` picks its navigation from the *window*
+width, not the platform: a rail at 700px and wider, the bottom bar below it, and
+labels on the rail past 1100px. The same macOS build switches as the window is
+dragged, and a tablet gets the right one in each orientation without a second
+code path. `ContentColumn` caps page width so a request list does not stretch
+across a 27-inch monitor.
+
+**The session and the transport are tied together in one place.** The API client
+cannot own the token — that is session state, and the router has to react to it
+— and the session cannot own the header, because every request needs it. So
+`config/dependencies.dart` gives each a way to ask the other: the client reads
+`session.accessToken` per request, and reports a 401 back by calling
+`session.signOut`. That single wiring is what turns an expired token into a trip
+to the login screen instead of an error on every screen at once, and it is why
+no repository, view model or widget knows requests are authenticated at all.
+
+Data flows one way: **widget → view model → repository → service → HTTP**, and
+dependencies are injected top-down, so any layer can be replaced with a fake.
