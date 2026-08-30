@@ -37,4 +37,3 @@ export type NewComment = typeof comment.$inferInsert;
 export const createCommentSchema = z.object({
   content: z.string().trim().min(1).max(2000),
 });
-

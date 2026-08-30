@@ -8,7 +8,7 @@ import { loginSchema, type LoginDto } from './auth.schema';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly auth: AuthService) { }
+  constructor(private readonly auth: AuthService) {}
 
   /**
    * The only unauthenticated route in the app — it has to be, since it is

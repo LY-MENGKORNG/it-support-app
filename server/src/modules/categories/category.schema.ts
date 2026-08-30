@@ -16,4 +16,3 @@ export const createCategorySchema = z.object({
   name: z.string().trim().min(2).max(60),
   description: z.string().trim().max(500).nullish(),
 });
-

@@ -20,10 +20,7 @@ import {
   requestHistory,
 } from '../request-histories/request-history.schema';
 import { publicUserColumns, user } from '../users/user.schema';
-import {
-  type NewRequest,
-  request,
-} from './request.schema';
+import { type NewRequest, request } from './request.schema';
 import { ListRequestQuery } from './request.dto';
 
 /** `%` and `_` are wildcards in SQL LIKE, so a user typing them means them literally. */
@@ -53,7 +50,7 @@ export type RequestPatch = Partial<NewRequest>;
  */
 @Injectable()
 export class RequestRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
 
   /**
    * One page of the list view. Rows are flat — each request carries its

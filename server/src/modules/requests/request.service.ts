@@ -7,10 +7,12 @@ import {
 import { type AuthenticatedUser } from '../auth/auth.schema';
 import { type RequestHistoryDraft } from '../request-histories/request-history.schema';
 import { RequestRepository, type RequestPatch } from './request.repository';
+import { type Request } from './request.schema';
 import {
-  type Request,
-} from './request.schema';
-import { CreateRequestDto, ListRequestQuery, UpdateRequestDto } from './request.dto';
+  CreateRequestDto,
+  ListRequestQuery,
+  UpdateRequestDto,
+} from './request.dto';
 
 /** The fields an update is allowed to touch. */
 type RequestChanges = UpdateRequestDto;
@@ -35,7 +37,7 @@ const STAFF_ONLY_FIELDS = [
  */
 @Injectable()
 export class RequestService {
-  constructor(private readonly repository: RequestRepository) { }
+  constructor(private readonly repository: RequestRepository) {}
 
   async list(query: ListRequestQuery) {
     const { rows, total } = await this.repository.findPage(query);
@@ -83,13 +85,13 @@ export class RequestService {
       ...(assignee == null
         ? []
         : [
-          {
-            userId: requesterId,
-            action: 'assigned' as const,
-            oldValue: null,
-            newValue: String(assignee),
-          },
-        ]),
+            {
+              userId: requesterId,
+              action: 'assigned' as const,
+              oldValue: null,
+              newValue: String(assignee),
+            },
+          ]),
     ];
 
     const id = this.repository.insertWithHistory(

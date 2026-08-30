@@ -10,15 +10,13 @@ import {
 import { ZodValidationPipe } from '@common/zod-validation.pipe';
 import { Roles } from '../auth/auth.decorator';
 import { CategoryService } from './category.service';
-import {
-  createCategorySchema,
-} from './category.schema';
+import { createCategorySchema } from './category.schema';
 import { ApiBody } from '@nestjs/swagger';
 import { CreateCategoryDto } from './category.dto';
 
 @Controller('category')
 export class CategoryController {
-  constructor(private readonly categories: CategoryService) { }
+  constructor(private readonly categories: CategoryService) {}
 
   @Get()
   list() {

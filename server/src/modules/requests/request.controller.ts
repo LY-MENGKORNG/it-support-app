@@ -17,11 +17,15 @@ import {
   listRequestQuerySchema,
   updateRequestSchema,
 } from './request.schema';
-import { CreateRequestDto, ListRequestQuery, UpdateRequestDto } from './request.dto';
+import {
+  CreateRequestDto,
+  ListRequestQuery,
+  UpdateRequestDto,
+} from './request.dto';
 
 @Controller('request')
 export class RequestController {
-  constructor(private readonly requests: RequestService) { }
+  constructor(private readonly requests: RequestService) {}
 
   @Get()
   list(
