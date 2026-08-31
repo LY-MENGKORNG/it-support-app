@@ -356,20 +356,20 @@ async function main() {
         const resolvedAt =
           status === 'resolved' || status === 'closed'
             ? new Date(
-                createdAt.getTime() + Math.floor(random() * 5 * DAY) + 3600_000,
-              )
+              createdAt.getTime() + Math.floor(random() * 5 * DAY) + 3600_000,
+            )
             : null;
         const closedAt =
           status === 'closed'
             ? new Date(
-                resolvedAt!.getTime() +
-                  Math.floor(random() * 3 * DAY) +
-                  3600_000,
-              )
+              resolvedAt!.getTime() +
+              Math.floor(random() * 3 * DAY) +
+              3600_000,
+            )
             : null;
         const updatedAt = closedAt ?? resolvedAt ?? createdAt;
 
-        const created = await db
+        const created = db
           .insert(request)
           .values({
             title,

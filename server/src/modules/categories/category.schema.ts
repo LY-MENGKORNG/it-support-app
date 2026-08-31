@@ -1,6 +1,6 @@
 import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { z } from 'zod';
-import { commonColumns } from 'src/common/helpers/schema.helper';
+import { commonColumns } from '@common/helpers/schema.helper';
 
 export const category = sqliteTable('category', {
   id: commonColumns.id,

@@ -1,7 +1,7 @@
 import { index, integer, text, snakeCase } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
-import { commonColumns } from 'src/common/helpers/schema.helper';
+import { commonColumns } from '@common/helpers/schema.helper';
 import { request } from '../requests/request.schema';
 import { user } from '../users/user.schema';
 

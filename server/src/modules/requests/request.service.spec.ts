@@ -3,7 +3,8 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { RequestService } from './request.service';
 import type { RequestRepository } from './request.repository';
 import type { AuthenticatedUser } from '../auth/auth.schema';
-import type { Request } from './request.schema';
+import type { NewRequest, Request } from './request.schema';
+import { RequestHistoryDraft } from '@modules/request-histories/request-history.schema';
 
 /**
  * The service's rules, with no database in sight.
@@ -47,15 +48,15 @@ const existing = {
 
 function buildService() {
   const updates: { patch: unknown; entries: unknown[] }[] = [];
-  const inserts: { values: any; entries: any[] }[] = [];
+  const inserts: { values: NewRequest; entries: RequestHistoryDraft[] }[] = [];
 
   const repository = {
-    findById: async (id: number) => (id === existing.id ? existing : undefined),
-    findDetail: async (id: number) =>
+    findById: (id: number) => (id === existing.id ? existing : undefined),
+    findDetail: (id: number) =>
       id === existing.id || id === 99 ? { ...existing, id } : undefined,
     updateWithHistory: (_id: number, patch: unknown, entries: unknown[]) =>
       updates.push({ patch, entries }),
-    insertWithHistory: (values: any, entries: any[]) => {
+    insertWithHistory: (values: NewRequest, entries: RequestHistoryDraft[]) => {
       inserts.push({ values, entries });
       return 99;
     },
@@ -85,10 +86,10 @@ describe('RequestService authorisation', () => {
     });
   });
 
-  it('refuses to let an employee assign a request they are creating', async () => {
+  it('refuses to let an employee assign a request they are creating', () => {
     const { service } = buildService();
 
-    await expect(
+    expect(
       service.create(
         {
           title: 'Wi-Fi drops',
@@ -117,18 +118,18 @@ describe('RequestService authorisation', () => {
     ]);
   });
 
-  it('refuses a status change from the person who raised it', async () => {
+  it('refuses a status change from the person who raised it', () => {
     const { service } = buildService();
 
-    await expect(
+    expect(
       service.update(existing.id, { status: 'resolved' }, EMPLOYEE),
     ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
-  it('refuses an assignment from the person who raised it', async () => {
+  it('refuses an assignment from the person who raised it', () => {
     const { service } = buildService();
 
-    await expect(
+    expect(
       service.update(existing.id, { assigneeId: STAFF.id }, EMPLOYEE),
     ).rejects.toBeInstanceOf(ForbiddenException);
   });
@@ -143,10 +144,10 @@ describe('RequestService authorisation', () => {
 
   // 404 rather than 403: a request you cannot touch is one you have no business
   // knowing exists.
-  it("hides someone else's request from an employee", async () => {
+  it("hides someone else's request from an employee", () => {
     const { service } = buildService();
 
-    await expect(
+    expect(
       service.update(existing.id, { title: 'Not mine' }, OTHER_EMPLOYEE),
     ).rejects.toBeInstanceOf(NotFoundException);
   });

@@ -1,0 +1,5 @@
+[test]
+# Mirrors the old jest `coverageDirectory` / `collectCoverageFrom` settings.
+coverageDir = "coverage"
+coverageReporter = ["text", "lcov"]
+coverageSkipTestFiles = true

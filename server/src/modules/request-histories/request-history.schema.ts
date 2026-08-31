@@ -1,7 +1,7 @@
 import { index, integer, snakeCase, text } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
 import { REQUEST_HISTORY_STATUS } from '../../common/constants';
-import { commonColumns } from 'src/common/helpers/schema.helper';
+import { commonColumns } from '@common/helpers/schema.helper';
 import { request } from '../requests/request.schema';
 import { user } from '../users/user.schema';
 

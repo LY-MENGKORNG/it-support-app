@@ -1,9 +1,9 @@
 import { defineRelations } from 'drizzle-orm';
-import { category } from 'src/modules/categories/category.schema';
-import { comment } from 'src/modules/comments/comment.schema';
-import { requestHistory } from 'src/modules/request-histories/request-history.schema';
-import { request } from 'src/modules/requests/request.schema';
-import { user } from 'src/modules/users/user.schema';
+import { category } from '@modules/categories/category.schema';
+import { comment } from '@modules/comments/comment.schema';
+import { requestHistory } from '@modules/request-histories/request-history.schema';
+import { request } from '@modules/requests/request.schema';
+import { user } from '@modules/users/user.schema';
 
 export const schema = {
   category,

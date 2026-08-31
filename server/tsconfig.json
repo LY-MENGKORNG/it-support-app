@@ -13,7 +13,7 @@
     "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    "rootDir": "./src",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
@@ -23,13 +23,13 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@common/*": [
-        "src/common/*"
+        "./src/common/*"
       ],
       "@config/*": [
-        "src/config/*"
+        "./src/config/*"
       ],
       "@modules/*": [
-        "src/modules/*"
+        "./src/modules/*"
       ]
     },
     "types": [

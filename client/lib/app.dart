@@ -14,14 +14,14 @@ import 'package:app/ui/core/themes/theme.dart';
 ///
 /// It deliberately owns no repositories — those come from the provider tree
 /// above it, which is also what disposes them.
-class MainApp extends StatefulWidget {
-  const MainApp({super.key});
+class App extends StatefulWidget {
+  const App({super.key});
 
   @override
-  State<MainApp> createState() => _MainAppState();
+  State<App> createState() => _AppState();
 }
 
-class _MainAppState extends State<MainApp> {
+class _AppState extends State<App> {
   late final GoRouter _router;
 
   @override

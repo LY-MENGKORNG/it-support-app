@@ -2,7 +2,7 @@ import { integer, snakeCase, text } from 'drizzle-orm/sqlite-core';
 import { ROLES } from '@common/constants';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { commonColumns } from 'src/common/helpers/schema.helper';
+import { commonColumns } from '@common/helpers/schema.helper';
 
 export const user = snakeCase.table('user', {
   id: commonColumns.id,

@@ -1,6 +1,6 @@
 import { Global, Inject, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { DRIZZLE } from 'src/common/constants';
+import { DRIZZLE } from '@common/constants';
 import { db, type DrizzleDB } from '@config/db';
 
 @Global()
