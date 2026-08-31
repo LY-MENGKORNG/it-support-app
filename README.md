@@ -67,28 +67,27 @@ flutter run --dart-define=API_BASE_URL=http://192.168.1.20:3000
 Interactive docs are served at **http://localhost:3000/api** once the server is
 running, with the raw OpenAPI spec at `/api-json`.
 
-
 Every route needs an `Authorization: Bearer <token>` header except
 `POST /auth/login`.
 
-| Method   | Path                          | Notes                                        |
-| -------- | ----------------------------- | -------------------------------------------- |
-| `POST`   | `/auth/login`                 | `{ email, password }` → `{ accessToken, user }`. The only public route. |
-| `GET`    | `/auth/me`                    | The signed-in user; how a stored token is restored. |
-| `GET`    | `/request`                    | Paged list. See query parameters below.       |
-| `GET`    | `/request/:id`                | Full record + comments + history.             |
-| `POST`   | `/request`                    | Records a `created` history entry.            |
-| `PATCH`  | `/request/:id`                | Partial update; records one entry per change. |
-| `GET`    | `/request/:id/comment`        | Comment thread, oldest first.                 |
-| `POST`   | `/request/:id/comment`        |                                               |
-| `GET`    | `/request/:id/history`        | Audit trail, newest first.                    |
-| `GET`    | `/user`                       | `q`, `role`, `limit`, `offset`.               |
-| `GET`    | `/user/assignable`            | Staff and admins — the assignee list. **Staff/admin only.** |
-| `GET`    | `/user/:id`                   |                                               |
-| `POST`   | `/user`                       | Takes a plaintext `password`; hashes it. **Admin only.** |
-| `GET`    | `/category`                   |                                               |
-| `POST`   | `/category`                   | **Admin only.**                               |
-| `DELETE` | `/category/:id`               | 409 if any request still uses it. **Admin only.** |
+| Method   | Path                   | Notes                                                                   |
+| -------- | ---------------------- | ----------------------------------------------------------------------- |
+| `POST`   | `/auth/login`          | `{ email, password }` → `{ accessToken, user }`. The only public route. |
+| `GET`    | `/auth/me`             | The signed-in user; how a stored token is restored.                     |
+| `GET`    | `/request`             | Paged list. See query parameters below.                                 |
+| `GET`    | `/request/:id`         | Full record + comments + history.                                       |
+| `POST`   | `/request`             | Records a `created` history entry.                                      |
+| `PATCH`  | `/request/:id`         | Partial update; records one entry per change.                           |
+| `GET`    | `/request/:id/comment` | Comment thread, oldest first.                                           |
+| `POST`   | `/request/:id/comment` |                                                                         |
+| `GET`    | `/request/:id/history` | Audit trail, newest first.                                              |
+| `GET`    | `/user`                | `q`, `role`, `limit`, `offset`.                                         |
+| `GET`    | `/user/assignable`     | Staff and admins — the assignee list. **Staff/admin only.**             |
+| `GET`    | `/user/:id`            |                                                                         |
+| `POST`   | `/user`                | Takes a plaintext `password`; hashes it. **Admin only.**                |
+| `GET`    | `/category`            |                                                                         |
+| `POST`   | `/category`            | **Admin only.**                                                         |
+| `DELETE` | `/category/:id`        | 409 if any request still uses it. **Admin only.**                       |
 
 `GET /request` accepts `q` (searches title and description), `status`,
 `priority`, `categoryId`, `requesterId`, `assigneeId`, `unassigned=true`,
@@ -107,10 +106,10 @@ about, and "who did this" is exactly the claim that must not be forgeable.
 
 Authorisation comes in two layers, because they answer different questions:
 
-- **`AuthGuard`** is registered globally, so *every* route requires a token
+- **`AuthGuard`** is registered globally, so _every_ route requires a token
   unless it says `@Public()`. It also enforces `@Roles(...)`, which is a
   statement about the route: only staff can list assignable users at all.
-- **The services** decide what a caller may do to a *particular record*, which a
+- **The services** decide what a caller may do to a _particular record_, which a
   guard cannot know. An employee may correct the wording or urgency of their own
   request; only staff may change its `status` or `assigneeId`. Touching someone
   else's request answers 404 rather than 403 — a request you cannot see is one
@@ -179,8 +178,8 @@ Cross-table relations live in `config/db/relation.config.ts`.
 - **Repositories** are the only place that touches `db`. They take plain
   arguments, return plain rows, and return `undefined` for "not there" — they
   never throw HTTP exceptions.
-- **Services** hold the rules: what a change *means* (which edits are worth an
-  audit entry), what a status *implies* (`resolvedAt` / `closedAt`), and that a
+- **Services** hold the rules: what a change _means_ (which edits are worth an
+  audit entry), what a status _implies_ (`resolvedAt` / `closedAt`), and that a
   missing row is a `404`.
 - **Controllers** parse and validate input, then delegate.
 
@@ -200,7 +199,7 @@ dependency injection.
 ```
 lib/
 ├── main.dart          entry point: builds the provider tree
-├── main_app.dart      MaterialApp.router
+├── app.dart           MaterialApp.router
 ├── config/            dependencies.dart — the whole object graph
 ├── routing/           routes.dart, router.dart (go_router + session guard)
 ├── domain/models/     the app's data types — no Flutter imports at all
@@ -233,7 +232,7 @@ cannot fire two writes.
 `RequestRepositoryRemote`. Swapping the implementation — remote, local, or a
 fake in a test — is a change to `config/dependencies.dart` alone.
 
-**One adaptive shell.** `HomeShell` picks its navigation from the *window*
+**One adaptive shell.** `HomeShell` picks its navigation from the _window_
 width, not the platform: a rail at 700px and wider, the bottom bar below it, and
 labels on the rail past 1100px. The same macOS build switches as the window is
 dragged, and a tablet gets the right one in each orientation without a second
