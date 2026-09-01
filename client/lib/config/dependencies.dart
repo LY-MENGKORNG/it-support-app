@@ -12,7 +12,7 @@ import 'package:app/data/repositories/user/user_repository_remote.dart';
 import 'package:app/data/services/api/api_client.dart';
 import 'package:app/data/services/shared_preferences_service.dart';
 
-/// The object graph, built once at startup.
+/// NOTE: The object graph, built once at startup.
 ///
 /// Registering repositories by their **abstract** type is the point: every
 /// `context.read<RequestRepository>()` is satisfied by whichever implementation
@@ -21,14 +21,14 @@ import 'package:app/data/services/shared_preferences_service.dart';
 ///
 /// Order matters: a provider can only `read()` something declared above it.
 List<SingleChildWidget> get providersRemote => [
-  // --- services: one per external data source, no state
+  // --- NOTE: services: one per external data source, no state
   Provider(
     create: (context) => ApiClient(),
     dispose: (_, client) => client.dispose(),
   ),
   Provider(create: (context) => const SharedPreferencesService()),
 
-  // --- repositories: the source of truth for each kind of data
+  // --- NOTE: repositories: the source of truth for each kind of data
   Provider<RequestRepository>(
     create: (context) => RequestRepositoryRemote(apiClient: context.read()),
   ),

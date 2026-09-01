@@ -4,4 +4,10 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Merged into the main manifest's <application> for debug builds only,
+         so a physical phone can reach the dev server over plain HTTP.
+         See res/xml/network_security_config.xml. -->
+    <application
+        android:networkSecurityConfig="@xml/network_security_config" />
 </manifest>

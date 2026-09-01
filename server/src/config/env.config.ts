@@ -4,8 +4,9 @@ export const envSchema = z
   .object({
     NODE_ENV: z
       .enum(['development', 'test', 'production'])
-      .default('development'),
-    PORT: z.coerce.number().int().positive().default(3000),
+      .default('development')
+      .readonly(),
+    PORT: z.coerce.number().int().positive().default(3000).readonly(),
 
     /**
      * The HMAC key every access token is signed with. Changing it invalidates
@@ -15,10 +16,14 @@ export const envSchema = z
      * makes production fail to boot rather than sign tokens with a value that
      * is printed in this repository.
      */
-    JWT_SECRET: z.string().min(16).default('dev-only-insecure-jwt-secret-key'),
+    JWT_SECRET: z
+      .string()
+      .min(16)
+      .default('dev-only-insecure-jwt-secret-key')
+      .readonly(),
 
     /** Any `ms` duration. Short enough to matter, long enough to be usable. */
-    JWT_EXPIRES_IN: z.string().default('7d'),
+    JWT_EXPIRES_IN: z.string().default('7d').readonly(),
   })
   .loose()
   .refine(

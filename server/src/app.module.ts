@@ -1,6 +1,5 @@
 import { MiddlewareConsumer, Module, type NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-
 import { RequestLoggerMiddleware } from './common/request-logger.middleware';
 import { envSchema } from './config/env.config';
 import { DBModule } from './modules/db/db.module';

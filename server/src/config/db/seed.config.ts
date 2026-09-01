@@ -296,8 +296,6 @@ async function main() {
   console.log('resetting…');
   await reset(db, schema);
 
-  // One hash for every seeded account: hashing 20 passwords separately is slow
-  // and buys nothing, since these are all the same throwaway password.
   const passwordHash = await Bun.password.hash('password-123');
 
   const categories = await db

@@ -11,13 +11,17 @@ abstract final class AppTheme {
   static const radius = BorderRadius.zero;
   static const _sharp = RoundedRectangleBorder(borderRadius: radius);
 
-  // A cool, desaturated palette: near-black surfaces with a single blue accent,
+  // A cool, desaturated palette: near-black surfaces with a single white accent,
   // so the status and priority colours are the only saturated things on screen.
+  //
+  // The accent being white means anything it fills is a *light* surface, so the
+  // content on top of it must use [_onAccent] rather than [_onSurface].
   static const _background = Color(0xFF0B0D10);
   static const _surface = Color(0xFF131619);
   static const _surfaceHigh = Color(0xFF1B1F24);
   static const _border = Color(0xFF2A3038);
-  static const _accent = Color(0xFF4C8DFF);
+  static const _accent = Color(0xFFFFFFFF);
+  static const _onAccent = Color(0xFF05070A);
   static const _onSurface = Color(0xFFE6E9EE);
   static const _muted = Color(0xFF8B95A3);
   static const _danger = Color(0xFFEF4444);
@@ -25,9 +29,9 @@ abstract final class AppTheme {
   static const colorScheme = ColorScheme(
     brightness: Brightness.dark,
     primary: _accent,
-    onPrimary: Color(0xFF05070A),
+    onPrimary: _onAccent,
     secondary: _accent,
-    onSecondary: Color(0xFF05070A),
+    onSecondary: _onAccent,
     surface: _surface,
     onSurface: _onSurface,
     surfaceContainerLowest: _background,
@@ -39,7 +43,7 @@ abstract final class AppTheme {
     outline: _border,
     outlineVariant: Color(0xFF1F242B),
     error: _danger,
-    onError: Color(0xFF05070A),
+    onError: _onAccent,
   );
 
   static OutlineInputBorder _sharpBorder(Color color, {double width = 1}) =>
@@ -119,13 +123,23 @@ abstract final class AppTheme {
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(shape: _sharp),
       ),
-      chipTheme: const ChipThemeData(
+      chipTheme: ChipThemeData(
         shape: _sharp,
-        side: BorderSide(color: _border),
+        side: const BorderSide(color: _border),
         backgroundColor: _surfaceHigh,
         selectedColor: _accent,
         showCheckmark: false,
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        // A selected chip is filled with the white accent, so its label has to
+        // invert or it vanishes. Note this has to be a [WidgetStateColor] on
+        // the `color` field: Chip flattens a [WidgetStateTextStyle] here and
+        // only ever state-resolves the colour inside the style.
+        labelStyle: (base.textTheme.labelLarge ?? const TextStyle()).copyWith(
+          color: WidgetStateColor.resolveWith(
+            (states) =>
+                states.contains(WidgetState.selected) ? _onAccent : _onSurface,
+          ),
+        ),
       ),
       dialogTheme: const DialogThemeData(
         backgroundColor: _surface,
@@ -175,7 +189,7 @@ abstract final class AppTheme {
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         shape: _sharp,
         backgroundColor: _accent,
-        foregroundColor: Color(0xFF05070A),
+        foregroundColor: _onAccent,
         elevation: 0,
         focusElevation: 0,
         hoverElevation: 0,

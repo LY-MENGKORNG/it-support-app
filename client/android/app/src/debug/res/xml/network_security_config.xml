@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug builds only.
+
+  Android denies cleartext HTTP by default above API 28, which makes a dev
+  server unreachable: the API is plain `http://` on a LAN address, so without
+  this every request fails before it leaves the phone.
+
+  This file lives in `src/debug/`, so it is compiled into debug builds and is
+  absent from release ones — release keeps HTTPS enforced, and there is no flag
+  to remember to turn back off before shipping.
+
+  Permitted broadly rather than pinned to one address on purpose: a dev
+  machine's LAN IP changes with DHCP, and a config that silently stops matching
+  is worse than a debug-only blanket.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

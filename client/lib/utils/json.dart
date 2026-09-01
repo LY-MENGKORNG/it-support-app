@@ -47,7 +47,7 @@ Json? objectOrNull(Json json, String key) => json[key] as Json?;
 List<T> listOf<T>(Json json, String key, T Function(Json) parse) {
   final value = json[key];
   if (value == null) return const [];
-  if (value is! List) {
+  if (value is! List<dynamic>) {
     throw FormatException(
       'Expected "$key" to be a list, got ${value.runtimeType}',
     );
