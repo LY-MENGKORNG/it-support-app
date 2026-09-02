@@ -3,3 +3,9 @@
 coverageDir = "coverage"
 coverageReporter = ["text", "lcov"]
 coverageSkipTestFiles = true
+coveragePathIgnorePatterns = [
+  "./src/common/constants/*",
+  "./src/common/helpers/*",
+  "./src/config/**",
+  "./src/modules/db/**",
+]
