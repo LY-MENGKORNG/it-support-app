@@ -23,14 +23,14 @@ String _two(int value) => value.toString().padLeft(2, '0');
 String formatRelative(DateTime time) {
   final diff = DateTime.now().difference(time);
 
-  if (diff.isNegative) return 'just now';
-  if (diff.inSeconds < 60) return 'just now';
-  if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-  if (diff.inHours < 24) return '${diff.inHours}h ago';
-  if (diff.inDays == 1) return 'yesterday';
-  if (diff.inDays < 30) return '${diff.inDays}d ago';
-
-  return formatDate(time);
+  return switch (diff) {
+    _ when diff.isNegative || diff.inSeconds < 60 => 'just now',
+    _ when diff.inMinutes < 60 => '${diff.inMinutes}m ago',
+    _ when diff.inHours < 24 => '${diff.inHours}h ago',
+    _ when diff.inDays == 1 => 'yesterday',
+    _ when diff.inDays < 30 => '${diff.inDays}d ago',
+    _ => formatDate(time),
+  };
 }
 
 /// `30 Aug 2026`
