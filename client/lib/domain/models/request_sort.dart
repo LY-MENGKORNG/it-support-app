@@ -1,4 +1,3 @@
-/// How the request list should be ordered.
 enum RequestSort {
   newest('newest', 'Newest first'),
   oldest('oldest', 'Oldest first'),

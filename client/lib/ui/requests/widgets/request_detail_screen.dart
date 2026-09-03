@@ -18,8 +18,6 @@ import 'package:app/ui/core/ui/user_avatar.dart';
 import 'package:app/ui/requests/view_models/request_detail_viewmodel.dart';
 import 'package:app/utils/date_format.dart';
 
-/// A single request: its details, the actions IT staff can take on it, the
-/// comment thread, and the audit trail.
 class RequestDetailScreen extends StatefulWidget {
   const RequestDetailScreen({super.key, required this.viewModel});
 
@@ -42,8 +40,6 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
     super.dispose();
   }
 
-  /// A failed *action* is reported without destroying the record on screen —
-  /// which is why it is a snackbar rather than an error page.
   void _onMutationChanged() {
     if (!mounted) return;
 
@@ -56,7 +52,6 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
       if (!command.error) continue;
 
       final error = command.exception;
-      // Consume the result so the same failure isn't reported twice.
       command.clearResult();
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -76,8 +71,6 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
     final viewModel = widget.viewModel;
 
     return PopScope<RequestDetail?>(
-      // Intercept the pop so the list gets the updated record back and can
-      // refresh a single row instead of refetching the whole page.
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
@@ -91,8 +84,6 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
             onPressed: () => context.pop(viewModel.detail),
           ),
         ),
-        // Pushed full-screen over the shell, so it sits outside the shell's
-        // content column and has to cap its own width.
         body: ContentColumn(
           child: ListenableBuilder(
             listenable: viewModel.load,
@@ -272,7 +263,6 @@ class _DetailBody extends StatelessWidget {
   }
 }
 
-/// Status, assignee and priority controls — only built for IT staff.
 class _Actions extends StatelessWidget {
   const _Actions({required this.detail, required this.viewModel});
 
@@ -489,8 +479,6 @@ class _HistoryTile extends StatelessWidget {
   final List<User> knownUsers;
   final Map<int, String> categories;
 
-  /// History stores raw strings — a status, a priority, or a bare id depending
-  /// on the action — so turning a row into a sentence is a UI concern.
   String _describe() => switch (entry.action) {
     RequestHistoryAction.created => 'created the request',
     RequestHistoryAction.statusChanged =>
@@ -503,26 +491,12 @@ class _HistoryTile extends StatelessWidget {
       'changed category to ${_category(entry.newValue)}',
   };
 
-  String _status(String? wire) {
-    if (wire == null) return 'nothing';
-    try {
-      return RequestStatus.fromWire(wire).label;
-    } on FormatException {
-      return wire;
-    }
-  }
+  String _status(String? wire) =>
+      wire == null ? 'nothing' : RequestStatus.tryFromWire(wire)?.label ?? wire;
 
-  String _priority(String? wire) {
-    if (wire == null) return 'nothing';
-    try {
-      return Priority.fromWire(wire).label;
-    } on FormatException {
-      return wire;
-    }
-  }
+  String _priority(String? wire) =>
+      wire == null ? 'nothing' : Priority.tryFromWire(wire)?.label ?? wire;
 
-  /// The id may belong to someone no longer in the assignable list, so fall
-  /// back to the request's own people, then to the raw id.
   String _user(String? raw) {
     final id = int.tryParse(raw ?? '');
     if (id == null) return 'someone';
@@ -585,7 +559,6 @@ class _HistoryTile extends StatelessWidget {
   }
 }
 
-/// The pinned composer at the bottom of the screen.
 class _CommentComposer extends StatefulWidget {
   const _CommentComposer({required this.viewModel});
 
@@ -612,7 +585,6 @@ class _CommentComposerState extends State<_CommentComposer> {
 
     await widget.viewModel.addComment.execute(text);
 
-    // Only clear on success, so a failed send does not lose what was typed.
     if (widget.viewModel.addComment.completed && mounted) {
       _controller.clear();
       _focusNode.unfocus();

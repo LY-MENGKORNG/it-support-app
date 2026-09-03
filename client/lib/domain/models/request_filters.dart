@@ -2,10 +2,6 @@ import 'priority.dart';
 import 'request_sort.dart';
 import 'request_status.dart';
 
-/// The filters the request list can be narrowed by.
-///
-/// Immutable with a [copyWith], so "same filters, next page" is one expression
-/// and no screen can mutate the filters another screen is using.
 class RequestFilters {
   const RequestFilters({
     this.query,
@@ -31,8 +27,6 @@ class RequestFilters {
   final int limit;
   final int offset;
 
-  /// True when anything other than sorting is narrowing the list — drives the
-  /// "clear filters" affordance in the UI.
   bool get isFiltering =>
       (query != null && query!.isNotEmpty) ||
       status != null ||
@@ -42,8 +36,6 @@ class RequestFilters {
       assigneeId != null ||
       unassignedOnly;
 
-  /// Clearing a field can't be expressed by passing null (that means "keep"),
-  /// so each nullable field gets an explicit `clearX` flag.
   RequestFilters copyWith({
     String? query,
     RequestStatus? status,
@@ -74,7 +66,6 @@ class RequestFilters {
     offset: offset ?? this.offset,
   );
 
-  /// Query-string form. Unset filters are omitted rather than sent as empty.
   Map<String, dynamic> toQueryParameters() => {
     if (query != null && query!.trim().isNotEmpty) 'q': query!.trim(),
     if (status != null) 'status': status!.wire,

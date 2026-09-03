@@ -4,11 +4,6 @@ import 'package:app/data/services/api/api_exception.dart';
 import 'package:app/ui/auth/view_models/login_viewmodel.dart';
 import 'package:app/ui/core/ui/content_column.dart';
 
-/// The way into the app.
-///
-/// Signing in changes the session, which the router listens to — so there is no
-/// navigation here. The form's only job is to collect credentials, hand them to
-/// the view model, and report what came back.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.viewModel});
 
@@ -26,11 +21,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _obscurePassword = true;
 
-  /// The failure from the last attempt, shown above the form.
-  ///
-  /// A banner rather than a snack bar: a wrong password is about *this form*,
-  /// and should stay on screen while it is corrected instead of sliding away
-  /// after four seconds.
   String? _error;
 
   @override
@@ -65,8 +55,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  /// A 401 here means "those credentials are wrong", not "your session
-  /// expired" — the generic message would be actively misleading.
   String _messageFor(Exception? exception) => switch (exception) {
     HttpException(:final isUnauthorized) when isUnauthorized =>
       'Incorrect email or password.',

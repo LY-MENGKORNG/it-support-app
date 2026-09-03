@@ -1,3 +1,6 @@
+import 'dart:core';
+import 'dart:core' as core;
+
 /// Utility class that simplifies handling errors.
 ///
 /// Return a [Result] from a function to indicate success or failure.
@@ -22,54 +25,73 @@
 sealed class Result<T> {
   const Result();
 
-  /// Creates a successful [Result], completed with the specified [value].
   const factory Result.ok(T value) = Ok._;
 
-  /// Creates an error [Result], completed with the specified [error].
   const factory Result.error(Exception error) = Error._;
+
+  static Result<T> safeTry<T>(
+    T Function() body, {
+    ErrorMapper onError = _asExceptionOrRethrow,
+  }) {
+    try {
+      return Result.ok(body());
+    } catch (error, stackTrace) {
+      return Result.error(onError(error, stackTrace));
+    }
+  }
+
+  static Future<Result<T>> safeTryAsync<T>(
+    Future<T> Function() body, {
+    ErrorMapper onError = _asExceptionOrRethrow,
+  }) async {
+    try {
+      return Result.ok(await body());
+    } catch (error, stackTrace) {
+      return Result.error(onError(error, stackTrace));
+    }
+  }
 }
 
-/// A successful [Result] with a returned [value].
 final class Ok<T> extends Result<T> {
   const Ok._(this.value);
 
-  /// The returned value of this result.
   final T value;
 
   @override
   String toString() => 'Result<$T>.ok($value)';
 }
 
-/// An error [Result] with a resulting [error].
 final class Error<T> extends Result<T> {
   const Error._(this.error);
 
-  /// The resulting error of this result.
   final Exception error;
 
   @override
   String toString() => 'Result<$T>.error($error)';
 }
 
+typedef ErrorMapper = Exception Function(Object error, StackTrace stackTrace);
+
+Never rethrowWithStack(Object error, StackTrace stackTrace) =>
+    core.Error.throwWithStackTrace(error, stackTrace);
+
+Exception _asExceptionOrRethrow(Object error, StackTrace stackTrace) =>
+    error is Exception ? error : rethrowWithStack(error, stackTrace);
+
 extension ResultCast<T> on Result<T> {
-  /// Narrows this result to [Ok] so `.value` can be read directly.
-  ///
-  /// Only use it where the branch has already been checked — in a test, or
-  /// after an `is Error<T>` early return. Anywhere else, prefer a `switch`,
-  /// which the compiler checks for you.
   Ok<T> get asOk => this as Ok<T>;
 
-  /// Narrows this result to [Error] so `.error` can be read directly.
   Error<T> get asError => this as Error<T>;
 }
 
 extension ResultMap<T> on Result<T> {
-  /// Applies [transform] to a successful value, forwarding an error untouched.
-  ///
-  /// Saves repositories from writing the same three-line `switch` every time
-  /// they need to reshape a service's payload.
   Result<R> map<R>(R Function(T value) transform) => switch (this) {
     Ok<T>(:final value) => Result.ok(transform(value)),
+    Error<T>(:final error) => Result.error(error),
+  };
+
+  Result<R> flatMap<R>(Result<R> Function(T value) transform) => switch (this) {
+    Ok<T>(:final value) => transform(value),
     Error<T>(:final error) => Result.error(error),
   };
 }

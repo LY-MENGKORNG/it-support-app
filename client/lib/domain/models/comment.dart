@@ -2,7 +2,6 @@ import 'package:app/utils/json.dart';
 
 import 'user.dart';
 
-/// One message in a request's discussion thread.
 class Comment {
   const Comment({
     required this.id,

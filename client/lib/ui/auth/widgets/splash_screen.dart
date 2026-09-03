@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Shown while a token saved on this device is checked against the server.
-///
-/// It exists so the router has somewhere to park during an async check — the
-/// alternative is showing the login form and yanking it away a frame later.
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 

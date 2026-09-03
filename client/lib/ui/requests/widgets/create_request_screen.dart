@@ -10,11 +10,6 @@ import 'package:app/ui/core/ui/status_chip.dart';
 import 'package:app/ui/requests/view_models/create_request_viewmodel.dart';
 import 'package:app/utils/result.dart';
 
-/// The "raise a request" form.
-///
-/// Validation runs client-side through [Form]/[TextFormField] for instant
-/// feedback, and the server validates again — the client's copy is a courtesy,
-/// never the enforcement.
 class CreateRequestScreen extends StatefulWidget {
   const CreateRequestScreen({super.key, required this.viewModel});
 
@@ -39,8 +34,6 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   @override
   void dispose() {
     widget.viewModel.submit.removeListener(_onSubmitChanged);
-    // Controllers hold native resources and listeners; leaking them is one of
-    // the easiest memory leaks to create in Flutter.
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -117,9 +110,6 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('New request')),
-      // Pushed full-screen over the shell, so it caps its own width. Narrower
-      // than a reading column: a form of short fields is harder to scan when
-      // its labels and inputs are far apart.
       body: ContentColumn(
         maxWidth: 640,
         child: ListenableBuilder(
@@ -174,10 +164,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                     minLines: 4,
                     maxLines: 8,
                     textCapitalization: TextCapitalization.sentences,
-                    decoration: const InputDecoration(
-                      hintText:
-                          'What happened, when it started, and anything you have '
-                          'already tried.',
+                    decoration: InputDecoration(
+                      hintText: viewModel.selectedCategory?.description ?? 'What happened, when it started, and anything you have already tried.',
                     ),
                   ),
                   const SizedBox(height: 20),

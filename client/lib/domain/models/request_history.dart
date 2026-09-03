@@ -3,11 +3,6 @@ import 'package:app/utils/json.dart';
 import 'request_history_action.dart';
 import 'user.dart';
 
-/// One entry in a request's audit trail.
-///
-/// [oldValue] and [newValue] are plain strings because a single column has to
-/// hold a status, a priority, or an id depending on [action]. Turning them into
-/// a sentence needs labels and names, so it happens in the UI layer.
 class RequestHistory {
   const RequestHistory({
     required this.id,

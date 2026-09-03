@@ -1,13 +1,15 @@
 import 'dart:convert';
 
+import 'package:app/data/services/local/shared_preference_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:app/data/repositories/session/session_repository_remote.dart';
-import 'package:app/data/services/api/api_client.dart';
-import 'package:app/data/services/shared_preferences_service.dart';
+import 'package:app/data/services/api/auth_api.dart';
+import 'package:app/data/services/api/request_api.dart';
+import 'package:app/data/services/api/rest_client.dart';
 import 'package:app/domain/models/user.dart';
 import 'package:app/utils/result.dart';
 
@@ -22,7 +24,7 @@ void main() {
 
   late List<http.Request> sent;
 
-  ({SessionRepositoryRemote session, ApiClient client}) build(
+  ({RemoteSessionRepository session, RestClient client}) build(
     http.Response Function(http.Request) handler,
   ) {
     sent = [];
@@ -31,9 +33,9 @@ void main() {
       return handler(request);
     });
 
-    final client = ApiClient(client: mock, baseUrl: 'http://test');
-    final session = SessionRepositoryRemote(
-      apiClient: client,
+    final client = RestClient(client: mock, baseUrl: 'http://test');
+    final session = RemoteSessionRepository(
+      auth: AuthApi(client),
       preferences: const SharedPreferencesService(),
     );
 
@@ -189,7 +191,7 @@ void main() {
     await session.signIn(email: 'a@b.com', password: 'password-123');
     expect(session.isSignedIn, isTrue);
 
-    await client.getRequest(42);
+    await RequestApi(client).get(42);
 
     expect(session.isSignedIn, isFalse);
     expect(session.accessToken, isNull);

@@ -4,8 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
-import 'package:app/data/services/api/api_client.dart';
 import 'package:app/data/services/api/api_exception.dart';
+import 'package:app/data/services/api/auth_api.dart';
+import 'package:app/data/services/api/comment_api.dart';
+import 'package:app/data/services/api/request_api.dart';
+import 'package:app/data/services/api/rest_client.dart';
 import 'package:app/domain/models/priority.dart';
 import 'package:app/domain/models/request.dart';
 import 'package:app/domain/models/request_filters.dart';
@@ -15,10 +18,11 @@ import 'package:app/utils/result.dart';
 
 import '../../fakes/fixtures.dart';
 
-/// Builds a real [ApiClient] over a stubbed transport, so these tests exercise
-/// URL building, status handling and JSON parsing together — the parts most
-/// likely to drift from the server — without touching the network.
-({ApiClient client, List<http.Request> sent}) buildClient(
+/// Builds a real [RestClient] over a stubbed transport, and drives it through
+/// the endpoint classes callers actually use — so these tests exercise URL
+/// building, status handling and JSON parsing together, the parts most likely
+/// to drift from the server, without touching the network.
+({RestClient client, List<http.Request> sent}) buildClient(
   http.Response Function(http.Request) handler, {
   String? token,
   void Function()? onUnauthorized,
@@ -30,7 +34,7 @@ import '../../fakes/fixtures.dart';
   });
 
   return (
-    client: ApiClient(
+    client: RestClient(
       client: mock,
       baseUrl: 'http://test',
       authTokenProvider: token == null ? null : () => token,
@@ -53,13 +57,13 @@ http.Response fail(int status, Object body) => http.Response(
 );
 
 void main() {
-  group('getRequests', () {
+  group('RequestApi.list', () {
     test('sends every active filter as a query parameter', () async {
       final (:client, :sent) = buildClient(
         (_) => ok(pageJson([requestJson()])),
       );
 
-      await client.getRequests(
+      await RequestApi(client).list(
         const RequestFilters(
           query: 'wifi',
           status: RequestStatus.inProgress,
@@ -90,7 +94,7 @@ void main() {
         ),
       );
 
-      final result = await client.getRequests(const RequestFilters());
+      final result = await RequestApi(client).list(const RequestFilters());
 
       expect(result, isA<Ok<RequestPage>>());
       expect(result.asOk.value.items, hasLength(2));
@@ -105,7 +109,7 @@ void main() {
         (_) => fail(404, {'message': 'Request 9 not found'}),
       );
 
-      final result = await client.getRequest(9);
+      final result = await RequestApi(client).get(9);
 
       expect(result, isA<Error<RequestDetail>>());
       final error = result.asError.error;
@@ -124,7 +128,7 @@ void main() {
         }),
       );
 
-      final result = await client.postRequest(
+      final result = await RequestApi(client).create(
         const NewRequest(
           title: 'x',
           description: 'y',
@@ -139,14 +143,14 @@ void main() {
     });
 
     test('a dropped connection becomes a NetworkException', () async {
-      final client = ApiClient(
+      final client = RestClient(
         client: MockClient(
           (_) async => throw http.ClientException('Connection refused'),
         ),
         baseUrl: 'http://test',
       );
 
-      final result = await client.getRequests(const RequestFilters());
+      final result = await RequestApi(client).list(const RequestFilters());
 
       expect(result.asError.error, isA<NetworkException>());
     });
@@ -158,7 +162,7 @@ void main() {
           (_) => http.Response('<html>502 Bad Gateway</html>', 200),
         );
 
-        final result = await client.getRequests(const RequestFilters());
+        final result = await RequestApi(client).list(const RequestFilters());
 
         expect(result.asError.error, isA<ParseException>());
       },
@@ -168,9 +172,27 @@ void main() {
       // 200 OK, valid JSON, wrong shape — the contract-mismatch case.
       final (:client, sent: _) = buildClient((_) => ok({'unexpected': true}));
 
-      final result = await client.getRequests(const RequestFilters());
+      final result = await RequestApi(client).list(const RequestFilters());
 
       expect(result.asError.error, isA<ParseException>());
+    });
+
+    test('a JSON array where an object belongs is a ParseException', () async {
+      final (:client, sent: _) = buildClient((_) => ok([requestJson()]));
+
+      final result = await RequestApi(client).get(42);
+
+      expect(result.asError.error, isA<ParseException>());
+    });
+
+    test('a status with no readable body still reports the status', () async {
+      final (:client, sent: _) = buildClient(
+        (_) => http.Response('<html>Bad Gateway</html>', 502),
+      );
+
+      final result = await RequestApi(client).get(42);
+
+      expect(result.asError.error.toString(), contains('502'));
     });
   });
 
@@ -180,10 +202,8 @@ void main() {
         (_) => ok(requestDetailJson(status: 'resolved')),
       );
 
-      final result = await client.patchRequest(
-        42,
-        const RequestPatch(status: RequestStatus.resolved),
-      );
+      final result = await RequestApi(client)
+          .update(42, const RequestPatch(status: RequestStatus.resolved));
 
       expect(sent.single.method, 'PATCH');
       expect(sent.single.url.path, '/request/42');
@@ -195,7 +215,7 @@ void main() {
     test('comments POST to the nested route', () async {
       final (:client, :sent) = buildClient((_) => ok(commentJson()));
 
-      final result = await client.postComment(42, content: 'On it.');
+      final result = await CommentApi(client).create(42, content: 'On it.');
 
       expect(sent.single.url.path, '/request/42/comment');
       expect(jsonDecode(sent.single.body), {'content': 'On it.'});
@@ -212,10 +232,8 @@ void main() {
         token: 'stale-token',
       );
 
-      final result = await client.login(
-        email: 'bopha.lim@example.com',
-        password: 'password-123',
-      );
+      final result = await AuthApi(client)
+          .login(email: 'bopha.lim@example.com', password: 'password-123');
 
       expect(sent.single.method, 'POST');
       expect(sent.single.url.path, '/auth/login');
@@ -234,7 +252,7 @@ void main() {
         token: 'jwt-123',
       );
 
-      await client.getRequest(42);
+      await RequestApi(client).get(42);
 
       expect(sent.single.headers['authorization'], 'Bearer jwt-123');
     });
@@ -242,7 +260,7 @@ void main() {
     test('no token means no header, rather than an empty one', () async {
       final (:client, :sent) = buildClient((_) => ok(requestDetailJson()));
 
-      await client.getRequest(42);
+      await RequestApi(client).get(42);
 
       expect(sent.single.headers.containsKey('authorization'), isFalse);
     });
@@ -255,7 +273,7 @@ void main() {
         onUnauthorized: () => unauthorizedCalls++,
       );
 
-      final result = await client.getRequest(42);
+      final result = await RequestApi(client).get(42);
 
       expect(unauthorizedCalls, 1);
       expect((result.asError.error as HttpException).isUnauthorized, isTrue);
@@ -270,7 +288,8 @@ void main() {
         onUnauthorized: () => unauthorizedCalls++,
       );
 
-      final result = await client.login(email: 'a@b.com', password: 'nope');
+      final result = await AuthApi(client)
+          .login(email: 'a@b.com', password: 'nope');
 
       expect(unauthorizedCalls, 0);
       expect((result.asError.error as HttpException).isUnauthorized, isTrue);
@@ -282,7 +301,7 @@ void main() {
         token: 'jwt-123',
       );
 
-      final result = await client.getCurrentUser();
+      final result = await AuthApi(client).currentUser();
 
       expect(sent.single.url.path, '/auth/me');
       expect(result.asOk.value.email, 'bopha.lim@example.com');

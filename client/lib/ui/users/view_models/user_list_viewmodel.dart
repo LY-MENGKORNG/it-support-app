@@ -9,7 +9,6 @@ import 'package:app/domain/models/user_role.dart';
 import 'package:app/utils/command.dart';
 import 'package:app/utils/result.dart';
 
-/// Backs the People tab: the directory, searchable and filterable by role.
 class UserListViewModel extends ChangeNotifier {
   UserListViewModel({required this._userRepository}) {
     load = Command0(_load)..execute();
@@ -31,6 +30,7 @@ class UserListViewModel extends ChangeNotifier {
 
   void search(String query) {
     _debounce?.cancel();
+    // NOTE: Sleep for 350 ms before refreshing.
     _debounce = Timer(const Duration(milliseconds: 350), () {
       _query = query;
       _refresh();
@@ -42,8 +42,6 @@ class UserListViewModel extends ChangeNotifier {
     _refresh();
   }
 
-  /// See `RequestListViewModel._refresh` — a command drops `execute()` calls
-  /// made while it is running, so a change mid-load has to be queued.
   Future<void> _refresh() async {
     if (load.running) {
       _reloadQueued = true;

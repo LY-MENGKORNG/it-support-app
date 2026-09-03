@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 import 'request_card.dart';
 import 'request_filter_sheet.dart';
 
-/// The Requests tab: search, filter, page through and open a request.
 class RequestListScreen extends StatefulWidget {
   const RequestListScreen({super.key, required this.viewModel});
 
@@ -40,8 +39,6 @@ class _RequestListScreenState extends State<RequestListScreen> {
     super.dispose();
   }
 
-  /// Loads the next page shortly *before* the list runs out, so paging is
-  /// invisible rather than a stutter at the bottom.
   void _onScroll() {
     if (!_scrollController.hasClients) return;
 
@@ -52,8 +49,6 @@ class _RequestListScreenState extends State<RequestListScreen> {
   }
 
   Future<void> _openFilters() async {
-    // The session is app-wide state, so it comes from the provider tree rather
-    // than being threaded through the view model.
     final user = context.read<SessionRepository>().currentUser;
     if (user == null) return;
 
@@ -67,9 +62,6 @@ class _RequestListScreenState extends State<RequestListScreen> {
   }
 
   Future<void> _openRequest(Request request) async {
-    // `extra` hands the row we already have to the detail screen so it can
-    // paint instantly. The detail screen still fetches the full record — this
-    // is a hint, not a substitute, and a deep link carries no `extra` at all.
     final updated = await context.pushNamed<RequestDetail>(
       RouteNames.requestDetail,
       pathParameters: {'id': '${request.id}'},
@@ -103,16 +95,7 @@ class _RequestListScreenState extends State<RequestListScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          final created = await context.pushNamed<RequestDetail>(
-            RouteNames.newRequest,
-          );
-          if (created != null) viewModel.load.execute();
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('New request'),
-      ),
+
       body: Column(
         children: [
           Padding(
@@ -140,8 +123,6 @@ class _RequestListScreenState extends State<RequestListScreen> {
             ),
           ),
           Expanded(
-            // Outer builder watches the *command* for load state; the inner one
-            // watches the view model for the data itself.
             child: ListenableBuilder(
               listenable: viewModel.load,
               builder: (context, child) {
@@ -204,11 +185,21 @@ class _RequestListScreenState extends State<RequestListScreen> {
           ),
         ],
       ),
+
+      floatingActionButton: FloatingActionButton.small(
+        onPressed: () async {
+          final created = await context.pushNamed<RequestDetail>(
+            RouteNames.newRequest,
+          );
+          if (created != null) viewModel.load.execute();
+        },
+        tooltip: 'New request',
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
 
-/// "42 requests · Newest first", plus a shortcut to drop the filters.
 class _ResultBar extends StatelessWidget {
   const _ResultBar({required this.viewModel});
 
@@ -245,7 +236,6 @@ class _ResultBar extends StatelessWidget {
   }
 }
 
-/// The last item in the list: a paging spinner, an end marker, or nothing.
 class _ListFooter extends StatelessWidget {
   const _ListFooter({required this.viewModel});
 

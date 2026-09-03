@@ -3,10 +3,6 @@ import 'package:go_router/go_router.dart';
 
 import 'content_column.dart';
 
-/// The three top-level destinations, and where they sit.
-///
-/// One list, read by both layouts below, so a new tab cannot appear in the
-/// bottom bar and be forgotten in the rail.
 const _destinations = [
   (
     icon: Icons.confirmation_number_outlined,
@@ -21,24 +17,12 @@ const _destinations = [
   ),
 ];
 
-/// The navigation frame that wraps the app's top-level destinations.
-///
-/// [StatefulNavigationShell] keeps a separate navigation stack per tab and
-/// preserves each one's state, so switching tabs does not reset scroll position
-/// or reload the list.
-///
-/// The shell picks its layout from the window width, not the platform: the same
-/// macOS build shows a rail when the window is wide and a bottom bar when it is
-/// dragged narrow, and a tablet gets the right one in each orientation without
-/// a second code path.
 class HomeShell extends StatelessWidget {
   const HomeShell({super.key, required this.shell});
 
   final StatefulNavigationShell shell;
 
   void _onTap(int index) {
-    // Tapping the destination you are already on pops that branch back to its
-    // root — the behaviour people expect from both a nav bar and a rail.
     shell.goBranch(index, initialLocation: index == shell.currentIndex);
   }
 
@@ -46,8 +30,6 @@ class HomeShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
 
-    // Every screen inside the shell is capped and centred here rather than
-    // wrapping itself, so the rule holds for tabs added later too.
     final body = ContentColumn(child: shell);
 
     if (width < Breakpoints.compact) {
@@ -92,8 +74,6 @@ class HomeShell extends StatelessWidget {
                 ),
             ],
           ),
-          // A hairline instead of a shadow: the theme draws separation with
-          // borders everywhere else, and elevation would be the odd one out.
           const VerticalDivider(width: 1, thickness: 1),
           Expanded(child: body),
         ],

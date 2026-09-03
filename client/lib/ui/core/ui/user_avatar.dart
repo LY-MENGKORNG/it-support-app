@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:app/domain/models/user.dart';
 
-/// Square, like everything else in this app, and coloured deterministically
-/// from the user's id so the same person always looks the same.
 class UserAvatar extends StatelessWidget {
   const UserAvatar(this.user, {super.key, this.size = 36});
 

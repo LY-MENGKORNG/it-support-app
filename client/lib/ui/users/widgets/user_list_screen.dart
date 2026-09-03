@@ -5,7 +5,6 @@ import 'package:app/ui/core/ui/error_indicator.dart';
 import 'package:app/ui/core/ui/user_avatar.dart';
 import 'package:app/ui/users/view_models/user_list_viewmodel.dart';
 
-/// The People tab — the directory of everyone who can raise or handle requests.
 class UserListScreen extends StatelessWidget {
   const UserListScreen({super.key, required this.viewModel});
 

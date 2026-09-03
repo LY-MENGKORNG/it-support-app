@@ -15,10 +15,6 @@ import 'package:app/domain/models/user.dart';
 import 'package:app/utils/command.dart';
 import 'package:app/utils/result.dart';
 
-/// Drives one request's detail screen.
-///
-/// Every mutation returns the full updated record from the API, so there is no
-/// local patching to drift out of sync — the server stays the source of truth.
 class RequestDetailViewModel extends ChangeNotifier {
   RequestDetailViewModel({
     required this._requestRepository,
@@ -75,20 +71,14 @@ class RequestDetailViewModel extends ChangeNotifier {
 
   bool get canManage => _sessionRepository.canManageRequests;
 
-  /// True when a preview was passed in but the full record has not arrived, so
-  /// the screen can hide the comment and history sections instead of claiming
-  /// there are none.
   bool get isPreviewOnly => _detail != null && load.running;
 
-  /// True while any mutation is in flight — the screen disables its controls
-  /// rather than allowing a second write.
   bool get isMutating =>
       changeStatus.running ||
       changePriority.running ||
       assign.running ||
       addComment.running;
 
-  /// Every command that can report a failure to the screen, as one listenable.
   Listenable get mutations =>
       Listenable.merge([changeStatus, changePriority, assign, addComment]);
 
@@ -105,8 +95,6 @@ class RequestDetailViewModel extends ChangeNotifier {
     }
   }
 
-  /// Loaded only for people who can actually act on a request. A failure leaves
-  /// the dropdowns empty rather than breaking the record on screen.
   Future<Result<void>> _loadActionOptions() async {
     final users = await _userRepository.getAssignableUsers();
     if (users is Ok<List<User>>) {
@@ -128,9 +116,6 @@ class RequestDetailViewModel extends ChangeNotifier {
   Future<Result<void>> _changePriority(Priority priority) =>
       _patch(RequestPatch(priority: priority));
 
-  /// Passing `null` unassigns. That has to travel as an explicit
-  /// `assigneeId: null`, which is what [RequestPatch.unassign] is for — an
-  /// omitted key means "leave alone", not "clear".
   Future<Result<void>> _assign(int? userId) =>
       _patch(RequestPatch(assigneeId: userId, unassign: userId == null));
 

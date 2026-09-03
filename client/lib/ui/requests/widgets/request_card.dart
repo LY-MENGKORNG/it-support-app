@@ -4,10 +4,6 @@ import 'package:app/utils/date_format.dart';
 import 'package:app/ui/core/ui/status_chip.dart';
 import 'package:app/domain/models/request.dart';
 
-/// One row in the requests list.
-///
-/// A separate widget because it is the unit the list repeats, and because
-/// keeping it out of the screen means the screen file stays about *the list*.
 class RequestCard extends StatelessWidget {
   const RequestCard({super.key, required this.request, required this.onTap});
 
@@ -53,8 +49,6 @@ class RequestCard extends StatelessWidget {
               style: muted,
             ),
             const SizedBox(height: 12),
-            // Wrap rather than Row: on a narrow phone these badges would
-            // otherwise overflow instead of moving to a second line.
             Wrap(
               spacing: 8,
               runSpacing: 8,

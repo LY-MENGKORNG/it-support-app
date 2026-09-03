@@ -5,8 +5,6 @@ import 'package:app/domain/models/request_status.dart';
 import 'package:app/ui/core/themes/semantic_colors.dart';
 import 'package:app/ui/core/themes/theme.dart';
 
-/// A small square-cornered badge. Used for both status and priority so the two
-/// always read as the same kind of thing.
 class _Badge extends StatelessWidget {
   const _Badge({required this.label, required this.color, this.dense = false});
 
@@ -22,8 +20,6 @@ class _Badge extends StatelessWidget {
         vertical: dense ? 2 : 4,
       ),
       decoration: BoxDecoration(
-        // A tinted fill plus a solid border keeps the badge readable against
-        // the dark surface without shouting.
         color: color.withValues(alpha: 0.14),
         border: Border.all(color: color.withValues(alpha: 0.55)),
         borderRadius: AppTheme.radius,

@@ -12,10 +12,6 @@ import 'package:app/domain/models/request_sort.dart';
 import 'package:app/utils/command.dart';
 import 'package:app/utils/result.dart';
 
-/// Drives the requests list: filters, search, paging and refresh.
-///
-/// It holds all of the screen's state and none of its widgets, which is what
-/// makes it testable in a plain Dart unit test.
 class RequestListViewModel extends ChangeNotifier {
   RequestListViewModel({
     required this._requestRepository,
@@ -29,17 +25,13 @@ class RequestListViewModel extends ChangeNotifier {
   final RequestRepository _requestRepository;
   final CategoryRepository _categoryRepository;
 
-  /// Typing shouldn't fire a request per keystroke.
   static const _searchDebounce = Duration(milliseconds: 350);
   static const _pageSize = 20;
 
-  /// Loads the first page. Also the retry target for the error state.
   late final Command0<void> load;
 
-  /// Appends the next page.
   late final Command0<void> loadMore;
 
-  /// Fills the filter sheet's category dropdown.
   late final Command0<void> loadCategories;
 
   RequestFilters _filters = const RequestFilters(limit: _pageSize);
@@ -84,14 +76,10 @@ class RequestListViewModel extends ChangeNotifier {
     _refresh();
   }
 
-  /// Swaps one row in place after the detail screen changed it, so returning to
-  /// the list does not require a full reload.
   void replace(Request updated) {
     final index = _items.indexWhere((item) => item.id == updated.id);
     if (index == -1) return;
 
-    // A status change can push a row out of the current filter; drop it rather
-    // than show something the filter says should not be there.
     final stillMatches =
         _filters.status == null || _filters.status == updated.status;
     _items = [..._items]
@@ -99,9 +87,6 @@ class RequestListViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// A [Command] deliberately ignores `execute()` while it is already running,
-  /// which would silently drop a filter change made mid-load. Queueing one
-  /// re-run keeps the list consistent with the newest filters.
   Future<void> _refresh() async {
     if (load.running) {
       _reloadQueued = true;
@@ -156,8 +141,6 @@ class RequestListViewModel extends ChangeNotifier {
     }
   }
 
-  /// A failure here is not worth failing the screen over — the filter sheet
-  /// simply offers no categories.
   Future<Result<void>> _loadCategories() async {
     final result = await _categoryRepository.getCategories();
     if (result is Ok<List<RequestCategory>>) {

@@ -1,9 +1,3 @@
-/// Small helpers for reading JSON.
-///
-/// `jsonDecode` hands back `Map<String, dynamic>`, so every field access is
-/// `dynamic` — which switches off static checking. These functions put the cast
-/// in one place and fail with a message naming the field, instead of a bare
-/// `type 'Null' is not a subtype of type 'String'` from somewhere in a factory.
 library;
 
 typedef Json = Map<String, dynamic>;
@@ -27,15 +21,12 @@ String? stringOrNull(Json json, String key) => json[key] as String?;
 bool boolOr(Json json, String key, {required bool fallback}) =>
     json[key] as bool? ?? fallback;
 
-/// Dates cross the wire as UTC ISO-8601 strings; the UI wants local time.
 DateTime dateOf(Json json, String key) =>
     DateTime.parse(stringOf(json, key)).toLocal();
 
 DateTime? dateOrNull(Json json, String key) {
   final value = json[key];
-  // Note the explicit null check. Writing `value ? ... : null` compiles here
-  // because `value` is dynamic, then throws at runtime — dynamic silences the
-  // analyzer, it does not make the code correct.
+
   if (value == null) return null;
   return DateTime.parse(value as String).toLocal();
 }

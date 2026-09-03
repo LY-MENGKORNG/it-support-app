@@ -4,6 +4,7 @@ import { REQUEST_HISTORY_STATUS } from '../../common/constants';
 import { commonColumns } from '@common/helpers/schema.helper';
 import { request } from '../requests/request.schema';
 import { user } from '../users/user.schema';
+import z from 'zod/v4';
 
 export const requestHistory = snakeCase.table(
   'request_history',
@@ -28,6 +29,8 @@ export const requestHistory = snakeCase.table(
     index('request_history_created_at_idx').on(table.createdAt),
   ],
 );
+
+export const requestResponseSchema = z.object({});
 
 export type RequestHistory = typeof requestHistory.$inferSelect;
 export type NewRequestHistory = typeof requestHistory.$inferInsert;

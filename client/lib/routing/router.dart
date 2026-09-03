@@ -21,16 +21,6 @@ import 'package:app/ui/users/widgets/user_list_screen.dart';
 
 import 'routes.dart';
 
-/// Builds the app's routing table.
-///
-/// View models are constructed here and handed to their screen, taking their
-/// repositories from the provider tree with `context.read()`. That keeps
-/// widgets unaware of the data layer entirely: a screen knows its view model
-/// and nothing else.
-///
-/// [sessionRepository] is passed in rather than read from context because the
-/// router itself needs it — for the redirect, and as the listenable that
-/// re-evaluates that redirect.
 GoRouter router(SessionRepository sessionRepository) => GoRouter(
   initialLocation: Routes.splash,
   refreshListenable: sessionRepository,
@@ -49,8 +39,6 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
       ),
     ),
 
-    // Declared before `/requests/:id` — `new` is a literal segment, and the
-    // first matching pattern wins, so the order here is load-bearing.
     GoRoute(
       path: Routes.newRequest,
       name: RouteNames.newRequest,
@@ -76,17 +64,12 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
             categoryRepository: context.read(),
             sessionRepository: context.read(),
             requestId: id,
-            // The list already holds the row that was tapped, so the detail
-            // screen can paint immediately while the full record loads. Only
-            // ever a hint: opening this URL directly passes nothing.
             preview: state.extra is Request ? state.extra! as Request : null,
           ),
         );
       },
     ),
 
-    // The tabbed part of the app. `indexedStack` keeps each tab's scroll
-    // position and state alive while you switch between them.
     StatefulShellRoute.indexedStack(
       builder: (context, state, shell) => HomeShell(shell: shell),
       branches: [
@@ -132,30 +115,17 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
   errorBuilder: (context, state) => _RouteErrorScreen(error: state.error),
 );
 
-/// Decides, before any screen builds, whether the requested location is allowed.
-///
-/// Returning `null` means "let it through"; returning a path means "go there
-/// instead". `GoRouter` re-runs this whenever `refreshListenable` notifies,
-/// which is why signing in or out needs no explicit navigation.
 String? _guard(GoRouterState state, SessionRepository session) {
   final location = state.matchedLocation;
 
-  // The stored token is checked against the server asynchronously. Park on the
-  // splash until that finishes, otherwise a returning user sees the login form
-  // flash by before being redirected away from it.
   if (session.isRestoring) {
     return location == Routes.splash ? null : Routes.splash;
   }
 
-  // Restore is done, so the splash has nothing left to show.
   if (location == Routes.splash) {
     return session.isSignedIn ? Routes.requests : Routes.login;
   }
 
-  // Every endpoint behind this point requires a token, so an unauthenticated
-  // visitor has nothing to see. This is also the redirect that fires when a
-  // token expires mid-session: the API client signs the session out, the
-  // session notifies, and go_router re-runs this guard.
   if (!session.isSignedIn && location != Routes.login) {
     return Routes.login;
   }

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:app/data/services/api/api_client.dart';
+import 'package:app/data/services/api/rest_client.dart';
 import 'package:app/ui/core/ui/user_avatar.dart';
 import 'package:app/ui/settings/view_models/settings_viewmodel.dart';
 
-/// Shows who is signed in, and lets them sign out.
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key, required this.viewModel});
 
@@ -68,8 +67,6 @@ class SettingsScreen extends StatelessWidget {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : null,
-                  // Signing out changes the session, which the router listens
-                  // to — it redirects to the login screen on its own.
                   onTap: viewModel.signOut.running
                       ? null
                       : viewModel.signOut.execute,
@@ -79,7 +76,7 @@ class SettingsScreen extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.dns_outlined),
                 title: const Text('API server'),
-                subtitle: Text(ApiClient.defaultBaseUrl),
+                subtitle: Text(RestClient.defaultBaseUrl),
               ),
               ListTile(
                 leading: const Icon(Icons.info_outline),

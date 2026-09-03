@@ -1,21 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// One place for colours and shapes, so no widget hardcodes either.
-///
-/// Two deliberate choices run through the whole file: the app is dark-only, and
-/// **nothing is rounded**. Material's defaults round almost every surface, so
-/// each component theme below has to opt out explicitly — that is what
-/// [_sharp] and [_sharpBorder] are for.
 abstract final class AppTheme {
-  /// Every corner radius in the app. Named so the intent survives a later edit.
   static const radius = BorderRadius.zero;
   static const _sharp = RoundedRectangleBorder(borderRadius: radius);
 
-  // A cool, desaturated palette: near-black surfaces with a single white accent,
-  // so the status and priority colours are the only saturated things on screen.
-  //
-  // The accent being white means anything it fills is a *light* surface, so the
-  // content on top of it must use [_onAccent] rather than [_onSurface].
   static const _background = Color(0xFF0B0D10);
   static const _surface = Color(0xFF131619);
   static const _surfaceHigh = Color(0xFF1B1F24);

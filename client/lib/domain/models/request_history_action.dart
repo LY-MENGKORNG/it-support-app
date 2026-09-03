@@ -1,4 +1,3 @@
-/// The kinds of change recorded in a request's audit trail.
 enum RequestHistoryAction {
   created('created'),
   statusChanged('status_changed'),
@@ -11,8 +10,14 @@ enum RequestHistoryAction {
 
   final String wire;
 
-  static RequestHistoryAction fromWire(String value) => values.firstWhere(
-    (action) => action.wire == value,
-    orElse: () => throw FormatException('Unknown history action: $value'),
-  );
+  static RequestHistoryAction? tryFromWire(String? value) {
+    for (final action in values) {
+      if (action.wire == value) return action;
+    }
+    return null;
+  }
+
+  static RequestHistoryAction fromWire(String value) =>
+      tryFromWire(value) ??
+      (throw FormatException('Unknown history action: $value'));
 }

@@ -4,14 +4,6 @@ import 'package:app/domain/models/priority.dart';
 import 'package:app/domain/models/request_history_action.dart';
 import 'package:app/domain/models/request_status.dart';
 
-/// How domain values are *drawn*.
-///
-/// These used to be getters on the enums themselves, which meant the domain
-/// layer imported `flutter/material.dart` — a domain model should be usable in
-/// a pure Dart test, on a server, or in a CLI, none of which have a `Color`.
-///
-/// Extensions keep the ergonomics (`status.color`) while leaving the mapping
-/// where it belongs: the UI layer.
 extension PriorityStyle on Priority {
   Color get color => switch (this) {
     .low => const Color(0xFF6B7280),

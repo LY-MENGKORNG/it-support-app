@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:app/data/services/api/api_exception.dart';
 
-/// Shown when a [Command] finished with an error.
-///
-/// Takes the retry callback rather than a view model, so it works for any
-/// failed action — `onPressed: viewModel.load.execute` is the usual wiring.
 class ErrorIndicator extends StatelessWidget {
   const ErrorIndicator({
     super.key,
@@ -17,7 +13,6 @@ class ErrorIndicator extends StatelessWidget {
 
   final String title;
 
-  /// The exception from `Result.error`, when there is one worth showing.
   final Object? error;
   final VoidCallback? onPressed;
   final String label;
@@ -65,7 +60,6 @@ class ErrorIndicator extends StatelessWidget {
   }
 }
 
-/// Shown when a load succeeded but there is nothing to display.
 class EmptyIndicator extends StatelessWidget {
   const EmptyIndicator({
     super.key,

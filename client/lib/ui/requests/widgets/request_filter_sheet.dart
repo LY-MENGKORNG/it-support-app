@@ -7,10 +7,6 @@ import 'package:app/domain/models/request_category.dart';
 import 'package:app/domain/models/user.dart';
 import 'package:app/domain/models/request_filters.dart';
 
-/// The filter sheet for the requests list.
-///
-/// It edits a *copy* of the filters and returns it on Apply, so backing out
-/// leaves the list exactly as it was. Returns null when dismissed.
 class RequestFilterSheet extends StatefulWidget {
   const RequestFilterSheet({
     super.key,
@@ -133,9 +129,6 @@ class _RequestFilterSheetState extends State<RequestFilterSheet> {
                 label: 'People',
                 child: Column(
                   children: [
-                    // `requesterId` and `assigneeId` are independent server-side,
-                    // but offering them as free-form pickers would be noise on a
-                    // phone. These two shortcuts cover what people actually want.
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       title: const Text('Raised by me'),

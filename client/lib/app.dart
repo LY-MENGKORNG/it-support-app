@@ -6,14 +6,6 @@ import 'package:app/data/repositories/session/session_repository.dart';
 import 'package:app/routing/router.dart';
 import 'package:app/ui/core/themes/theme.dart';
 
-/// The root widget.
-///
-/// Stateful because it owns the [GoRouter], which must be built exactly once:
-/// building it in `build()` would throw the whole navigation stack away on
-/// every rebuild.
-///
-/// It deliberately owns no repositories — those come from the provider tree
-/// above it, which is also what disposes them.
 class App extends StatefulWidget {
   const App({super.key});
 
@@ -31,7 +23,6 @@ class _AppState extends State<App> {
     final session = context.read<SessionRepository>();
     _router = router(session);
 
-    // Fire-and-forget: the router parks on the splash until this resolves.
     session.restore();
   }
 
@@ -47,8 +38,6 @@ class _AppState extends State<App> {
       title: 'IT Support',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark(),
-      // The app is dark-only, so the same theme is handed to both slots rather
-      // than letting the system pick an undefined light theme.
       darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.dark,
       routerConfig: _router,

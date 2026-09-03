@@ -7,8 +7,6 @@ import 'request_history.dart';
 import 'request_status.dart';
 import 'user.dart';
 
-/// A support request as it appears in a list: everything needed to render a
-/// row, nothing more. Comments and history belong to [RequestDetail].
 class Request {
   const Request({
     required this.id,
@@ -33,7 +31,6 @@ class Request {
   final RequestStatus status;
   final User requester;
 
-  /// Null while the request is waiting to be picked up.
   final User? assignee;
 
   final DateTime createdAt;
@@ -62,10 +59,6 @@ class Request {
   );
 }
 
-/// A request plus the two collections only the detail screen needs.
-///
-/// Composition rather than inheritance: a detail *has* a request, so every
-/// widget that renders a summary keeps working unchanged.
 class RequestDetail {
   const RequestDetail({
     required this.request,
@@ -96,7 +89,6 @@ class RequestDetail {
   );
 }
 
-/// One page of requests, with the totals the list view needs to page through.
 class RequestPage {
   const RequestPage({
     required this.items,
@@ -115,11 +107,6 @@ class RequestPage {
   );
 }
 
-/// The payload for creating a request.
-///
-/// There is no `requesterId`: the server reads the requester from the access
-/// token, so raising a request in someone else's name is not something this
-/// payload can express.
 class NewRequest {
   const NewRequest({
     required this.title,
@@ -134,7 +121,6 @@ class NewRequest {
   final int categoryId;
   final Priority priority;
 
-  /// Only IT staff may set this; the server rejects it from anyone else.
   final int? assigneeId;
 
   Json toJson() => {
@@ -146,14 +132,6 @@ class NewRequest {
   };
 }
 
-/// A partial update to a request.
-///
-/// Only non-null fields are serialised, because the server treats an absent key
-/// as "leave alone". [unassign] exists because clearing an assignee has to send
-/// an explicit `assigneeId: null`, which an omitted field cannot express.
-///
-/// Like [NewRequest], it carries no actor. Every change is recorded in the
-/// request's history against whoever the token says made it.
 class RequestPatch {
   const RequestPatch({
     this.title,

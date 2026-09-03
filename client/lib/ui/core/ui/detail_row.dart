@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// A labelled row used on the detail screen: `RequestCategory      Network`.
 class DetailRow extends StatelessWidget {
   const DetailRow({super.key, required this.label, required this.child});
 
@@ -37,7 +36,6 @@ class DetailRow extends StatelessWidget {
   }
 }
 
-/// A section title with a hairline rule, used to break long screens up.
 class SectionHeader extends StatelessWidget {
   const SectionHeader(this.title, {super.key, this.trailing});
 

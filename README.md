@@ -70,25 +70,6 @@ running, with the raw OpenAPI spec at `/api-json`.
 Every route needs an `Authorization: Bearer <token>` header except
 `POST /auth/login`.
 
-| Method   | Path                   | Notes                                                                   |
-| -------- | ---------------------- | ----------------------------------------------------------------------- |
-| `POST`   | `/auth/login`          | `{ email, password }` → `{ accessToken, user }`. The only public route. |
-| `GET`    | `/auth/me`             | The signed-in user; how a stored token is restored.                     |
-| `GET`    | `/request`             | Paged list. See query parameters below.                                 |
-| `GET`    | `/request/:id`         | Full record + comments + history.                                       |
-| `POST`   | `/request`             | Records a `created` history entry.                                      |
-| `PATCH`  | `/request/:id`         | Partial update; records one entry per change.                           |
-| `GET`    | `/request/:id/comment` | Comment thread, oldest first.                                           |
-| `POST`   | `/request/:id/comment` |                                                                         |
-| `GET`    | `/request/:id/history` | Audit trail, newest first.                                              |
-| `GET`    | `/user`                | `q`, `role`, `limit`, `offset`.                                         |
-| `GET`    | `/user/assignable`     | Staff and admins — the assignee list. **Staff/admin only.**             |
-| `GET`    | `/user/:id`            |                                                                         |
-| `POST`   | `/user`                | Takes a plaintext `password`; hashes it. **Admin only.**                |
-| `GET`    | `/category`            |                                                                         |
-| `POST`   | `/category`            | **Admin only.**                                                         |
-| `DELETE` | `/category/:id`        | 409 if any request still uses it. **Admin only.**                       |
-
 `GET /request` accepts `q` (searches title and description), `status`,
 `priority`, `categoryId`, `requesterId`, `assigneeId`, `unassigned=true`,
 `sort` (`newest` | `oldest` | `priority`), `limit`, `offset`, and answers with:
@@ -96,36 +77,6 @@ Every route needs an `Authorization: Bearer <token>` header except
 ```jsonc
 { "items": [...], "total": 54, "limit": 20, "offset": 0, "hasMore": true }
 ```
-
-### Who did what
-
-Writes carry no `requesterId`, `actorId` or `userId`. Every mutation is recorded
-in `request_history`, and the person it is recorded against comes from the
-verified access token — a field a client can type is a field a client can lie
-about, and "who did this" is exactly the claim that must not be forgeable.
-
-Authorisation comes in two layers, because they answer different questions:
-
-- **`AuthGuard`** is registered globally, so _every_ route requires a token
-  unless it says `@Public()`. It also enforces `@Roles(...)`, which is a
-  statement about the route: only staff can list assignable users at all.
-- **The services** decide what a caller may do to a _particular record_, which a
-  guard cannot know. An employee may correct the wording or urgency of their own
-  request; only staff may change its `status` or `assigneeId`. Touching someone
-  else's request answers 404 rather than 403 — a request you cannot see is one
-  you have no business knowing exists.
-
-The client mirrors these rules to hide controls that would only fail
-(`SessionRepository.canManageRequests`), but that is a courtesy: the server is
-the check that counts.
-
-### Status and history
-
-`resolvedAt` and `closedAt` are derived from `status` by the server and are never
-accepted from the client, so reopening a request clears them rather than leaving
-a stale resolution date behind. Each update writes its history rows inside the
-same transaction as the change itself, so the audit trail cannot drift from the
-record it describes.
 
 ---
 

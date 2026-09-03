@@ -2,10 +2,6 @@ import 'package:app/utils/json.dart';
 
 import 'user_role.dart';
 
-/// Someone who can raise or handle requests.
-///
-/// Immutable, like every domain model here: a change means a new instance, so
-/// data can only be mutated in the data layer where it belongs.
 class User {
   const User({
     required this.id,
@@ -22,9 +18,6 @@ class User {
   final String email;
   final UserRole role;
 
-  /// The request list embeds a *summary* of each user (id, name, email, role)
-  /// while `/user` returns the full row. These three are optional so one model
-  /// covers both shapes rather than forcing a near-duplicate class.
   final bool isActive;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -39,7 +32,6 @@ class User {
     updatedAt: dateOrNull(json, 'updatedAt'),
   );
 
-  /// First letter of each of the first two words — for avatars.
   String get initials {
     final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty);
     if (parts.isEmpty) return '?';

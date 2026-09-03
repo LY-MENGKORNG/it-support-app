@@ -1,5 +1,4 @@
 [test]
-# Mirrors the old jest `coverageDirectory` / `collectCoverageFrom` settings.
 coverageDir = "coverage"
 coverageReporter = ["text", "lcov"]
 coverageSkipTestFiles = true
@@ -8,4 +7,5 @@ coveragePathIgnorePatterns = [
   "./src/common/helpers/*",
   "./src/config/**",
   "./src/modules/db/**",
+  "./src/modules/*/*.schema.ts",
 ]

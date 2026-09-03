@@ -1,4 +1,3 @@
-/// What a person is allowed to do.
 enum UserRole {
   employee('employee', 'Employee'),
   staff('staff', 'IT Staff'),
@@ -9,11 +8,17 @@ enum UserRole {
   final String wire;
   final String label;
 
-  static UserRole fromWire(String value) => values.firstWhere(
-    (role) => role.wire == value,
-    orElse: () => throw FormatException('Unknown role: $value'),
-  );
+  static UserRole? tryFromWire(String? value) {
+    for (final role in values) {
+      if (role.wire == value) return role;
+    }
+    return null;
+  }
 
-  /// Only IT staff and admins may assign a request or change its status.
+  static UserRole fromWire(String value) {
+    return tryFromWire(value) ??
+        (throw FormatException('Unknown role: $value'));
+  }
+
   bool get isSupportStaff => this != UserRole.employee;
 }
