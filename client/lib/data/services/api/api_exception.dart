@@ -26,9 +26,7 @@ final class HttpException extends ApiException {
   final Map<String, String> fieldErrors;
 
   bool get isUnauthorized => statusCode == 401;
-
   bool get isForbidden => statusCode == 403;
-
   bool get isNotFound => statusCode == 404;
   bool get isConflict => statusCode == 409;
   bool get isValidation => statusCode == 400 || statusCode == 422;

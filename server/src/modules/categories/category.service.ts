@@ -4,12 +4,8 @@ import { CategoryRepository } from './category.repository';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly repository: CategoryRepository) {}
+  constructor(private readonly repository: CategoryRepository) { }
 
-  /**
-   * Unpaged on purpose: categories populate a dropdown, and a dropdown that
-   * paginates is a dropdown nobody can use.
-   */
   list() {
     return this.repository.findAll();
   }
@@ -25,8 +21,6 @@ export class CategoryService {
   }
 
   async remove(id: number) {
-    // Fails loudly if it is already gone, rather than reporting success for a
-    // delete that deleted nothing.
     await this.findOne(id);
     await this.repository.deleteById(id);
     return { id, deleted: true };

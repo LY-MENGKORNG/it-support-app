@@ -3,20 +3,15 @@ import 'package:flutter/foundation.dart';
 import 'result.dart';
 
 typedef CommandAction0<T> = Future<Result<T>> Function();
-
 typedef CommandAction1<T, A> = Future<Result<T>> Function(A);
 
 abstract class Command<T> extends ChangeNotifier {
   bool _running = false;
-
-  bool get running => _running;
-
   Result<T>? _result;
 
+  bool get running => _running;
   bool get error => _result is Error;
-
   bool get completed => _result is Ok;
-
   Result<T>? get result => _result;
 
   Exception? get exception => switch (_result) {

@@ -4,20 +4,9 @@ import { type DrizzleDB } from '@config/db';
 import { publicUserColumns, user } from './user.schema';
 import { CreateUserDto, ListUserQuery } from './user.dto';
 
-/**
- * All database access for users.
- *
- * Repositories answer questions about storage and nothing else: they take
- * plain arguments, return plain rows, and return `undefined` rather than
- * throwing when something is absent. Deciding that a missing user is a 404 is
- * the service's job, not the database's.
- *
- * Every read here goes through {@link publicUserColumns}, so `password_hash`
- * cannot escape this file by accident.
- */
 @Injectable()
 export class UserRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
 
   findMany({ q, role, limit, offset }: ListUserQuery) {
     return this.db.query.user.findMany({
@@ -26,8 +15,8 @@ export class UserRepository {
         ...(role ? { role } : {}),
         ...(q
           ? {
-              OR: [{ name: { like: `%${q}%` } }, { email: { like: `%${q}%` } }],
-            }
+            OR: [{ name: { like: `%${q}%` } }, { email: { like: `%${q}%` } }],
+          }
           : {}),
       },
       orderBy: { name: 'asc', id: 'asc' },
@@ -36,7 +25,6 @@ export class UserRepository {
     });
   }
 
-  /** Staff and admins who are still active — the assignee dropdown. */
   findAssignable() {
     return this.db.query.user.findMany({
       columns: publicUserColumns,
@@ -52,15 +40,6 @@ export class UserRepository {
     });
   }
 
-  /**
-   * The one read that returns `password_hash`, for the one caller that needs
-   * it: verifying a login.
-   *
-   * Named so that it cannot be mistaken for the ordinary lookup, and it stays
-   * the *only* exception to the `publicUserColumns` rule above — anything that
-   * calls this is responsible for dropping the hash before the row travels any
-   * further.
-   */
   findByEmailWithSecret(email: string) {
     return this.db.query.user.findFirst({
       where: { email },
@@ -68,10 +47,6 @@ export class UserRepository {
     });
   }
 
-  /**
-   * Takes an already-hashed password. Hashing is a policy decision, so it
-   * stays in the service — the repository only persists what it is handed.
-   */
   insert(values: Omit<CreateUserDto, 'password'> & { password_hash: string }) {
     const created = this.db.insert(user).values(values).returning().get();
 

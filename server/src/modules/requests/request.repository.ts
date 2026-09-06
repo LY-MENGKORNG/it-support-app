@@ -23,11 +23,9 @@ import { publicUserColumns, user } from '../users/user.schema';
 import { type NewRequest, request } from './request.schema';
 import { ListRequestQuery } from './request.dto';
 
-/** `%` and `_` are wildcards in SQL LIKE, so a user typing them means them literally. */
 const escapeLike = (value: string) =>
   value.replace(/[\\%_]/g, (char) => `\\${char}`);
 
-/** Ordering for `sort=priority`: most urgent first, newest first within a level. */
 const PRIORITY_RANK = sql`
   case ${request.priority}
     when 'critical' then 0
@@ -36,27 +34,12 @@ const PRIORITY_RANK = sql`
     else 3
   end`;
 
-/** The columns a request can actually be updated with. */
 export type RequestPatch = Partial<NewRequest>;
 
-/**
- * All database access for requests, including the audit trail that belongs to
- * them.
- *
- * History lives here rather than in `RequestHistoryRepository` because a change
- * and its history row must be written atomically — splitting them across two
- * repositories would mean either a transaction leaking into the service layer,
- * or an audit trail that can silently drift from the record it describes.
- */
 @Injectable()
 export class RequestRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
 
-  /**
-   * One page of the list view. Rows are flat — each request carries its
-   * requester, assignee and category inline — because a list never needs
-   * comments or history. Those come from {@link findDetail}.
-   */
   async findPage(query: ListRequestQuery) {
     const { limit, offset } = query;
     const requester = alias(user, 'requester');
@@ -106,8 +89,6 @@ export class RequestRepository {
       .where(where);
 
     return {
-      // A LEFT JOIN with no match still produces an object of nulls; an
-      // unassigned request should read as `assignee: null` on the wire.
       rows: rows.map((row) => ({
         ...row,
         assignee: row.assignee?.id == null ? null : row.assignee,
@@ -116,7 +97,6 @@ export class RequestRepository {
     };
   }
 
-  /** The full record: people, comments and audit trail included. */
   findDetail(id: number) {
     return this.db.query.request.findFirst({
       where: { id },
@@ -136,7 +116,6 @@ export class RequestRepository {
     });
   }
 
-  /** The bare row, with no relations — enough to diff an update against. */
   findById(id: number) {
     return this.db.query.request.findFirst({ where: { id } });
   }
@@ -149,11 +128,6 @@ export class RequestRepository {
     return found != null;
   }
 
-  /**
-   * Inserts a request and its opening history rows in one transaction, and
-   * returns the new id. The caller re-reads through {@link findDetail} so the
-   * response shape matches every other endpoint.
-   */
   insertWithHistory(values: NewRequest, entries: RequestHistoryDraft[]) {
     return this.db.transaction((tx) => {
       const created = tx.insert(request).values(values).returning().get();
@@ -168,10 +142,6 @@ export class RequestRepository {
     });
   }
 
-  /**
-   * Applies a patch and appends its history rows atomically, so the trail can
-   * never describe a change that did not land.
-   */
   updateWithHistory(
     id: number,
     patch: RequestPatch,
@@ -188,10 +158,6 @@ export class RequestRepository {
     });
   }
 
-  /**
-   * Turns the query string into SQL conditions. Returns `undefined` when
-   * nothing was filtered, which drizzle reads as "no WHERE clause".
-   */
   private buildFilters(query: ListRequestQuery): SQL | undefined {
     const conditions: SQL[] = [];
 

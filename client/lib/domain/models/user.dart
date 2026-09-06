@@ -22,15 +22,18 @@ class User {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  factory User.fromJson(Json json) => User(
-    id: intOf(json, 'id'),
-    name: stringOf(json, 'name'),
-    email: stringOf(json, 'email'),
-    role: UserRole.fromWire(stringOf(json, 'role')),
-    isActive: boolOr(json, 'isActive', fallback: true),
-    createdAt: dateOrNull(json, 'createdAt'),
-    updatedAt: dateOrNull(json, 'updatedAt'),
-  );
+  factory User.fromJson(JsonType json) {
+    final uj = Json(json);
+    return User(
+      id: uj.intOf('id'),
+      name: uj.stringOf('name'),
+      email: uj.stringOf('email'),
+      role: UserRole.fromWire(uj.stringOf('role')),
+      isActive: uj.boolOr('isActive', fallback: true),
+      createdAt: uj.dateOrNull('createdAt'),
+      updatedAt: uj.dateOrNull('updatedAt'),
+    );
+  }
 
   String get initials {
     final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty);

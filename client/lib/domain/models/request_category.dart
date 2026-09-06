@@ -14,12 +14,16 @@ class RequestCategory {
   final String? description;
   final DateTime? createdAt;
 
-  factory RequestCategory.fromJson(Json json) => RequestCategory(
-    id: intOf(json, 'id'),
-    name: stringOf(json, 'name'),
-    description: stringOrNull(json, 'description'),
-    createdAt: dateOrNull(json, 'createdAt'),
-  );
+  factory RequestCategory.fromJson(JsonType json) {
+    final rcj = Json(json);
+
+    return RequestCategory(
+      id: rcj.intOf('id'),
+      name: rcj.stringOf('name'),
+      description: rcj.stringOrNull('description'),
+      createdAt: rcj.dateOrNull('createdAt'),
+    );
+  }
 
   @override
   bool operator ==(Object other) =>

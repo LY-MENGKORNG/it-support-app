@@ -35,12 +35,6 @@ export const requestResponseSchema = z.object({});
 export type RequestHistory = typeof requestHistory.$inferSelect;
 export type NewRequestHistory = typeof requestHistory.$inferInsert;
 
-/**
- * A history row before it knows which request it belongs to.
- *
- * `RequestService` computes these from a diff, and `RequestRepository` writes
- * them alongside the change itself — so the two can never disagree.
- */
 export type RequestHistoryDraft = Omit<
   NewRequestHistory,
   'id' | 'requestId' | 'createdAt'

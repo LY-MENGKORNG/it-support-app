@@ -88,8 +88,6 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
           child: ListenableBuilder(
             listenable: viewModel.load,
             builder: (context, child) {
-              // A preview from the list means there is already something to show
-              // while the full record loads.
               if (viewModel.load.running && viewModel.detail == null) {
                 return const Center(child: CircularProgressIndicator());
               }

@@ -19,13 +19,16 @@ class Comment {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
-  factory Comment.fromJson(Json json) => Comment(
-    id: intOf(json, 'id'),
-    requestId: intOf(json, 'requestId'),
-    content: stringOf(json, 'content'),
-    // The API calls this `user`; `author` reads better at the call site.
-    author: User.fromJson(objectOf(json, 'user')),
-    createdAt: dateOf(json, 'createdAt'),
-    updatedAt: dateOrNull(json, 'updatedAt'),
-  );
+  factory Comment.fromJson(JsonType json) {
+    final cj = Json(json);
+
+    return Comment(
+      id: cj.intOf('id'),
+      requestId: cj.intOf('requestId'),
+      content: cj.stringOf('content'),
+      author: User.fromJson(cj.objectOf('user')),
+      createdAt: cj.dateOf('createdAt'),
+      updatedAt: cj.dateOrNull('updatedAt'),
+    );
+  }
 }

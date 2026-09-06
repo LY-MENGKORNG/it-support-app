@@ -1,47 +1,54 @@
 library;
 
-typedef Json = Map<String, dynamic>;
+typedef JsonType = Map<String, dynamic>;
+typedef ParseFn<T> = T Function(JsonType);
 
-T _require<T>(Json json, String key) {
-  final value = json[key];
-  if (value is T) return value;
-  throw FormatException(
-    'Expected "$key" to be $T but got ${value.runtimeType} ($value)',
-  );
-}
+class Json {
+  final JsonType _json;
 
-String stringOf(Json json, String key) => _require<String>(json, key);
+  Json(this._json);
 
-int intOf(Json json, String key) => _require<int>(json, key);
+  T _require<T>(String key) {
+    final value = _json[key];
 
-int? intOrNull(Json json, String key) => json[key] as int?;
-
-String? stringOrNull(Json json, String key) => json[key] as String?;
-
-bool boolOr(Json json, String key, {required bool fallback}) =>
-    json[key] as bool? ?? fallback;
-
-DateTime dateOf(Json json, String key) =>
-    DateTime.parse(stringOf(json, key)).toLocal();
-
-DateTime? dateOrNull(Json json, String key) {
-  final value = json[key];
-
-  if (value == null) return null;
-  return DateTime.parse(value as String).toLocal();
-}
-
-Json objectOf(Json json, String key) => _require<Json>(json, key);
-
-Json? objectOrNull(Json json, String key) => json[key] as Json?;
-
-List<T> listOf<T>(Json json, String key, T Function(Json) parse) {
-  final value = json[key];
-  if (value == null) return const [];
-  if (value is! List<dynamic>) {
+    if (value is T) return value;
     throw FormatException(
-      'Expected "$key" to be a list, got ${value.runtimeType}',
+      'Expected "$key" to be $T but got ${value.runtimeType} ($value)',
     );
   }
-  return value.cast<Json>().map(parse).toList(growable: false);
+
+  String stringOf(String key) => _require<String>(key);
+  String? stringOrNull(String key) => _json[key] as String?;
+
+  int intOf(String key) => _require<int>(key);
+  int? intOrNull(String key) => _json[key] as int?;
+
+  bool boolOr(String key, {required bool fallback}) {
+    return _json[key] as bool? ?? fallback;
+  }
+
+  DateTime dateOf(String key) {
+    return DateTime.parse(stringOf(key)).toLocal();
+  }
+
+  DateTime? dateOrNull(String key) {
+    final value = _json[key];
+
+    if (value == null) return null;
+    return DateTime.parse(value as String).toLocal();
+  }
+
+  JsonType objectOf(String key) => _require<JsonType>(key);
+  JsonType? objectOrNull(String key) => _json[key] as JsonType?;
+
+  List<T> listOf<T>(String key, ParseFn<T> parse) {
+    final value = _json[key];
+    if (value == null) return const [];
+    if (value is! List<dynamic>) {
+      throw FormatException(
+        'Expected "$key" to be a list, got ${value.runtimeType}',
+      );
+    }
+    return value.cast<JsonType>().map(parse).toList(growable: false);
+  }
 }

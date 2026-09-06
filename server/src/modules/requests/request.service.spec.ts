@@ -6,14 +6,6 @@ import type { AuthenticatedUser } from '../auth/auth.schema';
 import type { NewRequest, Request } from './request.schema';
 import { RequestHistoryDraft } from '@modules/request-histories/request-history.schema';
 
-/**
- * The service's rules, with no database in sight.
- *
- * These are the checks that decide who may change what, so they are worth
- * testing directly rather than only through the HTTP layer — a route can be
- * reordered or a guard removed, and this would still hold the line.
- */
-
 const EMPLOYEE: AuthenticatedUser = {
   id: 11,
   email: 'malis@example.com',
@@ -30,7 +22,6 @@ const STAFF: AuthenticatedUser = {
   role: 'staff',
 };
 
-/** A request raised by {@link EMPLOYEE}. */
 const existing = {
   id: 42,
   title: 'Wi-Fi drops',
@@ -142,8 +133,6 @@ describe('RequestService authorisation', () => {
     expect(updates).toHaveLength(1);
   });
 
-  // 404 rather than 403: a request you cannot touch is one you have no business
-  // knowing exists.
   it("hides someone else's request from an employee", () => {
     const { service } = buildService();
 

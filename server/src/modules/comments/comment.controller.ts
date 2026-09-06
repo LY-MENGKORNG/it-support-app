@@ -13,10 +13,9 @@ import { createCommentSchema } from './comment.schema';
 import { CreateCommentDto } from './comment.dto';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
 
-/** Comments only exist inside a request, so the route says so. */
 @Controller('request/:requestId/comment')
 export class CommentController {
-  constructor(private readonly comments: CommentService) {}
+  constructor(private readonly comments: CommentService) { }
 
   @Get()
   list(@Param('requestId', ParseIntPipe) requestId: number) {

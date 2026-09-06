@@ -30,10 +30,6 @@ export const comment = snakeCase.table(
 export type Comment = typeof comment.$inferSelect;
 export type NewComment = typeof comment.$inferInsert;
 
-/**
- * No `userId`: a comment is signed by whoever presented the token, so there is
- * no field in which to claim someone else wrote it.
- */
 export const createCommentSchema = z.object({
   content: z.string().trim().min(1).max(2000),
 });

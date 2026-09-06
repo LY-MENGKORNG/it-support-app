@@ -19,8 +19,7 @@ import { UserModule } from './modules/users/user.module';
       validate: (raw) => envSchema.parse(raw),
     }),
     DBModule,
-    // Registers the global AuthGuard, so importing it is what makes every other
-    // module's routes require a token.
+
     AuthModule,
     UserModule,
     CategoryModule,

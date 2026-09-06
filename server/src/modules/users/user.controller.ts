@@ -16,7 +16,7 @@ import { CreateUserDto, ListUserQuery } from './user.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly users: UserService) {}
+  constructor(private readonly users: UserService) { }
 
   @Get()
   @ApiQuery({ type: ListUserQuery })
@@ -27,10 +27,6 @@ export class UserController {
     return this.users.list(query);
   }
 
-  /**
-   * Declared before `:id` — Nest matches routes in order, so a literal segment
-   * has to come first or `assignable` would be parsed as an id.
-   */
   @Get('assignable')
   @Roles('staff', 'admin')
   @ApiOperation({ summary: 'IT staff who can be assigned to a request' })
@@ -44,10 +40,6 @@ export class UserController {
     return this.users.findOne(id);
   }
 
-  /**
-   * Accounts are created by an administrator, not by self-registration: this is
-   * an internal tool, and everyone in it already works here.
-   */
   @Post()
   @Roles('admin')
   @ApiOperation({ summary: 'Create new user' })

@@ -22,13 +22,16 @@ class RequestHistory {
   final String? oldValue;
   final String? newValue;
 
-  factory RequestHistory.fromJson(Json json) => RequestHistory(
-    id: intOf(json, 'id'),
-    requestId: intOf(json, 'requestId'),
-    action: RequestHistoryAction.fromWire(stringOf(json, 'action')),
-    actor: User.fromJson(objectOf(json, 'user')),
-    createdAt: dateOf(json, 'createdAt'),
-    oldValue: stringOrNull(json, 'oldValue'),
-    newValue: stringOrNull(json, 'newValue'),
-  );
+  factory RequestHistory.fromJson(JsonType json) {
+    final rhj = Json(json);
+    return RequestHistory(
+      id: rhj.intOf('id'),
+      requestId: rhj.intOf('requestId'),
+      action: RequestHistoryAction.fromWire(rhj.stringOf('action')),
+      actor: User.fromJson(rhj.objectOf('user')),
+      createdAt: rhj.dateOf('createdAt'),
+      oldValue: rhj.stringOrNull('oldValue'),
+      newValue: rhj.stringOrNull('newValue'),
+    );
+  }
 }

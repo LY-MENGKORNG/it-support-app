@@ -72,11 +72,13 @@ final class Error<T> extends Result<T> {
 
 typedef ErrorMapper = Exception Function(Object error, StackTrace stackTrace);
 
-Never rethrowWithStack(Object error, StackTrace stackTrace) =>
-    core.Error.throwWithStackTrace(error, stackTrace);
+Never rethrowWithStack(Object error, StackTrace stackTrace) {
+  return core.Error.throwWithStackTrace(error, stackTrace);
+}
 
-Exception _asExceptionOrRethrow(Object error, StackTrace stackTrace) =>
-    error is Exception ? error : rethrowWithStack(error, stackTrace);
+Exception _asExceptionOrRethrow(Object error, StackTrace stackTrace) {
+  return error is Exception ? error : rethrowWithStack(error, stackTrace);
+}
 
 extension ResultCast<T> on Result<T> {
   Ok<T> get asOk => this as Ok<T>;

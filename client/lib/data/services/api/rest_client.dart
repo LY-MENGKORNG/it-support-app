@@ -13,21 +13,19 @@ typedef Query = Map<String, dynamic>;
 
 typedef Decoder<T> = T Function(Object? payload);
 
-typedef Jsoner<T> = T Function(Json);
-
-Decoder<T> asObject<T>(Jsoner<T> parse) {
+Decoder<T> asObject<T>(ParseFn<T> parse) {
   return (payload) {
-    if (payload is Json) {
+    if (payload is JsonType) {
       return parse(payload);
     }
     throw ParseException('Expected a JSON object, got ${payload.runtimeType}.');
   };
 }
 
-Decoder<List<T>> asList<T>(T Function(Json) parse) {
+Decoder<List<T>> asList<T>(ParseFn<T> parse) {
   return (payload) {
     if (payload is List) {
-      return payload.cast<Json>().map(parse).toList(growable: false);
+      return payload.cast<JsonType>().map(parse).toList(growable: false);
     }
     throw ParseException('Expected a JSON array, got ${payload.runtimeType}.');
   };
@@ -193,13 +191,13 @@ class RestClient {
     );
   }
 
-  Json _bodyOf(http.Response response) =>
+  JsonType _bodyOf(http.Response response) =>
       switch (Result.safeTry(() => jsonDecode(response.body))) {
-        Ok(value: final Json body) => body,
+        Ok(value: final JsonType body) => body,
         _ => const {},
       };
 
-  String? _messageIn(Json body, Map<String, String> fieldErrors) {
+  String? _messageIn(JsonType body, Map<String, String> fieldErrors) {
     if (fieldErrors.isNotEmpty) {
       return fieldErrors.entries
           .map((entry) => '${entry.key}: ${entry.value}')

@@ -8,15 +8,10 @@ import { loginSchema, type LoginDto } from './auth.schema';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly auth: AuthService) {}
+  constructor(private readonly auth: AuthService) { }
 
-  /**
-   * The only unauthenticated route in the app — it has to be, since it is
-   * where a caller gets the token everything else demands.
-   */
   @Public()
   @Post('login')
-  // 200 rather than Nest's default 201: logging in creates no resource.
   @HttpCode(200)
   @ApiOperation({ summary: 'Exchange credentials for an access token' })
   @ApiBody({ type: LoginBodyDto })
@@ -24,13 +19,6 @@ export class AuthController {
     return this.auth.login(dto);
   }
 
-  /**
-   * Who the presented token belongs to.
-   *
-   * The client calls this on startup to turn a stored token back into a
-   * session, which doubles as a check that the token is still good — a
-   * deactivated account fails here instead of on the first write.
-   */
   @Get('me')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'The signed-in user' })

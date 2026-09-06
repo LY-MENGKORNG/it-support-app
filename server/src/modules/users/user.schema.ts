@@ -17,11 +17,6 @@ export const user = snakeCase.table('user', {
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
 
-/**
- * The columns every endpoint is allowed to hand back. Passing this to
- * `findMany({ columns })` makes leaking `password_hash` a compile error rather
- * than something you have to remember at each call site.
- */
 export const publicUserColumns = {
   id: true,
   name: true,
@@ -32,11 +27,6 @@ export const publicUserColumns = {
   updatedAt: true,
 } as const;
 
-/**
- * The client sends a plaintext `password`; the column is `password_hash`. The
- * DTO deliberately does not mirror the table here — hashing happens in the
- * service, and nothing outside it should be able to set the hash directly.
- */
 export const createUserSchema = z.object({
   name: z.string().trim().min(2).max(80),
   email: z.email(),

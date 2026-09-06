@@ -5,8 +5,9 @@ abstract final class Breakpoints {
 
   static const expanded = 1100.0;
 
-  static bool isCompact(BuildContext context) =>
-      MediaQuery.sizeOf(context).width < compact;
+  static bool isCompact(BuildContext context) {
+    return MediaQuery.sizeOf(context).width < compact;
+  }
 }
 
 class ContentColumn extends StatelessWidget {
@@ -16,11 +17,13 @@ class ContentColumn extends StatelessWidget {
   final double maxWidth;
 
   @override
-  Widget build(BuildContext context) => Align(
-    alignment: Alignment.topCenter,
-    child: ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: maxWidth),
-      child: child,
-    ),
-  );
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxWidth),
+        child: child,
+      ),
+    );
+  }
 }

@@ -4,12 +4,6 @@ import type { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import type { UserRepository } from '../users/user.repository';
 
-/**
- * Login's failure behaviour, which is the part worth pinning down: every
- * rejection has to look identical from the outside, or the endpoint becomes a
- * way to find out who works here and whose account is disabled.
- */
-
 const PASSWORD = 'password-123';
 
 function buildService({
@@ -68,8 +62,6 @@ describe('AuthService.login', () => {
     ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
-  // Same message for "no such account" as for "wrong password", so the
-  // endpoint cannot be used to enumerate who has an account here.
   it('rejects an unknown email with the same message', async () => {
     const unknown = buildService({ found: undefined });
     const wrongPassword = buildService({ found: await activeUser() });
@@ -118,9 +110,6 @@ describe('AuthService.verify', () => {
     );
   });
 
-  // A signature only proves *we* issued it, not that its claims still match
-  // what the code expects — an old token from before a schema change is signed
-  // perfectly well.
   it('rejects a correctly signed token with the wrong claims', () => {
     const service = buildService();
 

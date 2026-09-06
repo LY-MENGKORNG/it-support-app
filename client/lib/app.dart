@@ -27,12 +27,6 @@ class _AppState extends State<App> {
   }
 
   @override
-  void dispose() {
-    _router.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'IT Support',
@@ -42,5 +36,11 @@ class _AppState extends State<App> {
       themeMode: ThemeMode.dark,
       routerConfig: _router,
     );
+  }
+
+  @override
+  void dispose() {
+    _router.dispose();
+    super.dispose();
   }
 }

@@ -30,8 +30,10 @@ String formatRelative(DateTime time) {
   };
 }
 
-String formatDate(DateTime time) =>
-    '${time.day} ${_months[time.month - 1]} ${time.year}';
+String formatDate(DateTime time) {
+  return '${time.day} ${_months[time.month - 1]} ${time.year}';
+}
 
-String formatDateTime(DateTime time) =>
-    '${formatDate(time)}, ${_two(time.hour)}:${_two(time.minute)}';
+String formatDateTime(DateTime time) {
+  return '${formatDate(time)}, ${_two(time.hour)}:${_two(time.minute)}';
+}

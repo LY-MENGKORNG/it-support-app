@@ -8,10 +8,13 @@ class Session {
   final String accessToken;
   final User user;
 
-  factory Session.fromJson(Json json) => Session(
-    accessToken: stringOf(json, 'accessToken'),
-    user: User.fromJson(objectOf(json, 'user')),
-  );
+  factory Session.fromJson(JsonType json) {
+    final sj = Json(json);
+    return Session(
+      accessToken: sj.stringOf('accessToken'),
+      user: User.fromJson(sj.objectOf('user')),
+    );
+  }
 
   @override
   String toString() => 'Session(${user.email})';

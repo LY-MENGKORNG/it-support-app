@@ -16,7 +16,7 @@ import { CreateCategoryDto } from './category.dto';
 
 @Controller('category')
 export class CategoryController {
-  constructor(private readonly categories: CategoryService) {}
+  constructor(private readonly categories: CategoryService) { }
 
   @Get()
   list() {
@@ -28,8 +28,6 @@ export class CategoryController {
     return this.categories.findOne(id);
   }
 
-  // Everyone reads the category list to file a request; changing what the list
-  // *is* shapes every future request, so it stays with administrators.
   @Post()
   @Roles('admin')
   @ApiBody({ type: CreateCategoryDto })

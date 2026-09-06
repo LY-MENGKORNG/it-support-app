@@ -4,13 +4,12 @@ import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly repository: UserRepository) {}
+  constructor(private readonly repository: UserRepository) { }
 
   list(query: ListUserQuery) {
     return this.repository.findMany(query);
   }
 
-  /** IT staff who can be assigned to a request — the assignee dropdown. */
   listAssignable() {
     return this.repository.findAssignable();
   }
@@ -21,11 +20,6 @@ export class UserService {
     return found;
   }
 
-  /**
-   * The plaintext password never reaches the repository. Hashing is a policy
-   * decision, so it happens here and the DTO's `password` key is dropped —
-   * meaning the only way into `password_hash` is through this method.
-   */
   async create({ password, ...rest }: CreateUserDto) {
     return this.repository.insert({
       ...rest,

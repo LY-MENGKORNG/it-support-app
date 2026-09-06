@@ -14,30 +14,16 @@ import {
   UpdateRequestDto,
 } from './request.dto';
 
-/** The fields an update is allowed to touch. */
 type RequestChanges = UpdateRequestDto;
 
-/**
- * Changes only IT staff may make.
- *
- * Anyone may correct the wording or urgency of their own request; deciding that
- * it is resolved, or who is going to handle it, is the support team's call.
- */
 const STAFF_ONLY_FIELDS = [
   'status',
   'assigneeId',
 ] as const satisfies readonly (keyof RequestChanges)[];
 
-/**
- * Business rules for requests: what a change *means*.
- *
- * Deciding which changes are worth recording, and which timestamps a status
- * implies, is policy — it lives here. Where the rows actually go is
- * {@link RequestRepository}'s problem.
- */
 @Injectable()
 export class RequestService {
-  constructor(private readonly repository: RequestRepository) {}
+  constructor(private readonly repository: RequestRepository) { }
 
   async list(query: ListRequestQuery) {
     const { rows, total } = await this.repository.findPage(query);
@@ -58,13 +44,6 @@ export class RequestService {
     return found;
   }
 
-  /**
-   * The requester is the caller, full stop — there is no way to raise a request
-   * in someone else's name, because there is no field in which to say so.
-   */
-  // `async` so the guard below rejects rather than throwing synchronously: a
-  // method that returns a promise on the happy path and throws on the unhappy
-  // one forces every caller to handle failure twice.
   async create(dto: CreateRequestDto, actor: AuthenticatedUser) {
     const { assigneeId, ...rest } = dto;
     const assignee = assigneeId ?? null;
@@ -81,17 +60,16 @@ export class RequestService {
         oldValue: null,
         newValue: 'open',
       },
-      // A request created already assigned is two events, not one.
       ...(assignee == null
         ? []
         : [
-            {
-              userId: requesterId,
-              action: 'assigned' as const,
-              oldValue: null,
-              newValue: String(assignee),
-            },
-          ]),
+          {
+            userId: requesterId,
+            action: 'assigned' as const,
+            oldValue: null,
+            newValue: String(assignee),
+          },
+        ]),
     ];
 
     const id = this.repository.insertWithHistory(
@@ -126,13 +104,6 @@ export class RequestService {
     return this.findOne(id);
   }
 
-  /**
-   * Who may change what.
-   *
-   * This is a rule about *this record and this caller*, not about the route, so
-   * it lives here rather than in a guard — `AuthGuard` can tell that you are an
-   * employee, but only the service knows whether this is your request.
-   */
   private assertMayUpdate(
     existing: Request,
     changes: RequestChanges,
@@ -141,8 +112,6 @@ export class RequestService {
     if (isSupportStaff(actor)) return;
 
     if (existing.requesterId !== actor.id) {
-      // 404, not 403: a request you cannot touch is one you have no business
-      // knowing exists.
       throw new NotFoundException(`Request ${existing.id} not found`);
     }
 
@@ -156,7 +125,6 @@ export class RequestService {
     }
   }
 
-  /** One history entry per field that actually changed value. */
   private diff(
     before: Request,
     changes: RequestChanges,
@@ -198,10 +166,6 @@ export class RequestService {
     return entries;
   }
 
-  /**
-   * `resolvedAt` / `closedAt` are derived from status, never set by the client —
-   * otherwise a reopened request keeps a stale resolution date.
-   */
   private statusTimestamps(
     before: Request,
     changes: RequestChanges,
@@ -220,7 +184,6 @@ export class RequestService {
   }
 }
 
-/** Staff and admins; everyone else is an employee raising their own requests. */
 function isSupportStaff(actor: AuthenticatedUser) {
   return actor.role === 'staff' || actor.role === 'admin';
 }

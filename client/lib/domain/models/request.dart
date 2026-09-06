@@ -40,23 +40,27 @@ class Request {
 
   bool get isAssigned => assignee != null;
 
-  factory Request.fromJson(Json json) => Request(
-    id: intOf(json, 'id'),
-    title: stringOf(json, 'title'),
-    description: stringOf(json, 'description'),
-    category: RequestCategory.fromJson(objectOf(json, 'category')),
-    priority: Priority.fromWire(stringOf(json, 'priority')),
-    status: RequestStatus.fromWire(stringOf(json, 'status')),
-    requester: User.fromJson(objectOf(json, 'requester')),
-    assignee: switch (objectOrNull(json, 'assignee')) {
-      final Json user => User.fromJson(user),
-      null => null,
-    },
-    createdAt: dateOf(json, 'createdAt'),
-    updatedAt: dateOf(json, 'updatedAt'),
-    resolvedAt: dateOrNull(json, 'resolvedAt'),
-    closedAt: dateOrNull(json, 'closedAt'),
-  );
+  factory Request.fromJson(JsonType json) {
+    final rj = Json(json);
+
+    return Request(
+      id: rj.intOf('id'),
+      title: rj.stringOf('title'),
+      description: rj.stringOf('description'),
+      category: RequestCategory.fromJson(rj.objectOf('category')),
+      priority: Priority.fromWire(rj.stringOf('priority')),
+      status: RequestStatus.fromWire(rj.stringOf('status')),
+      requester: User.fromJson(rj.objectOf('requester')),
+      assignee: switch (rj.objectOrNull('assignee')) {
+        final JsonType user => User.fromJson(user),
+        null => null,
+      },
+      createdAt: rj.dateOf('createdAt'),
+      updatedAt: rj.dateOf('updatedAt'),
+      resolvedAt: rj.dateOrNull('resolvedAt'),
+      closedAt: rj.dateOrNull('closedAt'),
+    );
+  }
 }
 
 class RequestDetail {
@@ -72,11 +76,15 @@ class RequestDetail {
 
   int get id => request.id;
 
-  factory RequestDetail.fromJson(Json json) => RequestDetail(
-    request: Request.fromJson(json),
-    comments: listOf(json, 'comments', Comment.fromJson),
-    history: listOf(json, 'history', RequestHistory.fromJson),
-  );
+  factory RequestDetail.fromJson(JsonType json) {
+    final rdj = Json(json);
+
+    return RequestDetail(
+      request: Request.fromJson(json),
+      comments: rdj.listOf('comments', Comment.fromJson),
+      history: rdj.listOf('history', RequestHistory.fromJson),
+    );
+  }
 
   RequestDetail copyWith({
     Request? request,
@@ -100,11 +108,14 @@ class RequestPage {
   final int total;
   final bool hasMore;
 
-  factory RequestPage.fromJson(Json json) => RequestPage(
-    items: listOf(json, 'items', Request.fromJson),
-    total: intOf(json, 'total'),
-    hasMore: boolOr(json, 'hasMore', fallback: false),
-  );
+  factory RequestPage.fromJson(JsonType json) {
+    final rpj = Json(json);
+    return RequestPage(
+      items: rpj.listOf('items', Request.fromJson),
+      total: rpj.intOf('total'),
+      hasMore: rpj.boolOr('hasMore', fallback: false),
+    );
+  }
 }
 
 class NewRequest {
@@ -123,7 +134,7 @@ class NewRequest {
 
   final int? assigneeId;
 
-  Json toJson() => {
+  JsonType toJson() => {
     'title': title,
     'description': description,
     'categoryId': categoryId,
@@ -151,7 +162,7 @@ class RequestPatch {
   final int? assigneeId;
   final bool unassign;
 
-  Json toJson() => {
+  JsonType toJson() => {
     if (title != null) 'title': title,
     if (description != null) 'description': description,
     if (categoryId != null) 'categoryId': categoryId,
