@@ -32,8 +32,7 @@ import { DrizzleQueryError } from 'drizzle-orm';
 @Catch(DrizzleQueryError, LibsqlError)
 export class SQLiteExceptionFilter
   extends BaseExceptionFilter
-  implements ExceptionFilter
-{
+  implements ExceptionFilter {
   private readonly logger = new Logger(SQLiteExceptionFilter.name);
 
   catch(error: Error, host: ArgumentsHost) {
@@ -64,7 +63,7 @@ const CONSTRAINTS = [
  */
 export function asConflict(error: unknown): ConflictException | null {
   for (const link of causes(error)) {
-    const detail = `${String(link.code ?? '')} ${link.message}`;
+    const detail = `${String(JSON.stringify(link.code ?? ''))} ${link.message}`;
 
     for (const { pattern, message } of CONSTRAINTS) {
       if (pattern.test(detail)) return new ConflictException(message);
