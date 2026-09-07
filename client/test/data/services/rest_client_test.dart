@@ -227,7 +227,15 @@ void main() {
 
       final result = await RequestApi(client).list(const RequestFilters());
 
-      expect(result.asError.error, isA<ParseException>());
+      // The generated decoder knows which class and field it choked on, and
+      // that has to survive the trip into ParseException — otherwise a
+      // contract mismatch reaches the UI as an unattributable failure.
+      expect(
+        result.asError.error,
+        isA<ParseException>()
+            .having((e) => e.message, 'message', contains('RequestPage'))
+            .having((e) => e.message, 'message', contains('total')),
+      );
     });
 
     test('a JSON array where an object belongs is a ParseException', () async {

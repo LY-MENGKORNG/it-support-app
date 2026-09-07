@@ -1,7 +1,12 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import 'package:app/utils/json.dart';
 
 import 'user_role.dart';
 
+part 'generated/user.g.dart';
+
+@JsonSerializable(checked: true, createToJson: false)
 class User {
   const User({
     required this.id,
@@ -13,27 +18,22 @@ class User {
     this.updatedAt,
   });
 
+  factory User.fromJson(JsonType json) => _$UserFromJson(json);
+
   final int id;
   final String name;
   final String email;
+
+  @UserRoleConverter()
   final UserRole role;
 
+  @JsonKey(defaultValue: true)
   final bool isActive;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
 
-  factory User.fromJson(JsonType json) {
-    final uj = Json(json);
-    return User(
-      id: uj.intOf('id'),
-      name: uj.stringOf('name'),
-      email: uj.stringOf('email'),
-      role: UserRole.fromWire(uj.stringOf('role')),
-      isActive: uj.boolOr('isActive', fallback: true),
-      createdAt: uj.dateOrNull('createdAt'),
-      updatedAt: uj.dateOrNull('updatedAt'),
-    );
-  }
+  @LocalDateTimeOrNull()
+  final DateTime? createdAt;
+  @LocalDateTimeOrNull()
+  final DateTime? updatedAt;
 
   String get initials {
     final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty);

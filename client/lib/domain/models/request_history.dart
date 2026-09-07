@@ -1,8 +1,13 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import 'package:app/utils/json.dart';
 
 import 'request_history_action.dart';
 import 'user.dart';
 
+part 'generated/request_history.g.dart';
+
+@JsonSerializable(checked: true, createToJson: false)
 class RequestHistory {
   const RequestHistory({
     required this.id,
@@ -14,24 +19,22 @@ class RequestHistory {
     this.newValue,
   });
 
+  factory RequestHistory.fromJson(JsonType json) =>
+      _$RequestHistoryFromJson(json);
+
   final int id;
   final int requestId;
+
+  @RequestHistoryActionConverter()
   final RequestHistoryAction action;
+
+  /// The API calls them `user`; in a history entry they are who acted.
+  @JsonKey(name: 'user')
   final User actor;
+
+  @LocalDateTime()
   final DateTime createdAt;
+
   final String? oldValue;
   final String? newValue;
-
-  factory RequestHistory.fromJson(JsonType json) {
-    final rhj = Json(json);
-    return RequestHistory(
-      id: rhj.intOf('id'),
-      requestId: rhj.intOf('requestId'),
-      action: RequestHistoryAction.fromWire(rhj.stringOf('action')),
-      actor: User.fromJson(rhj.objectOf('user')),
-      createdAt: rhj.dateOf('createdAt'),
-      oldValue: rhj.stringOrNull('oldValue'),
-      newValue: rhj.stringOrNull('newValue'),
-    );
-  }
 }

@@ -1,0 +1,24 @@
+# Generated model code lives in `domain/models/generated/` rather than beside
+# each model.
+#
+# `json_serializable` writes `.json_serializable.g.part` fragments next to its
+# input either way; those are intermediates the build's cleanup step deletes.
+# What this moves is the combined `.g.dart`, which is why the option belongs to
+# `combining_builder` and not to `json_serializable`.
+#
+# Note that `build_extensions` REPLACES the builder's default `.dart` ->
+# `.g.dart` mapping rather than adding to it, so `combining_builder` now only
+# considers files under the path below. A `@JsonSerializable` class outside it
+# gets its fragment generated and then silently never combined: the build still
+# reports success, and the only symptom is the model failing to compile against
+# a missing `_$FooFromJson`. A second, broader pattern cannot fix this — `{{}}`
+# matches across `/`, so both patterns would claim the same input and the
+# builder fails with "Too many elements". Models kept elsewhere therefore need
+# their own line here.
+targets:
+  $default:
+    builders:
+      source_gen:combining_builder:
+        options:
+          build_extensions:
+            "^lib/domain/models/{{}}.dart": "lib/domain/models/generated/{{}}.g.dart"

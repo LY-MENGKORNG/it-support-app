@@ -1,5 +1,10 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import 'package:app/utils/json.dart';
 
+part 'generated/request_category.g.dart';
+
+@JsonSerializable(checked: true, createToJson: false)
 class RequestCategory {
   const RequestCategory({
     required this.id,
@@ -8,22 +13,16 @@ class RequestCategory {
     this.createdAt,
   });
 
+  factory RequestCategory.fromJson(JsonType json) =>
+      _$RequestCategoryFromJson(json);
+
   final int id;
   final String name;
 
   final String? description;
+
+  @LocalDateTimeOrNull()
   final DateTime? createdAt;
-
-  factory RequestCategory.fromJson(JsonType json) {
-    final rcj = Json(json);
-
-    return RequestCategory(
-      id: rcj.intOf('id'),
-      name: rcj.stringOf('name'),
-      description: rcj.stringOrNull('description'),
-      createdAt: rcj.dateOrNull('createdAt'),
-    );
-  }
 
   @override
   bool operator ==(Object other) =>

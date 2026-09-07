@@ -4,6 +4,7 @@ import 'dart:io' show SocketException;
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:json_annotation/json_annotation.dart';
 import 'package:app/utils/json.dart';
 import 'package:app/utils/result.dart';
 
@@ -210,6 +211,16 @@ class RestClient {
   Exception _asParseFailure(Object error, StackTrace stackTrace) =>
       switch (error) {
         ApiException() => error,
+        // A generated `fromJson` catches whatever the payload did wrong and
+        // knows the class and field it was decoding, which says more than the
+        // bare type error underneath. Without this branch a wrong-shaped
+        // response escapes as a throw instead of a Result.error.
+        CheckedFromJsonException(:final className?, :final key?) =>
+          ParseException('Unexpected $className in the response: "$key".'),
+        CheckedFromJsonException(:final message?) => ParseException(message),
+        CheckedFromJsonException() => const ParseException(
+          'The server returned a malformed response.',
+        ),
         FormatException(:final message) => ParseException(message),
         TypeError() => ParseException('Unexpected response shape: $error'),
         _ => rethrowWithStack(error, stackTrace),

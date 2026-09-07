@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 import 'package:app/domain/models/priority.dart';
 import 'package:app/domain/models/request.dart';
@@ -54,17 +55,19 @@ void main() {
       );
     });
 
+    // The generated decoder reports a bad payload as a
+    // CheckedFromJsonException rather than a FormatException. What has to hold
+    // either way is that the failure names the field and the class, so a
+    // malformed response is traceable to the one key that broke it.
     test('a missing required field names the field it failed on', () {
       final broken = requestJson()..remove('title');
 
       expect(
         () => Request.fromJson(broken),
         throwsA(
-          isA<FormatException>().having(
-            (e) => e.message,
-            'message',
-            contains('title'),
-          ),
+          isA<CheckedFromJsonException>()
+              .having((e) => e.key, 'key', 'title')
+              .having((e) => e.className, 'className', 'Request'),
         ),
       );
     });
