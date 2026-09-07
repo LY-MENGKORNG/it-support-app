@@ -114,18 +114,66 @@ class RestClient {
       request.body = jsonEncode(body);
     }
 
-    // The deadline has to cover reading the body, not just arriving at the
-    // headers. A server that answers and then stalls mid-body used to hang
-    // here forever: `timeout` sat on `send` alone, and `fromStream` — which is
-    // what actually waits for the bytes — ran outside it.
     final response = await Result.safeTryAsync(
-      () =>
-          _client.send(request).then(http.Response.fromStream).timeout(timeout),
+      () => _exchange(request),
       onError: _asNetworkFailure,
     );
 
     return response.flatMap(
       (response) => _read(response, authenticated: authenticated),
+    );
+  }
+
+  /// One deadline over the whole exchange: reaching the server, its status
+  /// line, and reading the body to the end.
+  ///
+  /// Two separate `timeout`s of [timeout] each would make the field's promise —
+  /// how long a call may take — a lie by a factor of two, so the second phase
+  /// gets whatever is left of the first.
+  Future<http.Response> _exchange(http.Request request) async {
+    final deadline = DateTime.now().add(timeout);
+    final streamed = await _client.send(request).timeout(timeout);
+
+    return _collect(streamed, within: deadline.difference(DateTime.now()));
+  }
+
+  /// The body, or a [TimeoutException] with the socket hung up.
+  ///
+  /// `Response.fromStream(...).timeout(...)` reads as the same thing and is
+  /// not: `timeout` abandons the *future*, while the subscription underneath it
+  /// goes on waiting for bytes — and goes on holding the connection. A server
+  /// that answers and then stalls mid-body would leak one socket per attempt
+  /// until the pool is empty, at which point the next call blocks inside `send`
+  /// before its own deadline is even armed, and the hang is back a layer down.
+  /// Cancelling the subscription is what actually hangs up.
+  Future<http.Response> _collect(
+    http.StreamedResponse streamed, {
+    required Duration within,
+  }) async {
+    final chunks = <int>[];
+    final finished = Completer<void>();
+    final subscription = streamed.stream.listen(
+      chunks.addAll,
+      onDone: finished.complete,
+      onError: finished.completeError,
+      cancelOnError: true,
+    );
+
+    try {
+      await finished.future.timeout(within);
+    } on TimeoutException {
+      await subscription.cancel();
+      rethrow;
+    }
+
+    return http.Response.bytes(
+      chunks,
+      streamed.statusCode,
+      request: streamed.request,
+      headers: streamed.headers,
+      isRedirect: streamed.isRedirect,
+      persistentConnection: streamed.persistentConnection,
+      reasonPhrase: streamed.reasonPhrase,
     );
   }
 
