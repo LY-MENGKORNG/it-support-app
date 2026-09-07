@@ -114,10 +114,13 @@ class RestClient {
       request.body = jsonEncode(body);
     }
 
+    // The deadline has to cover reading the body, not just arriving at the
+    // headers. A server that answers and then stalls mid-body used to hang
+    // here forever: `timeout` sat on `send` alone, and `fromStream` — which is
+    // what actually waits for the bytes — ran outside it.
     final response = await Result.safeTryAsync(
-      () async => http.Response.fromStream(
-        await _client.send(request).timeout(timeout),
-      ),
+      () =>
+          _client.send(request).then(http.Response.fromStream).timeout(timeout),
       onError: _asNetworkFailure,
     );
 
