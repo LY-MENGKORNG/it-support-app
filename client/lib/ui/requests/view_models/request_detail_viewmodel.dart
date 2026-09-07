@@ -80,8 +80,21 @@ class RequestDetailViewModel extends ChangeNotifier with SafeNotifier {
       assign.running ||
       addComment.running;
 
-  Listenable get mutations =>
-      Listenable.merge([changeStatus, changePriority, assign, addComment]);
+  /// The four mutating commands as one listenable, built once.
+  ///
+  /// `Listenable.merge` returns a new object on every call and defines no `==`,
+  /// so a getter would hand `ListenableBuilder` an unequal listenable on every
+  /// build — which tears down and re-adds a listener on all four commands each
+  /// time, including on every keystroke in the comment composer. It is also
+  /// what makes `addListener`/`removeListener` on this balance: a screen that
+  /// subscribes and unsubscribes would otherwise be doing so through two
+  /// different objects.
+  late final Listenable mutations = Listenable.merge([
+    changeStatus,
+    changePriority,
+    assign,
+    addComment,
+  ]);
 
   Future<Result<void>> _load() async {
     final result = await _requestRepository.getRequest(requestId);
@@ -89,7 +102,7 @@ class RequestDetailViewModel extends ChangeNotifier with SafeNotifier {
     switch (result) {
       case Ok<RequestDetail>(:final value):
         _detail = value;
-        notifySafely();
+        notifyListeners();
         return const Result.ok(null);
       case Error<RequestDetail>(:final error):
         return Result.error(error);
@@ -107,7 +120,7 @@ class RequestDetailViewModel extends ChangeNotifier with SafeNotifier {
       _categoryOptions = categories.value;
     }
 
-    notifySafely();
+    notifyListeners();
     return const Result.ok(null);
   }
 
@@ -126,7 +139,7 @@ class RequestDetailViewModel extends ChangeNotifier with SafeNotifier {
     switch (result) {
       case Ok<RequestDetail>(:final value):
         _detail = value;
-        notifySafely();
+        notifyListeners();
         return const Result.ok(null);
       case Error<RequestDetail>(:final error):
         return Result.error(error);
@@ -147,7 +160,7 @@ class RequestDetailViewModel extends ChangeNotifier with SafeNotifier {
         final current = _detail;
         if (current != null) {
           _detail = current.copyWith(comments: [...current.comments, value]);
-          notifySafely();
+          notifyListeners();
         }
         return const Result.ok(null);
       case Error<Comment>(:final error):

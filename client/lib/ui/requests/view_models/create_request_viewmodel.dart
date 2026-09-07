@@ -44,12 +44,12 @@ class CreateRequestViewModel extends ChangeNotifier with SafeNotifier {
 
   void selectCategory(RequestCategory? category) {
     _selectedCategory = category;
-    notifySafely();
+    notifyListeners();
   }
 
   void selectPriority(Priority priority) {
     _priority = priority;
-    notifySafely();
+    notifyListeners();
   }
 
   Future<Result<void>> _load() async {
@@ -59,7 +59,7 @@ class CreateRequestViewModel extends ChangeNotifier with SafeNotifier {
       case Ok<List<RequestCategory>>(:final value):
         _categoryOptions = value;
         _selectedCategory ??= value.isEmpty ? null : value.first;
-        notifySafely();
+        notifyListeners();
         return const Result.ok(null);
       case Error<List<RequestCategory>>(:final error):
         return Result.error(error);

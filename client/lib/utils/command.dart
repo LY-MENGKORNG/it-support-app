@@ -21,23 +21,27 @@ abstract class Command<T> extends ChangeNotifier with SafeNotifier {
   };
 
   Future<void> _execute(ZeroArgAction<T> action) async {
-    if (_running) return;
+    // Guarded here rather than in each caller: a disposed command has nobody to
+    // hand a result to, and the request behind it is a round trip nobody is
+    // waiting for. Every entry point — a scroll handler, a pull to refresh, a
+    // retry button, whatever is added next — comes through this one method.
+    if (_running || isDisposed) return;
 
     _running = true;
     _result = null;
-    notifySafely();
+    notifyListeners();
 
     try {
       _result = await action();
     } finally {
       _running = false;
-      notifySafely();
+      notifyListeners();
     }
   }
 
   void clearResult() {
     _result = null;
-    notifySafely();
+    notifyListeners();
   }
 }
 
