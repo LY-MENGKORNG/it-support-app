@@ -14,8 +14,9 @@ import 'package:app/domain/models/request_status.dart';
 import 'package:app/domain/models/user.dart';
 import 'package:app/utils/command.dart';
 import 'package:app/utils/result.dart';
+import 'package:app/utils/safe_notifier.dart';
 
-class RequestDetailViewModel extends ChangeNotifier {
+class RequestDetailViewModel extends ChangeNotifier with SafeNotifier {
   RequestDetailViewModel({
     required this._requestRepository,
     required this._userRepository,
@@ -88,7 +89,7 @@ class RequestDetailViewModel extends ChangeNotifier {
     switch (result) {
       case Ok<RequestDetail>(:final value):
         _detail = value;
-        notifyListeners();
+        notifySafely();
         return const Result.ok(null);
       case Error<RequestDetail>(:final error):
         return Result.error(error);
@@ -106,7 +107,7 @@ class RequestDetailViewModel extends ChangeNotifier {
       _categoryOptions = categories.value;
     }
 
-    notifyListeners();
+    notifySafely();
     return const Result.ok(null);
   }
 
@@ -125,7 +126,7 @@ class RequestDetailViewModel extends ChangeNotifier {
     switch (result) {
       case Ok<RequestDetail>(:final value):
         _detail = value;
-        notifyListeners();
+        notifySafely();
         return const Result.ok(null);
       case Error<RequestDetail>(:final error):
         return Result.error(error);
@@ -146,7 +147,7 @@ class RequestDetailViewModel extends ChangeNotifier {
         final current = _detail;
         if (current != null) {
           _detail = current.copyWith(comments: [...current.comments, value]);
-          notifyListeners();
+          notifySafely();
         }
         return const Result.ok(null);
       case Error<Comment>(:final error):

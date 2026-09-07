@@ -10,10 +10,11 @@ import 'package:app/domain/models/priority.dart';
 import 'package:app/domain/models/request.dart';
 import 'package:app/utils/command.dart';
 import 'package:app/utils/result.dart';
+import 'package:app/utils/safe_notifier.dart';
 
 typedef RequestDraft = ({String title, String description});
 
-class CreateRequestViewModel extends ChangeNotifier {
+class CreateRequestViewModel extends ChangeNotifier with SafeNotifier {
   CreateRequestViewModel({
     required this._requestRepository,
     required this._categoryRepository,
@@ -43,12 +44,12 @@ class CreateRequestViewModel extends ChangeNotifier {
 
   void selectCategory(RequestCategory? category) {
     _selectedCategory = category;
-    notifyListeners();
+    notifySafely();
   }
 
   void selectPriority(Priority priority) {
     _priority = priority;
-    notifyListeners();
+    notifySafely();
   }
 
   Future<Result<void>> _load() async {
@@ -58,7 +59,7 @@ class CreateRequestViewModel extends ChangeNotifier {
       case Ok<List<RequestCategory>>(:final value):
         _categoryOptions = value;
         _selectedCategory ??= value.isEmpty ? null : value.first;
-        notifyListeners();
+        notifySafely();
         return const Result.ok(null);
       case Error<List<RequestCategory>>(:final error):
         return Result.error(error);

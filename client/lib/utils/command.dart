@@ -1,11 +1,12 @@
 import 'package:flutter/foundation.dart';
 
 import 'result.dart';
+import 'safe_notifier.dart';
 
 typedef ZeroArgAction<T> = Future<Result<T>> Function();
 typedef OneArgAction<T, A> = Future<Result<T>> Function(A);
 
-abstract class Command<T> extends ChangeNotifier {
+abstract class Command<T> extends ChangeNotifier with SafeNotifier {
   bool _running = false;
   Result<T>? _result;
 
@@ -24,19 +25,19 @@ abstract class Command<T> extends ChangeNotifier {
 
     _running = true;
     _result = null;
-    notifyListeners();
+    notifySafely();
 
     try {
       _result = await action();
     } finally {
       _running = false;
-      notifyListeners();
+      notifySafely();
     }
   }
 
   void clearResult() {
     _result = null;
-    notifyListeners();
+    notifySafely();
   }
 }
 

@@ -11,8 +11,9 @@ import 'package:app/domain/models/request_filters.dart';
 import 'package:app/domain/models/request_sort.dart';
 import 'package:app/utils/command.dart';
 import 'package:app/utils/result.dart';
+import 'package:app/utils/safe_notifier.dart';
 
-class RequestListViewModel extends ChangeNotifier {
+class RequestListViewModel extends ChangeNotifier with SafeNotifier {
   RequestListViewModel({
     required this._requestRepository,
     required this._categoryRepository,
@@ -84,10 +85,11 @@ class RequestListViewModel extends ChangeNotifier {
         _filters.status == null || _filters.status == updated.status;
     _items = [..._items]
       ..replaceRange(index, index + 1, [if (stillMatches) updated]);
-    notifyListeners();
+    notifySafely();
   }
 
   Future<void> _refresh() async {
+    if (isDisposed) return;
     if (load.running) {
       _reloadQueued = true;
       return;
@@ -111,13 +113,13 @@ class RequestListViewModel extends ChangeNotifier {
         _items = value.items;
         _total = value.total;
         _hasMore = value.hasMore;
-        notifyListeners();
+        notifySafely();
         return const Result.ok(null);
       case Error<RequestPage>(:final error):
         _items = const [];
         _total = 0;
         _hasMore = false;
-        notifyListeners();
+        notifySafely();
         return Result.error(error);
     }
   }
@@ -134,7 +136,7 @@ class RequestListViewModel extends ChangeNotifier {
         _items = [..._items, ...value.items];
         _total = value.total;
         _hasMore = value.hasMore;
-        notifyListeners();
+        notifySafely();
         return const Result.ok(null);
       case Error<RequestPage>(:final error):
         return Result.error(error);
@@ -145,7 +147,7 @@ class RequestListViewModel extends ChangeNotifier {
     final result = await _categoryRepository.getCategories();
     if (result is Ok<List<RequestCategory>>) {
       _categoryOptions = result.value;
-      notifyListeners();
+      notifySafely();
     }
     return const Result.ok(null);
   }

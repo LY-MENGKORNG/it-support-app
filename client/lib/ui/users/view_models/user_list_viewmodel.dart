@@ -8,8 +8,9 @@ import 'package:app/domain/models/user.dart';
 import 'package:app/domain/models/user_role.dart';
 import 'package:app/utils/command.dart';
 import 'package:app/utils/result.dart';
+import 'package:app/utils/safe_notifier.dart';
 
-class UserListViewModel extends ChangeNotifier {
+class UserListViewModel extends ChangeNotifier with SafeNotifier {
   UserListViewModel({required this._userRepository}) {
     load = Command0(_load)..execute();
   }
@@ -43,6 +44,7 @@ class UserListViewModel extends ChangeNotifier {
   }
 
   Future<void> _refresh() async {
+    if (isDisposed) return;
     if (load.running) {
       _reloadQueued = true;
       return;
@@ -66,11 +68,11 @@ class UserListViewModel extends ChangeNotifier {
     switch (result) {
       case Ok<List<User>>(:final value):
         _items = value;
-        notifyListeners();
+        notifySafely();
         return const Result.ok(null);
       case Error<List<User>>(:final error):
         _items = const [];
-        notifyListeners();
+        notifySafely();
         return Result.error(error);
     }
   }

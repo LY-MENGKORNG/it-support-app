@@ -80,6 +80,29 @@ void main() {
     });
   });
 
+  group('disposal', () {
+    // A screen can be popped while its request is still in flight. The reply
+    // then lands on a command nobody owns any more, and `notifyListeners`
+    // asserts when that happens — so the command has to notice and drop it.
+    test('a reply that lands after dispose is dropped, not thrown', () async {
+      final completer = Completer<Result<int>>();
+      final command = Command0<int>(() => completer.future);
+
+      final pending = command.execute();
+      command.dispose();
+      completer.complete(const Result.ok(7));
+
+      await expectLater(pending, completes);
+    });
+
+    test('clearResult after dispose is a no-op rather than a crash', () {
+      final command = Command0<int>(() async => const Result.ok(1));
+      command.dispose();
+
+      expect(command.clearResult, returnsNormally);
+    });
+  });
+
   group('Command1', () {
     test('passes its argument through', () async {
       final command = Command1<String, int>(

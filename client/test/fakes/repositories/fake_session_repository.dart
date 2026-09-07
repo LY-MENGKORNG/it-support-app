@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import 'package:app/data/repositories/session/session_repository.dart';
 import 'package:app/domain/models/user.dart';
 import 'package:app/utils/result.dart';
@@ -21,6 +23,28 @@ class FakeSessionRepository extends SessionRepository {
 
   User? _currentUser;
   final bool _isRestoring = false;
+
+  /// Net [addListener] minus [removeListener] calls.
+  ///
+  /// A view model that subscribes to the session in its constructor has to give
+  /// that subscription back when it is disposed. This is how a test can see
+  /// whether it did — see test/bugs/viewmodel_lifetime_test.dart. Compare
+  /// deltas rather than absolute values: `provider` and `GoRouter` hold
+  /// subscriptions of their own for as long as the app is up.
+  int get listenerCount => _listenerCount;
+  int _listenerCount = 0;
+
+  @override
+  void addListener(VoidCallback listener) {
+    _listenerCount++;
+    super.addListener(listener);
+  }
+
+  @override
+  void removeListener(VoidCallback listener) {
+    _listenerCount--;
+    super.removeListener(listener);
+  }
 
   @override
   User? get currentUser => _currentUser;
