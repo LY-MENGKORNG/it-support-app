@@ -34,19 +34,21 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
     GoRoute(
       path: Routes.login,
       name: RouteNames.login,
-      builder: (context, state) => LoginScreen(
-        viewModel: LoginViewModel(sessionRepository: context.read()),
+      builder: (context, state) => _owned(
+        (context) => LoginViewModel(sessionRepository: context.read()),
+        (viewModel) => LoginScreen(viewModel: viewModel),
       ),
     ),
     GoRoute(
       path: Routes.newRequest,
       name: RouteNames.newRequest,
-      builder: (context, state) => CreateRequestScreen(
-        viewModel: CreateRequestViewModel(
+      builder: (context, state) => _owned(
+        (context) => CreateRequestViewModel(
           requestRepository: context.read(),
           categoryRepository: context.read(),
           sessionRepository: context.read(),
         ),
+        (viewModel) => CreateRequestScreen(viewModel: viewModel),
       ),
     ),
     GoRoute(
@@ -56,8 +58,8 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
         final id = int.tryParse(state.pathParameters['id'] ?? '');
         if (id == null) return const _InvalidRequestScreen();
 
-        return RequestDetailScreen(
-          viewModel: RequestDetailViewModel(
+        return _owned(
+          (context) => RequestDetailViewModel(
             requestRepository: context.read(),
             userRepository: context.read(),
             categoryRepository: context.read(),
@@ -65,6 +67,7 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
             requestId: id,
             preview: state.extra is Request ? state.extra! as Request : null,
           ),
+          (viewModel) => RequestDetailScreen(viewModel: viewModel),
         );
       },
     ),
@@ -77,11 +80,12 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
             GoRoute(
               path: Routes.requests,
               name: RouteNames.requests,
-              builder: (context, state) => RequestListScreen(
-                viewModel: RequestListViewModel(
+              builder: (context, state) => _owned(
+                (context) => RequestListViewModel(
                   requestRepository: context.read(),
                   categoryRepository: context.read(),
                 ),
+                (viewModel) => RequestListScreen(viewModel: viewModel),
               ),
             ),
           ],
@@ -91,8 +95,9 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
             GoRoute(
               path: Routes.users,
               name: RouteNames.users,
-              builder: (context, state) => UserListScreen(
-                viewModel: UserListViewModel(userRepository: context.read()),
+              builder: (context, state) => _owned(
+                (context) => UserListViewModel(userRepository: context.read()),
+                (viewModel) => UserListScreen(viewModel: viewModel),
               ),
             ),
           ],
@@ -102,8 +107,10 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
             GoRoute(
               path: Routes.settings,
               name: RouteNames.settings,
-              builder: (context, state) => SettingsScreen(
-                viewModel: SettingsViewModel(sessionRepository: context.read()),
+              builder: (context, state) => _owned(
+                (context) =>
+                    SettingsViewModel(sessionRepository: context.read()),
+                (viewModel) => SettingsScreen(viewModel: viewModel),
               ),
             ),
           ],
@@ -135,6 +142,24 @@ String? _guard(GoRouterState state, SessionRepository session) {
 
   return null;
 }
+
+/// Gives a route's view model an owner.
+///
+/// Built inline in a `builder`, as these used to be, a view model has none:
+/// nothing ever calls its `dispose`, so its commands, debounce timers and — in
+/// [SettingsViewModel]'s case — a listener on the shared [SessionRepository]
+/// outlive the screen, and a route visited twice leaves two of them behind.
+///
+/// [ChangeNotifierProvider] gives it a lifetime: [create] runs once per route
+/// instance rather than on every rebuild of the builder, and the view model is
+/// disposed when the route leaves the tree.
+Widget _owned<T extends ChangeNotifier>(
+  T Function(BuildContext context) create,
+  Widget Function(T viewModel) build,
+) => ChangeNotifierProvider<T>(
+  create: create,
+  child: Builder(builder: (context) => build(context.read<T>())),
+);
 
 class _InvalidRequestScreen extends StatelessWidget {
   const _InvalidRequestScreen();

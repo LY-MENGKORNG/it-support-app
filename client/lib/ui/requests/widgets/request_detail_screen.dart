@@ -174,7 +174,7 @@ class _DetailBody extends StatelessWidget {
                   child: Column(
                     children: [
                       DetailRow(
-                        label: 'RequestCategory',
+                        label: 'Category',
                         child: Text(request.category.name),
                       ),
                       DetailRow(

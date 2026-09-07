@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
@@ -10,9 +9,11 @@ import 'package:app/domain/models/request.dart';
 import 'package:app/domain/models/request_filters.dart';
 import 'package:app/domain/models/request_sort.dart';
 import 'package:app/utils/command.dart';
+import 'package:app/utils/debounced_refresh.dart';
 import 'package:app/utils/result.dart';
+import 'package:app/utils/safe_notifier.dart';
 
-class RequestListViewModel extends ChangeNotifier {
+class RequestListViewModel extends ChangeNotifier with SafeNotifier {
   RequestListViewModel({
     required this._requestRepository,
     required this._categoryRepository,
@@ -20,12 +21,12 @@ class RequestListViewModel extends ChangeNotifier {
     load = Command0(_load)..execute();
     loadMore = Command0(_loadMore);
     loadCategories = Command0(_loadCategories)..execute();
+    _refresh = DebouncedRefresh(load);
   }
 
   final RequestRepository _requestRepository;
   final CategoryRepository _categoryRepository;
 
-  static const _searchDebounce = Duration(milliseconds: 350);
   static const _pageSize = 20;
 
   late final Command0<void> load;
@@ -34,13 +35,13 @@ class RequestListViewModel extends ChangeNotifier {
 
   late final Command0<void> loadCategories;
 
+  late final DebouncedRefresh _refresh;
+
   RequestFilters _filters = const RequestFilters(limit: _pageSize);
   List<Request> _items = const [];
   List<RequestCategory> _categoryOptions = const [];
   int _total = 0;
   bool _hasMore = false;
-  Timer? _debounce;
-  bool _reloadQueued = false;
 
   RequestFilters get filters => _filters;
   UnmodifiableListView<Request> get items => UnmodifiableListView(_items);
@@ -51,29 +52,25 @@ class RequestListViewModel extends ChangeNotifier {
   bool get isEmpty => _items.isEmpty;
   bool get isFiltering => _filters.isFiltering;
 
-  void search(String query) {
-    _debounce?.cancel();
-    _debounce = Timer(_searchDebounce, () {
-      _filters = query.trim().isEmpty
-          ? _filters.copyWith(clearQuery: true, offset: 0)
-          : _filters.copyWith(query: query, offset: 0);
-      _refresh();
-    });
-  }
+  void search(String query) => _refresh.schedule(() {
+    _filters = query.trim().isEmpty
+        ? _filters.copyWith(clearQuery: true, offset: 0)
+        : _filters.copyWith(query: query, offset: 0);
+  });
 
   void applyFilters(RequestFilters filters) {
     _filters = filters.copyWith(offset: 0, limit: _pageSize);
-    _refresh();
+    _refresh.now();
   }
 
   void clearFilters() {
     _filters = const RequestFilters(limit: _pageSize);
-    _refresh();
+    _refresh.now();
   }
 
   void setSort(RequestSort sort) {
     _filters = _filters.copyWith(sort: sort, offset: 0);
-    _refresh();
+    _refresh.now();
   }
 
   void replace(Request updated) {
@@ -85,20 +82,6 @@ class RequestListViewModel extends ChangeNotifier {
     _items = [..._items]
       ..replaceRange(index, index + 1, [if (stillMatches) updated]);
     notifyListeners();
-  }
-
-  Future<void> _refresh() async {
-    if (load.running) {
-      _reloadQueued = true;
-      return;
-    }
-
-    await load.execute();
-
-    if (_reloadQueued) {
-      _reloadQueued = false;
-      await _refresh();
-    }
   }
 
   Future<Result<void>> _load() async {
@@ -152,7 +135,7 @@ class RequestListViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
-    _debounce?.cancel();
+    _refresh.cancel();
     load.dispose();
     loadMore.dispose();
     loadCategories.dispose();

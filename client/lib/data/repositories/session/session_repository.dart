@@ -2,8 +2,13 @@ import 'package:flutter/foundation.dart';
 
 import 'package:app/domain/models/user.dart';
 import 'package:app/utils/result.dart';
+import 'package:app/utils/safe_notifier.dart';
 
-abstract class SessionRepository extends ChangeNotifier {
+/// Session state, which every screen reads and the router redirects on.
+///
+/// [SafeNotifier] here rather than on the implementation: this object outlives
+/// every screen, and all three of its notifications land after an `await`.
+abstract class SessionRepository extends ChangeNotifier with SafeNotifier {
   User? get currentUser;
   String? get accessToken;
   bool get isRestoring;

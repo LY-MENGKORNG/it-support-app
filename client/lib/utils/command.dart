@@ -1,11 +1,12 @@
 import 'package:flutter/foundation.dart';
 
 import 'result.dart';
+import 'safe_notifier.dart';
 
 typedef ZeroArgAction<T> = Future<Result<T>> Function();
 typedef OneArgAction<T, A> = Future<Result<T>> Function(A);
 
-abstract class Command<T> extends ChangeNotifier {
+abstract class Command<T> extends ChangeNotifier with SafeNotifier {
   bool _running = false;
   Result<T>? _result;
 
@@ -20,7 +21,11 @@ abstract class Command<T> extends ChangeNotifier {
   };
 
   Future<void> _execute(ZeroArgAction<T> action) async {
-    if (_running) return;
+    // Guarded here rather than in each caller: a disposed command has nobody to
+    // hand a result to, and the request behind it is a round trip nobody is
+    // waiting for. Every entry point — a scroll handler, a pull to refresh, a
+    // retry button, whatever is added next — comes through this one method.
+    if (_running || isDisposed) return;
 
     _running = true;
     _result = null;

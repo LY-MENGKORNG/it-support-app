@@ -47,8 +47,14 @@ export class UserRepository {
     });
   }
 
-  insert(values: Omit<CreateUserDto, 'password'> & { password_hash: string }) {
-    const created = this.db.insert(user).values(values).returning().get();
+  async insert(
+    values: Omit<CreateUserDto, 'password'> & { password_hash: string },
+  ) {
+    // `await`, because on the libsql driver `.get()` is a promise. Without it
+    // the destructure below reads a `Promise`, every field comes back
+    // undefined, and a rejected insert — a duplicate email — floats outside the
+    // request, where no exception filter can turn it into a 409.
+    const created = await this.db.insert(user).values(values).returning().get();
 
     const { password_hash: _hash, ...safe } = created;
     return safe;

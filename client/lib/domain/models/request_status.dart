@@ -1,4 +1,6 @@
-enum RequestStatus {
+import 'package:app/utils/json.dart';
+
+enum RequestStatus implements WireEnum {
   open('open', 'Open'),
   inProgress('in_progress', 'In Progress'),
   resolved('resolved', 'Resolved'),
@@ -6,20 +8,14 @@ enum RequestStatus {
 
   const RequestStatus(this.wire, this.label);
 
+  @override
   final String wire;
   final String label;
 
-  static RequestStatus? tryFromWire(String? value) {
-    for (final status in values) {
-      if (status.wire == value) return status;
-    }
-    return null;
-  }
+  static RequestStatus? tryFromWire(String? value) => values.tryByWire(value);
 
-  static RequestStatus fromWire(String value) {
-    return tryFromWire(value) ??
-        (throw FormatException('Unknown request status: $value'));
-  }
+  static RequestStatus fromWire(String value) =>
+      values.byWire(value, label: 'request status');
 
   List<RequestStatus> get nextOptions => switch (this) {
     RequestStatus.open => [RequestStatus.inProgress, RequestStatus.resolved],
@@ -31,4 +27,11 @@ enum RequestStatus {
   bool get isSettled {
     return this == RequestStatus.resolved || this == RequestStatus.closed;
   }
+}
+
+class RequestStatusConverter extends WireConverter<RequestStatus> {
+  const RequestStatusConverter();
+
+  @override
+  RequestStatus fromJson(String json) => RequestStatus.fromWire(json);
 }

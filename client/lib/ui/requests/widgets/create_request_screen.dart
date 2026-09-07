@@ -170,7 +170,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  const _FieldLabel('RequestCategory'),
+                  const _FieldLabel('Category'),
                   DropdownButtonFormField<RequestCategory>(
                     initialValue: viewModel.selectedCategory,
                     isExpanded: true,

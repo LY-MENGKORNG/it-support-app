@@ -101,7 +101,7 @@ class _RequestFilterSheetState extends State<RequestFilterSheet> {
 
               if (widget.categories.isNotEmpty)
                 _Group(
-                  label: 'RequestCategory',
+                  label: 'Category',
                   child: DropdownButtonFormField<int?>(
                     initialValue: _draft.categoryId,
                     isExpanded: true,

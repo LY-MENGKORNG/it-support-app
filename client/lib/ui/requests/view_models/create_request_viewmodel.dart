@@ -10,10 +10,11 @@ import 'package:app/domain/models/priority.dart';
 import 'package:app/domain/models/request.dart';
 import 'package:app/utils/command.dart';
 import 'package:app/utils/result.dart';
+import 'package:app/utils/safe_notifier.dart';
 
 typedef RequestDraft = ({String title, String description});
 
-class CreateRequestViewModel extends ChangeNotifier {
+class CreateRequestViewModel extends ChangeNotifier with SafeNotifier {
   CreateRequestViewModel({
     required this._requestRepository,
     required this._categoryRepository,

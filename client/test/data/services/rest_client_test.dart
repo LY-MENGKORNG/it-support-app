@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -155,6 +156,58 @@ void main() {
       expect(result.asError.error, isA<NetworkException>());
     });
 
+    // The deadline covers reading the body, not just arriving at the status
+    // line — and abandoning the future is not enough, because the subscription
+    // under it would go on holding the socket.
+    test('a body that stalls times out and the socket is released', () async {
+      var cancelled = false;
+      final body = StreamController<List<int>>(
+        onCancel: () => cancelled = true,
+      );
+      addTearDown(body.close);
+
+      final client = RestClient(
+        baseUrl: 'http://test',
+        timeout: const Duration(milliseconds: 20),
+        client: MockClient.streaming(
+          (_, _) async => http.StreamedResponse(
+            body.stream,
+            200,
+            headers: {'content-type': 'application/json'},
+          ),
+        ),
+      );
+
+      final result = await RequestApi(client).get(42);
+
+      expect(result.asError.error, isA<NetworkException>());
+      expect(
+        cancelled,
+        isTrue,
+        reason: 'an abandoned response keeps its connection out of the pool',
+      );
+    });
+
+    test('a body that arrives in pieces is read whole', () async {
+      final client = RestClient(
+        baseUrl: 'http://test',
+        client: MockClient.streaming(
+          (_, _) async => http.StreamedResponse(
+            Stream.fromIterable([
+              utf8.encode('{"id":42,'),
+              utf8.encode('"title":"x"}'),
+            ]),
+            200,
+            headers: {'content-type': 'application/json'},
+          ),
+        ),
+      );
+
+      final result = await client.get('/anything', (payload) => payload);
+
+      expect(result.asOk.value, {'id': 42, 'title': 'x'});
+    });
+
     test(
       'a non-JSON body is reported as a parse failure, not a crash',
       () async {
@@ -174,7 +227,15 @@ void main() {
 
       final result = await RequestApi(client).list(const RequestFilters());
 
-      expect(result.asError.error, isA<ParseException>());
+      // The generated decoder knows which class and field it choked on, and
+      // that has to survive the trip into ParseException — otherwise a
+      // contract mismatch reaches the UI as an unattributable failure.
+      expect(
+        result.asError.error,
+        isA<ParseException>()
+            .having((e) => e.message, 'message', contains('RequestPage'))
+            .having((e) => e.message, 'message', contains('total')),
+      );
     });
 
     test('a JSON array where an object belongs is a ParseException', () async {

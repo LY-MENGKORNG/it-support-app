@@ -4,6 +4,7 @@ import 'dart:io' show SocketException;
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:json_annotation/json_annotation.dart';
 import 'package:app/utils/json.dart';
 import 'package:app/utils/result.dart';
 
@@ -115,14 +116,65 @@ class RestClient {
     }
 
     final response = await Result.safeTryAsync(
-      () async => http.Response.fromStream(
-        await _client.send(request).timeout(timeout),
-      ),
+      () => _exchange(request),
       onError: _asNetworkFailure,
     );
 
     return response.flatMap(
       (response) => _read(response, authenticated: authenticated),
+    );
+  }
+
+  /// One deadline over the whole exchange: reaching the server, its status
+  /// line, and reading the body to the end.
+  ///
+  /// Two separate `timeout`s of [timeout] each would make the field's promise —
+  /// how long a call may take — a lie by a factor of two, so the second phase
+  /// gets whatever is left of the first.
+  Future<http.Response> _exchange(http.Request request) async {
+    final deadline = DateTime.now().add(timeout);
+    final streamed = await _client.send(request).timeout(timeout);
+
+    return _collect(streamed, within: deadline.difference(DateTime.now()));
+  }
+
+  /// The body, or a [TimeoutException] with the socket hung up.
+  ///
+  /// `Response.fromStream(...).timeout(...)` reads as the same thing and is
+  /// not: `timeout` abandons the *future*, while the subscription underneath it
+  /// goes on waiting for bytes — and goes on holding the connection. A server
+  /// that answers and then stalls mid-body would leak one socket per attempt
+  /// until the pool is empty, at which point the next call blocks inside `send`
+  /// before its own deadline is even armed, and the hang is back a layer down.
+  /// Cancelling the subscription is what actually hangs up.
+  Future<http.Response> _collect(
+    http.StreamedResponse streamed, {
+    required Duration within,
+  }) async {
+    final chunks = <int>[];
+    final finished = Completer<void>();
+    final subscription = streamed.stream.listen(
+      chunks.addAll,
+      onDone: finished.complete,
+      onError: finished.completeError,
+      cancelOnError: true,
+    );
+
+    try {
+      await finished.future.timeout(within);
+    } on TimeoutException {
+      await subscription.cancel();
+      rethrow;
+    }
+
+    return http.Response.bytes(
+      chunks,
+      streamed.statusCode,
+      request: streamed.request,
+      headers: streamed.headers,
+      isRedirect: streamed.isRedirect,
+      persistentConnection: streamed.persistentConnection,
+      reasonPhrase: streamed.reasonPhrase,
     );
   }
 
@@ -159,6 +211,16 @@ class RestClient {
   Exception _asParseFailure(Object error, StackTrace stackTrace) =>
       switch (error) {
         ApiException() => error,
+        // A generated `fromJson` catches whatever the payload did wrong and
+        // knows the class and field it was decoding, which says more than the
+        // bare type error underneath. Without this branch a wrong-shaped
+        // response escapes as a throw instead of a Result.error.
+        CheckedFromJsonException(:final className?, :final key?) =>
+          ParseException('Unexpected $className in the response: "$key".'),
+        CheckedFromJsonException(:final message?) => ParseException(message),
+        CheckedFromJsonException() => const ParseException(
+          'The server returned a malformed response.',
+        ),
         FormatException(:final message) => ParseException(message),
         TypeError() => ParseException('Unexpected response shape: $error'),
         _ => rethrowWithStack(error, stackTrace),

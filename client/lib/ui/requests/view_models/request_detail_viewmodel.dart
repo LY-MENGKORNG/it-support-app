@@ -14,8 +14,9 @@ import 'package:app/domain/models/request_status.dart';
 import 'package:app/domain/models/user.dart';
 import 'package:app/utils/command.dart';
 import 'package:app/utils/result.dart';
+import 'package:app/utils/safe_notifier.dart';
 
-class RequestDetailViewModel extends ChangeNotifier {
+class RequestDetailViewModel extends ChangeNotifier with SafeNotifier {
   RequestDetailViewModel({
     required this._requestRepository,
     required this._userRepository,
@@ -79,8 +80,21 @@ class RequestDetailViewModel extends ChangeNotifier {
       assign.running ||
       addComment.running;
 
-  Listenable get mutations =>
-      Listenable.merge([changeStatus, changePriority, assign, addComment]);
+  /// The four mutating commands as one listenable, built once.
+  ///
+  /// `Listenable.merge` returns a new object on every call and defines no `==`,
+  /// so a getter would hand `ListenableBuilder` an unequal listenable on every
+  /// build — which tears down and re-adds a listener on all four commands each
+  /// time, including on every keystroke in the comment composer. It is also
+  /// what makes `addListener`/`removeListener` on this balance: a screen that
+  /// subscribes and unsubscribes would otherwise be doing so through two
+  /// different objects.
+  late final Listenable mutations = Listenable.merge([
+    changeStatus,
+    changePriority,
+    assign,
+    addComment,
+  ]);
 
   Future<Result<void>> _load() async {
     final result = await _requestRepository.getRequest(requestId);

@@ -1,3 +1,5 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import 'package:app/utils/json.dart';
 
 import 'request_category.dart';
@@ -7,6 +9,9 @@ import 'request_history.dart';
 import 'request_status.dart';
 import 'user.dart';
 
+part 'generated/request.g.dart';
+
+@JsonSerializable(checked: true, createToJson: false)
 class Request {
   const Request({
     required this.id,
@@ -23,46 +28,34 @@ class Request {
     this.closedAt,
   });
 
+  factory Request.fromJson(JsonType json) => _$RequestFromJson(json);
+
   final int id;
   final String title;
   final String description;
   final RequestCategory category;
-  final Priority priority;
-  final RequestStatus status;
-  final User requester;
 
+  @PriorityConverter()
+  final Priority priority;
+  @RequestStatusConverter()
+  final RequestStatus status;
+
+  final User requester;
   final User? assignee;
 
+  @LocalDateTime()
   final DateTime createdAt;
+  @LocalDateTime()
   final DateTime updatedAt;
+  @LocalDateTimeOrNull()
   final DateTime? resolvedAt;
+  @LocalDateTimeOrNull()
   final DateTime? closedAt;
 
   bool get isAssigned => assignee != null;
-
-  factory Request.fromJson(JsonType json) {
-    final rj = Json(json);
-
-    return Request(
-      id: rj.intOf('id'),
-      title: rj.stringOf('title'),
-      description: rj.stringOf('description'),
-      category: RequestCategory.fromJson(rj.objectOf('category')),
-      priority: Priority.fromWire(rj.stringOf('priority')),
-      status: RequestStatus.fromWire(rj.stringOf('status')),
-      requester: User.fromJson(rj.objectOf('requester')),
-      assignee: switch (rj.objectOrNull('assignee')) {
-        final JsonType user => User.fromJson(user),
-        null => null,
-      },
-      createdAt: rj.dateOf('createdAt'),
-      updatedAt: rj.dateOf('updatedAt'),
-      resolvedAt: rj.dateOrNull('resolvedAt'),
-      closedAt: rj.dateOrNull('closedAt'),
-    );
-  }
 }
 
+@JsonSerializable(checked: true, createToJson: false)
 class RequestDetail {
   const RequestDetail({
     required this.request,
@@ -70,21 +63,23 @@ class RequestDetail {
     required this.history,
   });
 
+  factory RequestDetail.fromJson(JsonType json) =>
+      _$RequestDetailFromJson(json);
+
+  /// The detail payload is flat: the request's own fields sit alongside
+  /// `comments` and `history` rather than nested under a `request` key, so
+  /// this field is read from the whole payload instead of from one key of it.
+  @JsonKey(readValue: _wholePayload)
   final Request request;
+
+  @JsonKey(defaultValue: <Comment>[])
   final List<Comment> comments;
+  @JsonKey(defaultValue: <RequestHistory>[])
   final List<RequestHistory> history;
 
+  static Object? _wholePayload(Map<dynamic, dynamic> json, String key) => json;
+
   int get id => request.id;
-
-  factory RequestDetail.fromJson(JsonType json) {
-    final rdj = Json(json);
-
-    return RequestDetail(
-      request: Request.fromJson(json),
-      comments: rdj.listOf('comments', Comment.fromJson),
-      history: rdj.listOf('history', RequestHistory.fromJson),
-    );
-  }
 
   RequestDetail copyWith({
     Request? request,
@@ -97,6 +92,7 @@ class RequestDetail {
   );
 }
 
+@JsonSerializable(checked: true, createToJson: false)
 class RequestPage {
   const RequestPage({
     required this.items,
@@ -104,20 +100,18 @@ class RequestPage {
     required this.hasMore,
   });
 
-  final List<Request> items;
-  final int total;
-  final bool hasMore;
+  factory RequestPage.fromJson(JsonType json) => _$RequestPageFromJson(json);
 
-  factory RequestPage.fromJson(JsonType json) {
-    final rpj = Json(json);
-    return RequestPage(
-      items: rpj.listOf('items', Request.fromJson),
-      total: rpj.intOf('total'),
-      hasMore: rpj.boolOr('hasMore', fallback: false),
-    );
-  }
+  @JsonKey(defaultValue: <Request>[])
+  final List<Request> items;
+
+  final int total;
+
+  @JsonKey(defaultValue: false)
+  final bool hasMore;
 }
 
+@JsonSerializable(createFactory: false, includeIfNull: false)
 class NewRequest {
   const NewRequest({
     required this.title,
@@ -130,19 +124,22 @@ class NewRequest {
   final String title;
   final String description;
   final int categoryId;
+
+  @PriorityConverter()
   final Priority priority;
 
   final int? assigneeId;
 
-  JsonType toJson() => {
-    'title': title,
-    'description': description,
-    'categoryId': categoryId,
-    'priority': priority.wire,
-    if (assigneeId != null) 'assigneeId': assigneeId,
-  };
+  JsonType toJson() => _$NewRequestToJson(this);
 }
 
+/// Hand-written, because a patch's absent and null keys mean different things.
+///
+/// An omitted key means "leave this alone", so clearing an assignee has to
+/// send an explicit `null` — the one case where a null must survive into the
+/// body while every other unset field stays out of it. `includeIfNull: false`
+/// applies to all of them or none, so it cannot express this, and [unassign]
+/// is a flag about the encoding rather than a field to encode.
 class RequestPatch {
   const RequestPatch({
     this.title,
