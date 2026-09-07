@@ -14,8 +14,9 @@ const config = new DocumentBuilder()
   .addSecurityRequirements('bearer')
   .build();
 
-export const apiReference = (app: INestApplication<any>) =>
-  reference({
+export function apiReference(app: INestApplication<any>) {
+  return reference({
     content: () => SwaggerModule.createDocument(app, config),
-    theme: 'kepler',
+    theme: 'saturn',
   });
+}

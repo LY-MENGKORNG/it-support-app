@@ -61,43 +61,50 @@ void main() {
     expect(it.session.isSignedIn, isFalse, reason: 'session must be cleared');
   });
 
-  test('B: session expires WHILE using the app -> session is cleared', () async {
-    SharedPreferences.setMockInitialValues({'access_token': 'good'});
+  test(
+    'B: session expires WHILE using the app -> session is cleared',
+    () async {
+      SharedPreferences.setMockInitialValues({'access_token': 'good'});
 
-    var expiredNow = false;
-    final it = build((request) {
-      if (expiredNow) return expired();
-      return request.url.path == '/auth/me'
-          ? ok(userJson())
-          : ok(const <String, Object?>{});
-    });
+      var expiredNow = false;
+      final it = build((request) {
+        if (expiredNow) return expired();
+        return request.url.path == '/auth/me'
+            ? ok(userJson())
+            : ok(const <String, Object?>{});
+      });
 
-    await it.session.restore();
-    expect(it.session.isSignedIn, isTrue, reason: 'signed in to begin with');
+      await it.session.restore();
+      expect(it.session.isSignedIn, isTrue, reason: 'signed in to begin with');
 
-    var notified = 0;
-    it.session.addListener(() => notified++);
+      var notified = 0;
+      it.session.addListener(() => notified++);
 
-    // The token expires on the server. The app makes an ordinary call.
-    expiredNow = true;
-    final call = await it.client.get<Object?>('/requests', (p) => p);
-    expect(call, isA<Error<Object?>>(), reason: 'server rejected the call');
+      // The token expires on the server. The app makes an ordinary call.
+      expiredNow = true;
+      final call = await it.client.get<Object?>('/requests', (p) => p);
+      expect(call, isA<Error<Object?>>(), reason: 'server rejected the call');
 
-    // Give the fire-and-forget signOut() a chance to run.
-    await Future<void>.delayed(Duration.zero);
+      // Give the fire-and-forget signOut() a chance to run.
+      await Future<void>.delayed(Duration.zero);
 
-    expect(notified, greaterThan(0), reason: 'router must be told to re-check');
-    expect(
-      it.session.isSignedIn,
-      isFalse,
-      reason: 'a 401 during normal use must clear the session',
-    );
-    expect(
-      await const SharedPreferencesService().fetchToken(),
-      isA<Ok<String?>>().having((r) => r.value, 'stored token', isNull),
-      reason: 'the dead token must not survive on disk',
-    );
-  });
+      expect(
+        notified,
+        greaterThan(0),
+        reason: 'router must be told to re-check',
+      );
+      expect(
+        it.session.isSignedIn,
+        isFalse,
+        reason: 'a 401 during normal use must clear the session',
+      );
+      expect(
+        await const SharedPreferencesService().fetchToken(),
+        isA<Ok<String?>>().having((r) => r.value, 'stored token', isNull),
+        reason: 'the dead token must not survive on disk',
+      );
+    },
+  );
 
   testWidgets('C: cleared session sends the router to the login screen', (
     tester,
