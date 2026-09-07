@@ -6,7 +6,7 @@ typedef ParseFn<T> = T Function(JsonType);
 class Json {
   final JsonType _json;
 
-  Json(this._json);
+  const Json(this._json);
 
   T _require<T>(String key) {
     final value = _json[key];

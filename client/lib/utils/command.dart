@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 
 import 'result.dart';
 
-typedef CommandAction0<T> = Future<Result<T>> Function();
-typedef CommandAction1<T, A> = Future<Result<T>> Function(A);
+typedef ZeroArgAction<T> = Future<Result<T>> Function();
+typedef OneArgAction<T, A> = Future<Result<T>> Function(A);
 
 abstract class Command<T> extends ChangeNotifier {
   bool _running = false;
@@ -19,12 +19,7 @@ abstract class Command<T> extends ChangeNotifier {
     _ => null,
   };
 
-  void clearResult() {
-    _result = null;
-    notifyListeners();
-  }
-
-  Future<void> _execute(CommandAction0<T> action) async {
+  Future<void> _execute(ZeroArgAction<T> action) async {
     if (_running) return;
 
     _running = true;
@@ -38,22 +33,29 @@ abstract class Command<T> extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void clearResult() {
+    _result = null;
+    notifyListeners();
+  }
 }
 
+/// A utility class for executing an action with notify its listeners before and after execution.
 final class Command0<T> extends Command<T> {
   Command0(this._action);
 
-  final CommandAction0<T> _action;
+  final ZeroArgAction<T> _action;
 
   Future<void> execute() async {
     await _execute(_action);
   }
 }
 
+/// A utility class for executing an action containing one arguments by notifying its listeners before and after execution.
 final class Command1<T, A> extends Command<T> {
   Command1(this._action);
 
-  final CommandAction1<T, A> _action;
+  final OneArgAction<T, A> _action;
 
   Future<void> execute(A argument) async {
     await _execute(() => _action(argument));

@@ -19,7 +19,7 @@ export class CommentService {
       throw new NotFoundException(`Request ${requestId} not found`);
     }
 
-    const created = this.repository.insert(requestId, { ...dto, userId });
+    const created = await this.repository.insert(requestId, { ...dto, userId });
 
     return this.repository.findById(created.id);
   }

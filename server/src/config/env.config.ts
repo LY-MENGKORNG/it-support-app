@@ -8,6 +8,9 @@ export const envSchema = z
       .readonly(),
     PORT: z.coerce.number().int().positive().default(3000).readonly(),
 
+    TURSO_CONNECTION_URL: z.url().readonly(),
+    TURSO_AUTH_TOKEN: z.string().readonly(),
+
     /**
      * The HMAC key every access token is signed with. Changing it invalidates
      * every issued token, which is exactly what you want after a leak.
@@ -32,5 +35,7 @@ export const envSchema = z
       env.JWT_SECRET !== 'dev-only-insecure-jwt-secret-key',
     { path: ['JWT_SECRET'], message: 'JWT_SECRET must be set in production' },
   );
+
+export const env = envSchema.parse(Bun.env);
 
 export type Env = z.infer<typeof envSchema>;

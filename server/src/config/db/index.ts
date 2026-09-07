@@ -1,16 +1,20 @@
-import { Database } from 'bun:sqlite';
-import { drizzle, SQLiteBunDatabase } from 'drizzle-orm/bun-sqlite';
+import { drizzle, LibSQLDatabase } from 'drizzle-orm/libsql';
+import { type Client, createClient } from '@libsql/client';
 import { relations } from './relation.config';
+import { env } from '@config/env.config';
 
-const client = new Database('db.sqlite');
+export const connection = {
+  url: env.TURSO_CONNECTION_URL!,
+  authToken: env.TURSO_AUTH_TOKEN!,
+} as const;
 
-client.run('PRAGMA journal_mode = WAL;'); // concurrent readers
-client.run('PRAGMA foreign_keys = ON;'); // OFF by default in SQLite
-client.run('PRAGMA busy_timeout = 5000;'); // avoid SQLITE_BUSY throws
-client.run('PRAGMA synchronous = NORMAL;'); // safe with WAL
+const client = createClient({
+  url: connection.url,
+  authToken: connection.authToken,
+});
 
-export const db = drizzle({ client, relations });
+export const db = drizzle({ relations, client, logger: true });
 
-export type DrizzleDB = SQLiteBunDatabase<typeof relations> & {
-  $client: Database;
+export type DrizzleDB = LibSQLDatabase<typeof relations> & {
+  $client: Client;
 };

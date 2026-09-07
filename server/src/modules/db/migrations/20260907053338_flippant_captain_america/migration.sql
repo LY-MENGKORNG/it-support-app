@@ -10,7 +10,7 @@ CREATE TABLE `comment` (
 	`request_id` integer NOT NULL,
 	`user_id` integer NOT NULL,
 	`content` text NOT NULL,
-	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
 	`updated_at` integer,
 	CONSTRAINT `fk_comment_request_id_request_id_fk` FOREIGN KEY (`request_id`) REFERENCES `request`(`id`) ON DELETE CASCADE,
 	CONSTRAINT `fk_comment_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
@@ -23,7 +23,7 @@ CREATE TABLE `request_history` (
 	`action` text NOT NULL,
 	`old_value` text,
 	`new_value` text,
-	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
+	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
 	CONSTRAINT `fk_request_history_request_id_request_id_fk` FOREIGN KEY (`request_id`) REFERENCES `request`(`id`) ON DELETE CASCADE,
 	CONSTRAINT `fk_request_history_user_id_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
 );

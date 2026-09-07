@@ -2,6 +2,7 @@ import { Global, Inject, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DRIZZLE } from '@common/constants';
 import { db, type DrizzleDB } from '@config/db';
+import { safeTry } from '@common/utils/exception';
 
 @Global()
 @Module({
@@ -17,9 +18,9 @@ import { db, type DrizzleDB } from '@config/db';
   exports: [DRIZZLE],
 })
 export class DBModule {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
 
   onApplicationShutdown() {
-    this.db.$client.close();
+    safeTry(() => this.db.$client.close());
   }
 }

@@ -129,11 +129,12 @@ export class RequestRepository {
   }
 
   insertWithHistory(values: NewRequest, entries: RequestHistoryDraft[]) {
-    return this.db.transaction((tx) => {
-      const created = tx.insert(request).values(values).returning().get();
+    return this.db.transaction(async (tx) => {
+      const created = await tx.insert(request).values(values).returning().get();
 
       if (entries.length) {
-        tx.insert(requestHistory)
+        await tx
+          .insert(requestHistory)
           .values(entries.map((entry) => ({ ...entry, requestId: created.id })))
           .run();
       }
@@ -142,16 +143,17 @@ export class RequestRepository {
     });
   }
 
-  updateWithHistory(
+  async updateWithHistory(
     id: number,
     patch: RequestPatch,
     entries: RequestHistoryDraft[],
   ) {
-    this.db.transaction((tx) => {
-      tx.update(request).set(patch).where(eq(request.id, id)).run();
+    await this.db.transaction(async (tx) => {
+      await tx.update(request).set(patch).where(eq(request.id, id)).run();
 
       if (entries.length) {
-        tx.insert(requestHistory)
+        await tx
+          .insert(requestHistory)
           .values(entries.map((entry) => ({ ...entry, requestId: id })))
           .run();
       }

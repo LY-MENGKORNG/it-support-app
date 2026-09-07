@@ -1,16 +1,5 @@
 #!/usr/bin/env bun
 
-/**
- * Deterministic demo data.
- *
- * The previous version only refined the `user` table, so drizzle-seed filled
- * `request.status` / `request.priority` with random strings that the enums
- * reject. Everything here is written by hand instead, because the interesting
- * part of this dataset is that it is *consistent*: a resolved request has a
- * `resolvedAt`, an assigned request has an `assigned` history row, and every
- * status change in the audit trail actually happened.
- */
-
 import { reset } from 'drizzle-seed';
 import { schema } from './relation.config';
 import { db } from '.';
@@ -21,7 +10,6 @@ import { request } from '@modules/requests/request.schema';
 import { user } from '@modules/users/user.schema';
 import type { Priority, RequestStatus, Role } from '@common/constants';
 
-/** Seeded PRNG (mulberry32) so re-running gives the same database every time. */
 function rng(seed: number) {
   return () => {
     seed = (seed + 0x6d2b79f5) | 0;
@@ -74,7 +62,6 @@ const PEOPLE: readonly (readonly [string, Role])[] = [
   ['Nisa Chea', 'employee'],
 ];
 
-/** Title + description pairs, grouped by the category they belong to. */
 const TICKETS: Record<string, readonly (readonly [string, string])[]> = {
   Network: [
     [
@@ -269,7 +256,7 @@ const COMMENTS = {
 } as const;
 
 const PRIORITIES: readonly Priority[] = ['low', 'medium', 'high', 'critical'];
-/** Weighted so most tickets are ordinary and criticals stay rare. */
+
 const PRIORITY_POOL: readonly Priority[] = [
   'low',
   'low',
@@ -338,8 +325,6 @@ async function main() {
     const cat = categoryByName.get(categoryName)!;
 
     for (const [title, description] of tickets) {
-      // Each ticket template is used a couple of times so the list is long
-      // enough to page and filter through.
       const copies = 1 + Math.floor(random() * 2);
 
       for (let copy = 0; copy < copies; copy++) {
@@ -347,7 +332,6 @@ async function main() {
         const priority = pick(PRIORITY_POOL);
         const requester = pick(employees);
         const isOpen = status === 'open';
-        // An open ticket may still be unassigned; anything further along is not.
         const assignee = isOpen && chance(0.5) ? null : pick(staff);
 
         const createdAt = daysAgo(90);
@@ -367,7 +351,7 @@ async function main() {
             : null;
         const updatedAt = closedAt ?? resolvedAt ?? createdAt;
 
-        const created = db
+        const created = await db
           .insert(request)
           .values({
             title,
@@ -386,7 +370,6 @@ async function main() {
           .get();
         requestCount++;
 
-        // --- audit trail, in the order the events would really have happened
         const history: (typeof requestHistory.$inferInsert)[] = [
           {
             requestId: created.id,
@@ -455,7 +438,6 @@ async function main() {
         await db.insert(requestHistory).values(history);
         historyCount += history.length;
 
-        // --- comment thread, matching how far the ticket actually got
         const thread: (typeof comment.$inferInsert)[] = [];
         const author = assignee ?? pick(staff);
 

@@ -72,7 +72,7 @@ export class RequestService {
         ]),
     ];
 
-    const id = this.repository.insertWithHistory(
+    const id = await this.repository.insertWithHistory(
       { ...rest, requesterId, assigneeId: assignee, status: 'open' },
       entries,
     );
@@ -99,7 +99,7 @@ export class RequestService {
       ...this.statusTimestamps(existing, changes),
     };
 
-    this.repository.updateWithHistory(id, patch, entries);
+    await this.repository.updateWithHistory(id, patch, entries);
 
     return this.findOne(id);
   }

@@ -38,7 +38,6 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
         viewModel: LoginViewModel(sessionRepository: context.read()),
       ),
     ),
-
     GoRoute(
       path: Routes.newRequest,
       name: RouteNames.newRequest,
