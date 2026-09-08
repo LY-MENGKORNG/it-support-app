@@ -144,7 +144,7 @@ the audit trail can never drift from the record.
 ### Client
 
 Follows the [official Flutter app architecture guide](https://docs.flutter.dev/app-architecture),
-including the `Result` and `Command` patterns and `package:provider` for
+including the `Result` and `Command` patterns and `package:get` for
 dependency injection.
 
 ```
