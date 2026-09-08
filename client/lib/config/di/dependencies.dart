@@ -15,21 +15,6 @@ import 'package:app/data/services/api/request_api.dart';
 import 'package:app/data/services/api/rest_client.dart';
 import 'package:app/data/services/api/user_api.dart';
 
-/// Registers the app's object graph into GetX's global registry.
-///
-/// Order is load-bearing, unlike the provider list this replaced: `Get.put` is
-/// eager, and a `Get.find()` sitting in an argument list is resolved at
-/// registration time. Moving a line above its dependency — an alphabetical
-/// tidy-up of what now reads like a sorted list — crashes on launch with
-/// `"CategoryApi" not found`, so the grouping below is the dependency order and
-/// not a filing scheme.
-///
-/// Every registration is `permanent`. `Get.lazyPut` would restore provider's
-/// laziness, but only with `fenix`, which lets an instance be dropped and
-/// rebuilt — and the session wiring at the bottom binds *these two instances*
-/// to each other for the life of the app. A rebuilt [RestClient] would come
-/// back without its token provider, and every request after that would go out
-/// unauthenticated.
 void registerDeps() {
   // NOTE: services
   Get.put(RestClient(), permanent: true);
@@ -57,13 +42,6 @@ void registerDeps() {
   );
 
   // NOTE: change notifiers
-  //
-  // `RestClient.dispose()` is unreachable now: provider's `dispose:` callback
-  // closed the `http.Client`, and GetX calls no teardown on a plain object —
-  // `permanent` additionally exempts this one from `Get.delete`. Accepted
-  // rather than making the transport a `GetxService` to get the hook back: the
-  // client lives as long as the process and dies with it, and the tests that
-  // care build their own.
   final session = RemoteSessionRepository(
     auth: Get.find(),
     preferences: Get.find(),
