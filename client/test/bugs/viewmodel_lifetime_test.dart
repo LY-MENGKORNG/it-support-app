@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 import 'package:app/data/repositories/category/category_repository.dart';
 import 'package:app/data/repositories/request/request_repository.dart';
@@ -24,10 +24,18 @@ import '../fakes/repositories/fake_user_repository.dart';
 /// one still notifying a screen that had been gone for some time.
 ///
 /// The session's listener count is the probe. Only deltas are asserted on:
-/// `provider` and `GoRouter` hold subscriptions of their own that are supposed
-/// to last for the whole run.
+/// `GoRouter` holds a subscription of its own, taken at construction for
+/// `refreshListenable`, that is supposed to last for the whole run.
 void main() {
   ({FakeSessionRepository session, GoRouter router, Widget app}) build() {
+    // The route builders resolve these three from the registry. The session is
+    // handed to `router` instead, so the object the guard redirects on and the
+    // one the screens use cannot drift apart.
+    Get.put<RequestRepository>(FakeRequestRepository());
+    Get.put<CategoryRepository>(FakeCategoryRepository());
+    Get.put<UserRepository>(FakeUserRepository());
+    addTearDown(Get.reset);
+
     final session = FakeSessionRepository(user: kStaff);
     final router = routing.router(session);
     addTearDown(router.dispose);
@@ -35,15 +43,7 @@ void main() {
     return (
       session: session,
       router: router,
-      app: MultiProvider(
-        providers: [
-          Provider<RequestRepository>.value(value: FakeRequestRepository()),
-          Provider<CategoryRepository>.value(value: FakeCategoryRepository()),
-          Provider<UserRepository>.value(value: FakeUserRepository()),
-          ChangeNotifierProvider<SessionRepository>.value(value: session),
-        ],
-        child: MaterialApp.router(routerConfig: router),
-      ),
+      app: MaterialApp.router(routerConfig: router),
     );
   }
 
@@ -80,8 +80,9 @@ void main() {
     await tester.pumpWidget(it.app);
     await tester.pumpAndSettle();
 
-    // Settle first: the count includes provider's own subscription, taken the
-    // first time a route reads the session, and that one never comes back.
+    // Settle to a signed-out baseline first: each loop iteration below signs
+    // in and out again, so the count has to be measured from the same state it
+    // will be compared against.
     it.router.go(Routes.settings);
     await tester.pumpAndSettle();
     await it.session.signOut();

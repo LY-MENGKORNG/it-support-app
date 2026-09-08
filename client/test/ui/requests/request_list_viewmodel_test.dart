@@ -7,14 +7,17 @@ import 'package:app/ui/requests/view_models/request_list_viewmodel.dart';
 import '../../fakes/fixtures.dart';
 import '../../fakes/repositories/fake_category_repository.dart';
 import '../../fakes/repositories/fake_request_repository.dart';
+import '../../fakes/repositories/fake_session_repository.dart';
 
 void main() {
   late FakeRequestRepository requests;
   late FakeCategoryRepository categories;
+  late FakeSessionRepository session;
 
   RequestListViewModel build() => RequestListViewModel(
     requestRepository: requests,
     categoryRepository: categories,
+    sessionRepository: session,
   );
 
   setUp(() {
@@ -25,6 +28,7 @@ void main() {
       ],
     );
     categories = FakeCategoryRepository();
+    session = FakeSessionRepository(user: kStaff);
   });
 
   group('load', () {

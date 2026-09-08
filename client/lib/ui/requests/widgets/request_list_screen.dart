@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:app/data/repositories/session/session_repository.dart';
 import 'package:app/domain/models/request.dart';
 import 'package:app/routing/routes.dart';
 import 'package:app/ui/core/ui/error_indicator.dart';
 import 'package:app/ui/requests/view_models/request_list_viewmodel.dart';
-import 'package:provider/provider.dart';
 
 import 'request_card.dart';
 import 'request_filter_sheet.dart';
@@ -49,7 +47,7 @@ class _RequestListScreenState extends State<RequestListScreen> {
   }
 
   Future<void> _openFilters() async {
-    final user = context.read<SessionRepository>().currentUser;
+    final user = widget.viewModel.currentUser;
     if (user == null) return;
 
     final result = await RequestFilterSheet.show(

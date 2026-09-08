@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 import 'package:app/data/repositories/session/session_repository.dart';
 import 'package:app/domain/models/request.dart';
@@ -21,6 +21,15 @@ import 'package:app/ui/users/widgets/user_list_screen.dart';
 
 import 'routes.dart';
 
+/// The app's routes, and the guard that decides which of them you may see.
+///
+/// [sessionRepository] is passed down to every view model that needs it rather
+/// than each resolving its own from the registry. Both would return the same
+/// singleton in the running app — but only in the running app: a caller that
+/// injects a different session (which is what the tests do) would get a router
+/// redirecting on one object while its screens sign in and out of another, and
+/// the two would drift with nothing to catch it. Threading the parameter makes
+/// them the same object by construction.
 GoRouter router(SessionRepository sessionRepository) => GoRouter(
   initialLocation: Routes.splash,
   refreshListenable: sessionRepository,
@@ -35,7 +44,7 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
       path: Routes.login,
       name: RouteNames.login,
       builder: (context, state) => _owned(
-        (context) => LoginViewModel(sessionRepository: context.read()),
+        () => LoginViewModel(sessionRepository: sessionRepository),
         (viewModel) => LoginScreen(viewModel: viewModel),
       ),
     ),
@@ -43,10 +52,10 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
       path: Routes.newRequest,
       name: RouteNames.newRequest,
       builder: (context, state) => _owned(
-        (context) => CreateRequestViewModel(
-          requestRepository: context.read(),
-          categoryRepository: context.read(),
-          sessionRepository: context.read(),
+        () => CreateRequestViewModel(
+          requestRepository: Get.find(),
+          categoryRepository: Get.find(),
+          sessionRepository: sessionRepository,
         ),
         (viewModel) => CreateRequestScreen(viewModel: viewModel),
       ),
@@ -59,11 +68,11 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
         if (id == null) return const _InvalidRequestScreen();
 
         return _owned(
-          (context) => RequestDetailViewModel(
-            requestRepository: context.read(),
-            userRepository: context.read(),
-            categoryRepository: context.read(),
-            sessionRepository: context.read(),
+          () => RequestDetailViewModel(
+            requestRepository: Get.find(),
+            userRepository: Get.find(),
+            categoryRepository: Get.find(),
+            sessionRepository: sessionRepository,
             requestId: id,
             preview: state.extra is Request ? state.extra! as Request : null,
           ),
@@ -81,9 +90,10 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
               path: Routes.requests,
               name: RouteNames.requests,
               builder: (context, state) => _owned(
-                (context) => RequestListViewModel(
-                  requestRepository: context.read(),
-                  categoryRepository: context.read(),
+                () => RequestListViewModel(
+                  requestRepository: Get.find(),
+                  categoryRepository: Get.find(),
+                  sessionRepository: sessionRepository,
                 ),
                 (viewModel) => RequestListScreen(viewModel: viewModel),
               ),
@@ -96,7 +106,7 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
               path: Routes.users,
               name: RouteNames.users,
               builder: (context, state) => _owned(
-                (context) => UserListViewModel(userRepository: context.read()),
+                () => UserListViewModel(userRepository: Get.find()),
                 (viewModel) => UserListScreen(viewModel: viewModel),
               ),
             ),
@@ -108,8 +118,7 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
               path: Routes.settings,
               name: RouteNames.settings,
               builder: (context, state) => _owned(
-                (context) =>
-                    SettingsViewModel(sessionRepository: context.read()),
+                () => SettingsViewModel(sessionRepository: sessionRepository),
                 (viewModel) => SettingsScreen(viewModel: viewModel),
               ),
             ),
@@ -150,16 +159,50 @@ String? _guard(GoRouterState state, SessionRepository session) {
 /// [SettingsViewModel]'s case — a listener on the shared [SessionRepository]
 /// outlive the screen, and a route visited twice leaves two of them behind.
 ///
-/// [ChangeNotifierProvider] gives it a lifetime: [create] runs once per route
-/// instance rather than on every rebuild of the builder, and the view model is
-/// disposed when the route leaves the tree.
+/// This is a plain [StatefulWidget] rather than a `Get.put`: GetX calls no
+/// teardown on a [ChangeNotifier], so registering one here would give it a
+/// home but still never dispose it — the leak this exists to fix, back again.
 Widget _owned<T extends ChangeNotifier>(
-  T Function(BuildContext context) create,
+  T Function() create,
   Widget Function(T viewModel) build,
-) => ChangeNotifierProvider<T>(
-  create: create,
-  child: Builder(builder: (context) => build(context.read<T>())),
-);
+) => _Owned<T>(create, build);
+
+class _Owned<T extends ChangeNotifier> extends StatefulWidget {
+  const _Owned(this.create, this.build);
+
+  final T Function() create;
+  final Widget Function(T viewModel) build;
+
+  @override
+  State<_Owned<T>> createState() => _OwnedState<T>();
+}
+
+class _OwnedState<T extends ChangeNotifier> extends State<_Owned<T>> {
+  /// Assigned in [initState], not by a `late final` field initializer.
+  ///
+  /// A `late` initializer runs on first *read*, and `dispose` reads it too, so
+  /// a route torn down before it ever built would construct a view model in
+  /// order to destroy it — running constructor side effects for a screen
+  /// nobody saw, and [RequestListViewModel] starts two requests in its. A
+  /// throw from `create` would also re-run there, surfacing from inside
+  /// `dispose` and masking the original error.
+  T? _viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = widget.create();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.build(_viewModel!);
+
+  @override
+  void dispose() {
+    _viewModel?.dispose();
+    super.dispose();
+  }
+}
 
 class _InvalidRequestScreen extends StatelessWidget {
   const _InvalidRequestScreen();

@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:app/data/repositories/session/session_repository.dart';
 import 'package:app/data/repositories/session/session_repository_remote.dart';
 import 'package:app/data/services/api/auth_api.dart';
 import 'package:app/data/services/api/rest_client.dart';
@@ -112,11 +110,10 @@ void main() {
     SharedPreferences.setMockInitialValues({'access_token': 'expired'});
     final it = build((request) => expired());
 
+    // No DI wrapper: `router` takes the session directly, and every view model
+    // on the way to /login is handed that same object.
     await tester.pumpWidget(
-      ChangeNotifierProvider<SessionRepository>.value(
-        value: it.session,
-        child: MaterialApp.router(routerConfig: router(it.session)),
-      ),
+      MaterialApp.router(routerConfig: router(it.session)),
     );
 
     await it.session.restore();

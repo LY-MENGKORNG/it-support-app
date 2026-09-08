@@ -4,10 +4,12 @@ import 'package:flutter/foundation.dart';
 
 import 'package:app/data/repositories/category/category_repository.dart';
 import 'package:app/data/repositories/request/request_repository.dart';
+import 'package:app/data/repositories/session/session_repository.dart';
 import 'package:app/domain/models/request_category.dart';
 import 'package:app/domain/models/request.dart';
 import 'package:app/domain/models/request_filters.dart';
 import 'package:app/domain/models/request_sort.dart';
+import 'package:app/domain/models/user.dart';
 import 'package:app/utils/command.dart';
 import 'package:app/utils/debounced_refresh.dart';
 import 'package:app/utils/result.dart';
@@ -17,6 +19,7 @@ class RequestListViewModel extends ChangeNotifier with SafeNotifier {
   RequestListViewModel({
     required this._requestRepository,
     required this._categoryRepository,
+    required this._sessionRepository,
   }) {
     load = Command0(_load)..execute();
     loadMore = Command0(_loadMore);
@@ -26,6 +29,7 @@ class RequestListViewModel extends ChangeNotifier with SafeNotifier {
 
   final RequestRepository _requestRepository;
   final CategoryRepository _categoryRepository;
+  final SessionRepository _sessionRepository;
 
   static const _pageSize = 20;
 
@@ -42,6 +46,12 @@ class RequestListViewModel extends ChangeNotifier with SafeNotifier {
   List<RequestCategory> _categoryOptions = const [];
   int _total = 0;
   bool _hasMore = false;
+
+  /// Who is filtering, which the filter sheet needs to offer "assigned to me".
+  ///
+  /// Exposed here so the screen reads its view model rather than reaching into
+  /// the repository layer for one field.
+  User? get currentUser => _sessionRepository.currentUser;
 
   RequestFilters get filters => _filters;
   UnmodifiableListView<Request> get items => UnmodifiableListView(_items);

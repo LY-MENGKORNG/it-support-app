@@ -1,6 +1,5 @@
+import 'package:get/get.dart';
 import 'package:app/data/services/local/shared_preference_service.dart';
-import 'package:provider/provider.dart';
-import 'package:provider/single_child_widget.dart';
 import 'package:app/data/repositories/category/category_repository.dart';
 import 'package:app/data/repositories/category/category_repository_remote.dart';
 import 'package:app/data/repositories/request/request_repository.dart';
@@ -16,49 +15,63 @@ import 'package:app/data/services/api/request_api.dart';
 import 'package:app/data/services/api/rest_client.dart';
 import 'package:app/data/services/api/user_api.dart';
 
-List<SingleChildWidget> get remoteProviders => [
-  //  NOTE: services
-  Provider(
-    create: (context) => RestClient(),
-    dispose: (_, client) => client.dispose(),
-  ),
-  Provider(create: (context) => const SharedPreferencesService()),
+/// Registers the app's object graph into GetX's global registry.
+///
+/// Order is load-bearing, unlike the provider list this replaced: `Get.put` is
+/// eager, and a `Get.find()` sitting in an argument list is resolved at
+/// registration time. Moving a line above its dependency — an alphabetical
+/// tidy-up of what now reads like a sorted list — crashes on launch with
+/// `"CategoryApi" not found`, so the grouping below is the dependency order and
+/// not a filing scheme.
+///
+/// Every registration is `permanent`. `Get.lazyPut` would restore provider's
+/// laziness, but only with `fenix`, which lets an instance be dropped and
+/// rebuilt — and the session wiring at the bottom binds *these two instances*
+/// to each other for the life of the app. A rebuilt [RestClient] would come
+/// back without its token provider, and every request after that would go out
+/// unauthenticated.
+void registerDeps() {
+  // NOTE: services
+  Get.put(RestClient(), permanent: true);
+  Get.put(const SharedPreferencesService(), permanent: true);
 
-  //  NOTE: endpoints
-  Provider(create: (context) => AuthApi(context.read())),
-  Provider(create: (context) => RequestApi(context.read())),
-  Provider(create: (context) => CommentApi(context.read())),
-  Provider(create: (context) => UserApi(context.read())),
-  Provider(create: (context) => CategoryApi(context.read())),
+  // NOTE: endpoints
+  Get.put(AuthApi(Get.find()), permanent: true);
+  Get.put(CategoryApi(Get.find()), permanent: true);
+  Get.put(CommentApi(Get.find()), permanent: true);
+  Get.put(RequestApi(Get.find()), permanent: true);
+  Get.put(UserApi(Get.find()), permanent: true);
 
-  //  NOTE: repositories
-  Provider<RequestRepository>(
-    create: (context) => RemoteRequestRepository(
-      requests: context.read(),
-      comments: context.read(),
-    ),
-  ),
-  Provider<UserRepository>(
-    create: (context) => RemoteUserRepository(users: context.read()),
-  ),
-  Provider<CategoryRepository>(
-    create: (context) => RemoteCategoryRepository(categories: context.read()),
-  ),
+  // NOTE: repos
+  Get.put<CategoryRepository>(
+    RemoteCategoryRepository(categories: Get.find()),
+    permanent: true,
+  );
+  Get.put<RequestRepository>(
+    RemoteRequestRepository(requests: Get.find(), comments: Get.find()),
+    permanent: true,
+  );
+  Get.put<UserRepository>(
+    RemoteUserRepository(users: Get.find()),
+    permanent: true,
+  );
 
-  //  NOTE: change notifiers
-  ChangeNotifierProvider<SessionRepository>(
-    create: (context) {
-      final client = context.read<RestClient>();
-      final session = RemoteSessionRepository(
-        auth: context.read(),
-        preferences: context.read(),
-      );
+  // NOTE: change notifiers
+  //
+  // `RestClient.dispose()` is unreachable now: provider's `dispose:` callback
+  // closed the `http.Client`, and GetX calls no teardown on a plain object —
+  // `permanent` additionally exempts this one from `Get.delete`. Accepted
+  // rather than making the transport a `GetxService` to get the hook back: the
+  // client lives as long as the process and dies with it, and the tests that
+  // care build their own.
+  final session = RemoteSessionRepository(
+    auth: Get.find(),
+    preferences: Get.find(),
+  );
+  final client = Get.find<RestClient>();
 
-      client.authTokenProvider = () => session.accessToken;
+  client.authTokenProvider = () => session.accessToken;
+  client.onUnauthorized = session.signOut;
 
-      client.onUnauthorized = session.signOut;
-
-      return session;
-    },
-  ),
-];
+  Get.put<SessionRepository>(session, permanent: true);
+}

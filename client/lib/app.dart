@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 import 'package:app/data/repositories/session/session_repository.dart';
 import 'package:app/routing/router.dart';
@@ -20,7 +20,7 @@ class _AppState extends State<App> {
   void initState() {
     super.initState();
 
-    final session = context.read<SessionRepository>();
+    final session = Get.find<SessionRepository>();
     _router = router(session);
 
     session.restore();
