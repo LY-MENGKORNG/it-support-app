@@ -27,7 +27,7 @@ class _AppState extends State<App> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context) {
     return MaterialApp.router(
       title: '🚨 IT Support',
       debugShowCheckedModeBanner: false,
