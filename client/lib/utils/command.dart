@@ -7,7 +7,10 @@ typedef ZeroArgAction<T> = Future<Result<T>> Function();
 typedef OneArgAction<T, A> = Future<Result<T>> Function(A);
 
 abstract class Command<T> extends ChangeNotifier with SafeNotifier {
+  /// If the action executing.
   bool _running = false;
+
+  /// The result of the action
   Result<T>? _result;
 
   bool get running => _running;
@@ -21,10 +24,6 @@ abstract class Command<T> extends ChangeNotifier with SafeNotifier {
   };
 
   Future<void> _execute(ZeroArgAction<T> action) async {
-    // Guarded here rather than in each caller: a disposed command has nobody to
-    // hand a result to, and the request behind it is a round trip nobody is
-    // waiting for. Every entry point — a scroll handler, a pull to refresh, a
-    // retry button, whatever is added next — comes through this one method.
     if (_running || isDisposed) return;
 
     _running = true;

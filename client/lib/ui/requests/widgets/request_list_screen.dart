@@ -28,15 +28,6 @@ class _RequestListScreenState extends State<RequestListScreen> {
     _scrollController.addListener(_onScroll);
   }
 
-  @override
-  void dispose() {
-    _scrollController
-      ..removeListener(_onScroll)
-      ..dispose();
-    _searchController.dispose();
-    super.dispose();
-  }
-
   void _onScroll() {
     if (!_scrollController.hasClients) return;
 
@@ -195,6 +186,15 @@ class _RequestListScreenState extends State<RequestListScreen> {
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    _searchController.dispose();
+    super.dispose();
   }
 }
 

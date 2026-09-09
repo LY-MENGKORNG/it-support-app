@@ -34,12 +34,6 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
     widget.viewModel.mutations.addListener(_onMutationChanged);
   }
 
-  @override
-  void dispose() {
-    widget.viewModel.mutations.removeListener(_onMutationChanged);
-    super.dispose();
-  }
-
   void _onMutationChanged() {
     if (!mounted) return;
 
@@ -113,6 +107,12 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    widget.viewModel.mutations.removeListener(_onMutationChanged);
+    super.dispose();
   }
 }
 
@@ -570,13 +570,6 @@ class _CommentComposerState extends State<_CommentComposer> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
-
   Future<void> _send() async {
     final text = _controller.text;
     if (text.trim().isEmpty) return;
@@ -637,5 +630,12 @@ class _CommentComposerState extends State<_CommentComposer> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
   }
 }

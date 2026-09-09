@@ -29,15 +29,6 @@ class _LoginScreenState extends State<LoginScreen> {
     widget.viewModel.signIn.addListener(_onSignInChanged);
   }
 
-  @override
-  void dispose() {
-    widget.viewModel.signIn.removeListener(_onSignInChanged);
-    _emailController.dispose();
-    _passwordController.dispose();
-    _passwordFocus.dispose();
-    super.dispose();
-  }
-
   void _onSignInChanged() {
     final command = widget.viewModel.signIn;
     if (!mounted) return;
@@ -198,6 +189,15 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    widget.viewModel.signIn.removeListener(_onSignInChanged);
+    _emailController.dispose();
+    _passwordController.dispose();
+    _passwordFocus.dispose();
+    super.dispose();
   }
 }
 

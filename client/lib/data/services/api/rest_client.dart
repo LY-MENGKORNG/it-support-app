@@ -93,8 +93,6 @@ class RestClient {
     );
   }
 
-  void dispose() => _client.close();
-
   Future<Result<dynamic>> _payload(
     String method,
     String path, {
@@ -274,4 +272,6 @@ class RestClient {
       _ => null,
     };
   }
+
+  void dispose() => _client.close();
 }

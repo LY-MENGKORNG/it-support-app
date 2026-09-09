@@ -31,14 +31,6 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     widget.viewModel.submit.addListener(_onSubmitChanged);
   }
 
-  @override
-  void dispose() {
-    widget.viewModel.submit.removeListener(_onSubmitChanged);
-    _titleController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
-  }
-
   void _onSubmitChanged() {
     final command = widget.viewModel.submit;
     if (!mounted) return;
@@ -245,6 +237,14 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     Priority.high => 'You are blocked on this.',
     Priority.critical => 'Several people are blocked, or something is unsafe.',
   };
+
+  @override
+  void dispose() {
+    widget.viewModel.submit.removeListener(_onSubmitChanged);
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
 }
 
 class _FieldLabel extends StatelessWidget {
