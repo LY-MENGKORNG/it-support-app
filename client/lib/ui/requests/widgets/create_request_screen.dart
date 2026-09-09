@@ -247,6 +247,16 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   }
 }
 
+class InvalidRequestScreen extends StatelessWidget {
+  const InvalidRequestScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Request')),
+    body: const Center(child: Text('That request id is not valid.')),
+  );
+}
+
 class _FieldLabel extends StatelessWidget {
   const _FieldLabel(this.text);
 

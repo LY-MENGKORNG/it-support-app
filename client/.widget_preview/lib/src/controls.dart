@@ -404,15 +404,6 @@ class _PreviewSearchControlsState extends State<PreviewSearchControls> {
     _syncControllerQueryToTextField();
   }
 
-  @override
-  void dispose() {
-    widget.controller.searchQueryListenable.removeListener(
-      _syncControllerQueryToTextField,
-    );
-    _searchController.dispose();
-    super.dispose();
-  }
-
   void _syncControllerQueryToTextField() {
     final query = widget.controller.searchQueryListenable.value;
     if (_searchController.text == query) {
@@ -468,6 +459,15 @@ class _PreviewSearchControlsState extends State<PreviewSearchControls> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    widget.controller.searchQueryListenable.removeListener(
+      _syncControllerQueryToTextField,
+    );
+    _searchController.dispose();
+    super.dispose();
   }
 }
 

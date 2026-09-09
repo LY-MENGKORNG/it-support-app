@@ -65,7 +65,7 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
       name: RouteNames.requestDetail,
       builder: (context, state) {
         final id = int.tryParse(state.pathParameters['id'] ?? '');
-        if (id == null) return const _InvalidRequestScreen();
+        if (id == null) return const InvalidRequestScreen();
 
         return _owned(
           () => RequestDetailViewModel(
@@ -202,16 +202,6 @@ class _OwnedState<T extends ChangeNotifier> extends State<_Owned<T>> {
     _viewModel?.dispose();
     super.dispose();
   }
-}
-
-class _InvalidRequestScreen extends StatelessWidget {
-  const _InvalidRequestScreen();
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Request')),
-    body: const Center(child: Text('That request id is not valid.')),
-  );
 }
 
 class _RouteErrorScreen extends StatelessWidget {

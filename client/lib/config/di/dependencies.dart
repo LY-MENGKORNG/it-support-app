@@ -20,7 +20,7 @@ void registerDeps() {
   Get.put(RestClient(), permanent: true);
   Get.put(const SharedPreferencesService(), permanent: true);
 
-  // NOTE: endpoints
+  // NOTE: api endpoints
   Get.put(AuthApi(Get.find()), permanent: true);
   Get.put(CategoryApi(Get.find()), permanent: true);
   Get.put(CommentApi(Get.find()), permanent: true);
