@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:app/domain/models/priority.dart';
 import 'package:app/domain/models/request_status.dart';
-import 'package:app/ui/core/themes/semantic_colors.dart';
-import 'package:app/ui/core/themes/theme.dart';
+import 'package:app/ui/core/styles/semantic_color.dart';
+import 'package:app/ui/core/styles/theme.dart';
 
 class _Badge extends StatelessWidget {
   const _Badge({required this.label, required this.color, this.dense = false});

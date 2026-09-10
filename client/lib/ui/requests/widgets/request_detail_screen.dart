@@ -1,3 +1,5 @@
+import 'package:app/domain/models/request_detail.dart';
+import 'package:app/ui/requests/widgets/commnet_composer.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,7 +11,7 @@ import 'package:app/domain/models/request_history.dart';
 import 'package:app/domain/models/request_history_action.dart';
 import 'package:app/domain/models/request_status.dart';
 import 'package:app/domain/models/user.dart';
-import 'package:app/ui/core/themes/semantic_colors.dart';
+import 'package:app/ui/core/styles/semantic_color.dart';
 import 'package:app/ui/core/ui/content_column.dart';
 import 'package:app/ui/core/ui/detail_row.dart';
 import 'package:app/ui/core/ui/error_indicator.dart';
@@ -255,7 +257,7 @@ class _DetailBody extends StatelessWidget {
             ),
           ),
         ),
-        _CommentComposer(viewModel: viewModel),
+        CommentComposer(viewModel: viewModel),
       ],
     );
   }
@@ -554,88 +556,5 @@ class _HistoryTile extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class _CommentComposer extends StatefulWidget {
-  const _CommentComposer({required this.viewModel});
-
-  final RequestDetailViewModel viewModel;
-
-  @override
-  State<_CommentComposer> createState() => _CommentComposerState();
-}
-
-class _CommentComposerState extends State<_CommentComposer> {
-  final _controller = TextEditingController();
-  final _focusNode = FocusNode();
-
-  Future<void> _send() async {
-    final text = _controller.text;
-    if (text.trim().isEmpty) return;
-
-    await widget.viewModel.addComment.execute(text);
-
-    if (widget.viewModel.addComment.completed && mounted) {
-      _controller.clear();
-      _focusNode.unfocus();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        border: Border(top: BorderSide(color: theme.colorScheme.outline)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  minLines: 1,
-                  maxLines: 4,
-                  textInputAction: TextInputAction.newline,
-                  decoration: const InputDecoration(hintText: 'Add a comment'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              ListenableBuilder(
-                listenable: Listenable.merge([
-                  _controller,
-                  widget.viewModel.addComment,
-                ]),
-                builder: (context, _) {
-                  final canSend =
-                      _controller.text.trim().isNotEmpty &&
-                      !widget.viewModel.addComment.running;
-
-                  return IconButton.filled(
-                    onPressed: canSend ? _send : null,
-                    icon: const Icon(Icons.send, size: 18),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _focusNode.dispose();
-    super.dispose();
   }
 }

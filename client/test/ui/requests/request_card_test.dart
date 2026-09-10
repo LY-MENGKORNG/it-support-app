@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:app/domain/models/priority.dart';
 import 'package:app/domain/models/request_status.dart';
-import 'package:app/ui/core/themes/theme.dart';
+import 'package:app/ui/core/styles/theme.dart';
 import 'package:app/ui/requests/widgets/request_card.dart';
 
 import '../../fakes/fixtures.dart';

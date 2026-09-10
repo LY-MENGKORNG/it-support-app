@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:app/domain/models/request_detail.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:app/data/repositories/category/category_repository.dart';
@@ -7,7 +8,6 @@ import 'package:app/data/repositories/request/request_repository.dart';
 import 'package:app/data/repositories/session/session_repository.dart';
 import 'package:app/data/repositories/user/user_repository.dart';
 import 'package:app/domain/models/request_category.dart';
-import 'package:app/domain/models/comment.dart';
 import 'package:app/domain/models/priority.dart';
 import 'package:app/domain/models/request.dart';
 import 'package:app/domain/models/request_status.dart';
@@ -65,8 +65,10 @@ class RequestDetailViewModel extends ChangeNotifier with SafeNotifier {
 
   RequestDetail? get detail => _detail;
   Request? get request => _detail?.request;
+
   UnmodifiableListView<User> get assignableUsers =>
       UnmodifiableListView(_assignableUsers);
+
   UnmodifiableListView<RequestCategory> get categoryOptions =>
       UnmodifiableListView(_categoryOptions);
 
@@ -156,14 +158,14 @@ class RequestDetailViewModel extends ChangeNotifier with SafeNotifier {
     );
 
     switch (result) {
-      case Ok<Comment>(:final value):
+      case Ok(:final value):
         final current = _detail;
         if (current != null) {
           _detail = current.copyWith(comments: [...current.comments, value]);
           notifyListeners();
         }
         return const Result.ok(null);
-      case Error<Comment>(:final error):
+      case Error(:final error):
         return Result.error(error);
     }
   }

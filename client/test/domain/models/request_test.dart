@@ -1,3 +1,4 @@
+import 'package:app/domain/models/request_detail.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:json_annotation/json_annotation.dart';
 

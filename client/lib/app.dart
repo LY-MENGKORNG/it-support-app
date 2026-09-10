@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:app/data/repositories/session/session_repository.dart';
 import 'package:app/routing/router.dart';
-import 'package:app/ui/core/themes/theme.dart';
+import 'package:app/ui/core/styles/theme.dart';
 
 class App extends StatefulWidget {
   const App({super.key});

@@ -1,8 +1,9 @@
+import 'package:app/domain/models/request_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:app/domain/models/request.dart';
-import 'package:app/routing/routes.dart';
+import 'package:app/routing/route.dart';
 import 'package:app/ui/core/ui/error_indicator.dart';
 import 'package:app/ui/requests/view_models/request_list_viewmodel.dart';
 

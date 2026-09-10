@@ -7,6 +7,7 @@ library;
 import 'package:app/domain/models/priority.dart';
 import 'package:app/domain/models/request.dart';
 import 'package:app/domain/models/request_category.dart';
+import 'package:app/domain/models/request_detail.dart';
 import 'package:app/domain/models/request_status.dart';
 import 'package:app/domain/models/user.dart';
 import 'package:app/domain/models/user_role.dart';

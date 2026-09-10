@@ -7,15 +7,15 @@ typedef ZeroArgAction<T> = Future<Result<T>> Function();
 typedef OneArgAction<T, A> = Future<Result<T>> Function(A);
 
 abstract class Command<T> extends ChangeNotifier with SafeNotifier {
-  /// If the action executing.
   bool _running = false;
-
-  /// The result of the action
   Result<T>? _result;
 
+  /// If the action [T] is executing.
   bool get running => _running;
   bool get error => _result is Error;
   bool get completed => _result is Ok;
+
+  /// The result of the action.
   Result<T>? get result => _result;
 
   Exception? get exception => switch (_result) {
@@ -23,6 +23,7 @@ abstract class Command<T> extends ChangeNotifier with SafeNotifier {
     _ => null,
   };
 
+  /// Executes the action and notifies its listeners before and after execution.
   Future<void> _execute(ZeroArgAction<T> action) async {
     if (_running || isDisposed) return;
 
@@ -51,7 +52,7 @@ final class Command0<T> extends Command<T> {
   final ZeroArgAction<T> _action;
 
   Future<void> execute() async {
-    await _execute(_action);
+    await super._execute(_action);
   }
 }
 
@@ -62,6 +63,6 @@ final class Command1<T, A> extends Command<T> {
   final OneArgAction<T, A> _action;
 
   Future<void> execute(A argument) async {
-    await _execute(() => _action(argument));
+    await super._execute(() => _action(argument));
   }
 }

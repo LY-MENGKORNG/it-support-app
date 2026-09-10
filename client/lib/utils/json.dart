@@ -11,10 +11,6 @@ typedef JsonType = Map<String, dynamic>;
 typedef ParseFn<T> = T Function(JsonType);
 
 /// A domain enum with a stable over-the-wire spelling.
-///
-/// The API sends `in_progress` where the Dart constant is `inProgress`, so
-/// `values.byName(...)` throws; every such enum carries its wire string and
-/// looks itself up by it instead.
 abstract interface class WireEnum {
   String get wire;
 }
@@ -29,15 +25,12 @@ extension WireValues<T extends WireEnum> on List<T> {
 
   /// [label] names the enum in the failure, so a bad payload says which field
   /// it came from rather than just that some enum did not match.
-  T byWire(String wire, {required String label}) =>
-      tryByWire(wire) ?? (throw FormatException('Unknown $label: $wire'));
+  T byWire(String wire, {required String label}) {
+    return tryByWire(wire) ?? (throw FormatException('Unknown $label: $wire'));
+  }
 }
 
 /// Bridges a [WireEnum] into the generated `fromJson`.
-///
-/// Encoding is the same for every wire enum, so subclasses supply only the
-/// decode, and they do it by delegating to their own `fromWire` — that keeps
-/// one lookup and one failure message per enum rather than a second copy here.
 abstract class WireConverter<T extends WireEnum>
     implements JsonConverter<T, String> {
   const WireConverter();
@@ -47,10 +40,6 @@ abstract class WireConverter<T extends WireEnum>
 }
 
 /// Dates arrive as ISO-8601 UTC and are held in local time.
-///
-/// `DateTime.parse` on its own leaves them in UTC, and Dart's `DateTime`
-/// equality counts `isUtc` — so dropping the `toLocal()` would quietly change
-/// every date comparison and every date the UI renders.
 class LocalDateTime implements JsonConverter<DateTime, String> {
   const LocalDateTime();
 
@@ -65,8 +54,9 @@ class LocalDateTimeOrNull implements JsonConverter<DateTime?, String?> {
   const LocalDateTimeOrNull();
 
   @override
-  DateTime? fromJson(String? json) =>
-      json == null ? null : DateTime.parse(json).toLocal();
+  DateTime? fromJson(String? json) {
+    return json == null ? null : DateTime.parse(json).toLocal();
+  }
 
   @override
   String? toJson(DateTime? object) => object?.toUtc().toIso8601String();

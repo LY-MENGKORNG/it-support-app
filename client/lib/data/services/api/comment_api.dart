@@ -8,10 +8,11 @@ class CommentApi {
 
   final RestClient _client;
 
-  Future<Result<Comment>> create(int requestId, {required String content}) =>
-      _client.post(
-        '/request/$requestId/comment',
-        asObject(Comment.fromJson),
-        body: {'content': content},
-      );
+  Future<Result<Comment>> create(int requestId, {required String content}) {
+    return _client.post(
+      '/request/$requestId/comment',
+      asObject(Comment.fromJson),
+      body: {'content': content},
+    );
+  }
 }

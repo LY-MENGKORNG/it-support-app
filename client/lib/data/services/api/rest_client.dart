@@ -46,8 +46,8 @@ class RestClient {
   final String baseUrl;
   final Duration timeout;
 
+  /// Authentication sides.
   String? Function()? authTokenProvider;
-
   void Function()? onUnauthorized;
 
   static String get defaultBaseUrl {
@@ -59,18 +59,22 @@ class RestClient {
     return 'http://localhost:3000';
   }
 
-  Future<Result<T>> get<T>(String path, Decoder<T> decode, {Query? query}) =>
-      send('GET', path, decode, query: query);
+  Future<Result<T>> get<T>(String path, Decoder<T> decode, {Query? query}) {
+    return send('GET', path, decode, query: query);
+  }
 
   Future<Result<T>> post<T>(
     String path,
     Decoder<T> decode, {
     Object? body,
     bool authenticated = true,
-  }) => send('POST', path, decode, body: body, authenticated: authenticated);
+  }) {
+    return send('POST', path, decode, body: body, authenticated: authenticated);
+  }
 
-  Future<Result<T>> patch<T>(String path, Decoder<T> decode, {Object? body}) =>
-      send('PATCH', path, decode, body: body);
+  Future<Result<T>> patch<T>(String path, Decoder<T> decode, {Object? body}) {
+    return send('PATCH', path, decode, body: body);
+  }
 
   Future<Result<T>> send<T>(
     String method,
@@ -194,35 +198,33 @@ class RestClient {
     );
   }
 
-  Exception _asNetworkFailure(Object error, StackTrace stackTrace) =>
-      switch (error) {
-        TimeoutException() => const NetworkException(
-          'The server took too long to respond.',
-        ),
-        SocketException(:final osError) => NetworkException(
-          'Cannot reach $baseUrl (${osError?.message ?? 'no connection'}).',
-        ),
-        http.ClientException(:final message) => NetworkException(message),
-        _ => rethrowWithStack(error, stackTrace),
-      };
+  Exception _asNetworkFailure(Object error, StackTrace stackTrace) {
+    return switch (error) {
+      TimeoutException() => const NetworkException(
+        'The server took too long to respond.',
+      ),
+      SocketException(:final osError) => NetworkException(
+        'Cannot reach $baseUrl (${osError?.message ?? 'no connection'}).',
+      ),
+      http.ClientException(:final message) => NetworkException(message),
+      _ => rethrowWithStack(error, stackTrace),
+    };
+  }
 
-  Exception _asParseFailure(Object error, StackTrace stackTrace) =>
-      switch (error) {
-        ApiException() => error,
-        // A generated `fromJson` catches whatever the payload did wrong and
-        // knows the class and field it was decoding, which says more than the
-        // bare type error underneath. Without this branch a wrong-shaped
-        // response escapes as a throw instead of a Result.error.
-        CheckedFromJsonException(:final className?, :final key?) =>
-          ParseException('Unexpected $className in the response: "$key".'),
-        CheckedFromJsonException(:final message?) => ParseException(message),
-        CheckedFromJsonException() => const ParseException(
-          'The server returned a malformed response.',
-        ),
-        FormatException(:final message) => ParseException(message),
-        TypeError() => ParseException('Unexpected response shape: $error'),
-        _ => rethrowWithStack(error, stackTrace),
-      };
+  Exception _asParseFailure(Object error, StackTrace stackTrace) {
+    return switch (error) {
+      ApiException() => error,
+      CheckedFromJsonException(:final className?, :final key?) =>
+        ParseException('Unexpected $className in the response: "$key".'),
+      CheckedFromJsonException(:final message?) => ParseException(message),
+      CheckedFromJsonException() => const ParseException(
+        'The server returned a malformed response.',
+      ),
+      FormatException(:final message) => ParseException(message),
+      TypeError() => ParseException('Unexpected response shape: $error'),
+      _ => rethrowWithStack(error, stackTrace),
+    };
+  }
 
   Uri _uri(String path, Query? query) {
     final uri = Uri.parse('$baseUrl$path');
@@ -251,11 +253,12 @@ class RestClient {
     );
   }
 
-  JsonType _bodyOf(http.Response response) =>
-      switch (Result.safeTry(() => jsonDecode(response.body))) {
-        Ok(value: final JsonType body) => body,
-        _ => const {},
-      };
+  JsonType _bodyOf(http.Response response) {
+    return switch (Result.safeTry(() => jsonDecode(response.body))) {
+      Ok(value: final JsonType body) => body,
+      _ => const {},
+    };
+  }
 
   String? _messageIn(JsonType body, Map<String, String> fieldErrors) {
     if (fieldErrors.isNotEmpty) {

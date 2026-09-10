@@ -8,7 +8,7 @@ import 'package:app/data/repositories/request/request_repository.dart';
 import 'package:app/data/repositories/session/session_repository.dart';
 import 'package:app/data/repositories/user/user_repository.dart';
 import 'package:app/routing/router.dart' as routing;
-import 'package:app/routing/routes.dart';
+import 'package:app/routing/route.dart';
 
 import '../fakes/fixtures.dart';
 import '../fakes/repositories/fake_category_repository.dart';

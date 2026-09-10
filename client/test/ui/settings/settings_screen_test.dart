@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:app/ui/core/themes/theme.dart';
+import 'package:app/ui/core/styles/theme.dart';
 import 'package:app/ui/settings/view_models/settings_viewmodel.dart';
 import 'package:app/ui/settings/widgets/settings_screen.dart';
 

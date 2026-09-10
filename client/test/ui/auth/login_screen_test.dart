@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:app/data/services/api/api_exception.dart';
 import 'package:app/ui/auth/view_models/login_viewmodel.dart';
 import 'package:app/ui/auth/widgets/login_screen.dart';
-import 'package:app/ui/core/themes/theme.dart';
+import 'package:app/ui/core/styles/theme.dart';
 
 import '../../fakes/repositories/fake_session_repository.dart';
 

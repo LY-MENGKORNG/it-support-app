@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:app/domain/models/request_detail.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:app/data/repositories/category/category_repository.dart';

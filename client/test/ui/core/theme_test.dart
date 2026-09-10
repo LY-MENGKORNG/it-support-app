@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:app/ui/core/themes/theme.dart';
+import 'package:app/ui/core/styles/theme.dart';
 
 /// The accent is white, which makes any surface it fills a *light* one. These
 /// pin the "content on the accent inverts" rule, because the failure mode is

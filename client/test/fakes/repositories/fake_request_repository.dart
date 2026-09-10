@@ -1,6 +1,7 @@
 import 'package:app/data/repositories/request/request_repository.dart';
 import 'package:app/domain/models/comment.dart';
 import 'package:app/domain/models/request.dart';
+import 'package:app/domain/models/request_detail.dart';
 import 'package:app/domain/models/request_filters.dart';
 import 'package:app/utils/result.dart';
 

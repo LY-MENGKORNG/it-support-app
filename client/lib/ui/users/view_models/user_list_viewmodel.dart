@@ -19,7 +19,6 @@ class UserListViewModel extends ChangeNotifier with SafeNotifier {
   final UserRepository _userRepository;
 
   late final Command0<void> load;
-
   late final DebouncedRefresh _refresh;
 
   List<User> _items = const [];
@@ -31,7 +30,6 @@ class UserListViewModel extends ChangeNotifier with SafeNotifier {
   bool get isEmpty => _items.isEmpty;
 
   void search(String query) => _refresh.schedule(() => _query = query);
-
   void filterByRole(UserRole? role) {
     _role = role;
     _refresh.now();

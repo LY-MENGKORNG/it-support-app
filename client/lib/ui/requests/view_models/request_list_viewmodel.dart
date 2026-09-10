@@ -34,9 +34,7 @@ class RequestListViewModel extends ChangeNotifier with SafeNotifier {
   static const _pageSize = 20;
 
   late final Command0<void> load;
-
   late final Command0<void> loadMore;
-
   late final Command0<void> loadCategories;
 
   late final DebouncedRefresh _refresh;
