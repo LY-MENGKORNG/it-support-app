@@ -4,7 +4,6 @@ abstract final class Routes {
 
   static const requests = '/requests';
   static const newRequest = '/requests/new';
-
   static String requestDetail(int id) => '/requests/$id';
 
   static const users = '/users';

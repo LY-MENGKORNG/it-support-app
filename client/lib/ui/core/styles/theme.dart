@@ -1,9 +1,7 @@
+import 'package:app/ui/core/styles/painting.dart';
 import 'package:flutter/material.dart';
 
 abstract final class AppTheme {
-  static const radius = BorderRadius.zero;
-  static const _sharp = RoundedRectangleBorder(borderRadius: radius);
-
   static const _background = Color(0xFF0B0D10);
   static const _surface = Color(0xFF131619);
   static const _surfaceHigh = Color(0xFF1B1F24);
@@ -34,11 +32,12 @@ abstract final class AppTheme {
     onError: _onAccent,
   );
 
-  static OutlineInputBorder _sharpBorder(Color color, {double width = 1}) =>
-      OutlineInputBorder(
-        borderRadius: radius,
-        borderSide: BorderSide(color: color, width: width),
-      );
+  static OutlineInputBorder _sharpBorder(Color color, {double width = 1}) {
+    return OutlineInputBorder(
+      borderRadius: Painting.radius,
+      borderSide: BorderSide(color: color, width: width),
+    );
+  }
 
   static ThemeData dark() {
     final base = ThemeData(
@@ -69,11 +68,11 @@ abstract final class AppTheme {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         margin: EdgeInsets.zero,
-        shape: _sharp,
+        shape: Painting.sharp,
       ),
       listTileTheme: const ListTileThemeData(
         contentPadding: EdgeInsets.symmetric(horizontal: 16),
-        shape: _sharp,
+        shape: Painting.sharp,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -92,36 +91,32 @@ abstract final class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          shape: _sharp,
+          shape: Painting.sharp,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          shape: _sharp,
+          shape: Painting.sharp,
           side: const BorderSide(color: _border),
           foregroundColor: _onSurface,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(shape: _sharp),
+        style: TextButton.styleFrom(shape: Painting.sharp),
       ),
       iconButtonTheme: IconButtonThemeData(
-        style: IconButton.styleFrom(shape: _sharp),
+        style: IconButton.styleFrom(shape: Painting.sharp),
       ),
       chipTheme: ChipThemeData(
-        shape: _sharp,
+        shape: Painting.sharp,
         side: const BorderSide(color: _border),
         backgroundColor: _surfaceHigh,
         selectedColor: _accent,
         showCheckmark: false,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        // A selected chip is filled with the white accent, so its label has to
-        // invert or it vanishes. Note this has to be a [WidgetStateColor] on
-        // the `color` field: Chip flattens a [WidgetStateTextStyle] here and
-        // only ever state-resolves the colour inside the style.
         labelStyle: (base.textTheme.labelLarge ?? const TextStyle()).copyWith(
           color: WidgetStateColor.resolveWith(
             (states) =>
@@ -132,30 +127,30 @@ abstract final class AppTheme {
       dialogTheme: const DialogThemeData(
         backgroundColor: _surface,
         surfaceTintColor: Colors.transparent,
-        shape: _sharp,
+        shape: Painting.sharp,
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: _surface,
         surfaceTintColor: Colors.transparent,
-        shape: _sharp,
+        shape: Painting.sharp,
         showDragHandle: true,
       ),
       snackBarTheme: const SnackBarThemeData(
         backgroundColor: _surfaceHigh,
         contentTextStyle: TextStyle(color: _onSurface),
         behavior: SnackBarBehavior.floating,
-        shape: _sharp,
+        shape: Painting.sharp,
       ),
       popupMenuTheme: const PopupMenuThemeData(
         color: _surfaceHigh,
         surfaceTintColor: Colors.transparent,
-        shape: _sharp,
+        shape: Painting.sharp,
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: _surface,
         surfaceTintColor: Colors.transparent,
         indicatorColor: _accent.withValues(alpha: 0.18),
-        indicatorShape: _sharp,
+        indicatorShape: Painting.sharp,
         elevation: 0,
         height: 64,
         labelTextStyle: WidgetStateProperty.resolveWith(
@@ -175,7 +170,7 @@ abstract final class AppTheme {
         ),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        shape: _sharp,
+        shape: Painting.sharp,
         backgroundColor: _accent,
         foregroundColor: _onAccent,
         elevation: 0,
@@ -203,7 +198,7 @@ abstract final class AppTheme {
         menuStyle: const MenuStyle(
           backgroundColor: WidgetStatePropertyAll(_surfaceHigh),
           surfaceTintColor: WidgetStatePropertyAll(Colors.transparent),
-          shape: WidgetStatePropertyAll(_sharp),
+          shape: WidgetStatePropertyAll(Painting.sharp),
         ),
       ),
       textTheme: base.textTheme.apply(

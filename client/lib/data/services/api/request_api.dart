@@ -5,31 +5,37 @@ import 'package:app/utils/result.dart';
 import 'package:app/utils/api.dart';
 
 class RequestApi {
-  const RequestApi(this._client);
-
   final RestClient _client;
 
   static const _path = '/request';
 
-  Future<Result<RequestPage>> list(RequestFilters filters) => _client.get(
-    _path,
-    asObject(RequestPage.fromJson),
-    query: filters.toQueryParameters(),
-  );
+  const RequestApi(this._client);
 
-  Future<Result<RequestDetail>> get(int id) =>
-      _client.get('$_path/$id', asObject(RequestDetail.fromJson));
+  Future<Result<RequestPage>> list(RequestFilters filters) {
+    return _client.get(
+      _path,
+      asObject(RequestPage.fromJson),
+      query: filters.toQueryParameters(),
+    );
+  }
 
-  Future<Result<RequestDetail>> create(NewRequest draft) => _client.post(
-    _path,
-    asObject(RequestDetail.fromJson),
-    body: draft.toJson(),
-  );
+  Future<Result<RequestDetail>> get(int id) {
+    return _client.get('$_path/$id', asObject(RequestDetail.fromJson));
+  }
 
-  Future<Result<RequestDetail>> update(int id, RequestPatch patch) =>
-      _client.patch(
-        '$_path/$id',
-        asObject(RequestDetail.fromJson),
-        body: patch.toJson(),
-      );
+  Future<Result<RequestDetail>> create(NewRequest draft) {
+    return _client.post(
+      _path,
+      asObject(RequestDetail.fromJson),
+      body: draft.toJson(),
+    );
+  }
+
+  Future<Result<RequestDetail>> update(int id, RequestPatch patch) {
+    return _client.patch(
+      '$_path/$id',
+      asObject(RequestDetail.fromJson),
+      body: patch.toJson(),
+    );
+  }
 }

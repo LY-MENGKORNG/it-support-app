@@ -4,9 +4,9 @@ import 'package:app/utils/api.dart';
 import 'package:app/utils/result.dart';
 
 class AuthApi {
-  const AuthApi(this._client);
-
   final RestClient _client;
+
+  const AuthApi(this._client);
 
   Future<Result<Session>> login({
     required String email,

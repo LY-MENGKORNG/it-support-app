@@ -8,18 +8,24 @@ class SharedPreferencesService {
 
   Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
 
-  Future<Result<String?>> fetchToken() => Result.safeTryAsync(() async {
-    final prefs = await _prefs;
-    return prefs.getString(_tokenKey);
-  });
+  Future<Result<String?>> fetchToken() {
+    return Result.safeTryAsync(() async {
+      final prefs = await _prefs;
+      return prefs.getString(_tokenKey);
+    });
+  }
 
-  Future<Result<void>> saveToken(String token) => Result.safeTryAsync(() async {
-    final prefs = await _prefs;
-    await prefs.setString(_tokenKey, token);
-  });
+  Future<Result<void>> saveToken(String token) {
+    return Result.safeTryAsync(() async {
+      final prefs = await _prefs;
+      await prefs.setString(_tokenKey, token);
+    });
+  }
 
-  Future<Result<void>> removeToken() => Result.safeTryAsync(() async {
-    final prefs = await _prefs;
-    await prefs.remove(_tokenKey);
-  });
+  Future<Result<void>> removeToken() {
+    return Result.safeTryAsync(() async {
+      final prefs = await _prefs;
+      await prefs.remove(_tokenKey);
+    });
+  }
 }

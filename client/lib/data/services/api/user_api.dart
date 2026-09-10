@@ -4,11 +4,11 @@ import 'package:app/utils/result.dart';
 import 'package:app/utils/api.dart';
 
 class UserApi {
-  const UserApi(this._client);
-
   final RestClient _client;
 
   static const _path = '/user';
+
+  const UserApi(this._client);
 
   Future<Result<List<User>>> list({
     String? query,

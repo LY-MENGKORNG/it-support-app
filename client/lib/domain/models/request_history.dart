@@ -9,19 +9,6 @@ part 'generated/request_history.g.dart';
 
 @JsonSerializable(checked: true, createToJson: false)
 class RequestHistory {
-  const RequestHistory({
-    required this.id,
-    required this.requestId,
-    required this.action,
-    required this.actor,
-    required this.createdAt,
-    this.oldValue,
-    this.newValue,
-  });
-
-  factory RequestHistory.fromJson(JsonType json) =>
-      _$RequestHistoryFromJson(json);
-
   final int id;
   final int requestId;
 
@@ -37,4 +24,17 @@ class RequestHistory {
 
   final String? oldValue;
   final String? newValue;
+
+  const RequestHistory({
+    required this.id,
+    required this.requestId,
+    required this.action,
+    required this.actor,
+    required this.createdAt,
+    this.oldValue,
+    this.newValue,
+  });
+
+  factory RequestHistory.fromJson(JsonType json) =>
+      _$RequestHistoryFromJson(json);
 }

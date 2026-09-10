@@ -6,27 +6,28 @@ enum RequestStatus implements WireEnum {
   resolved('resolved', 'Resolved'),
   closed('closed', 'Closed');
 
-  const RequestStatus(this.wire, this.label);
-
   @override
   final String wire;
   final String label;
 
-  static RequestStatus? tryFromWire(String? value) => values.tryByWire(value);
-
-  static RequestStatus fromWire(String value) =>
-      values.byWire(value, label: 'request status');
-
-  List<RequestStatus> get nextOptions => switch (this) {
-    RequestStatus.open => [RequestStatus.inProgress, RequestStatus.resolved],
-    RequestStatus.inProgress => [RequestStatus.resolved, RequestStatus.open],
-    RequestStatus.resolved => [RequestStatus.closed, RequestStatus.open],
-    RequestStatus.closed => [RequestStatus.open],
-  };
+  const RequestStatus(this.wire, this.label);
 
   bool get isSettled {
     return this == RequestStatus.resolved || this == RequestStatus.closed;
   }
+
+  static RequestStatus? tryFromWire(String? value) => values.tryByWire(value);
+
+  static RequestStatus fromWire(String value) {
+    return values.byWire(value, label: 'request status');
+  }
+
+  List<RequestStatus> get nextOptions => switch (this) {
+    .open => [.inProgress, .resolved],
+    .inProgress => [.resolved, .open],
+    .resolved => [.closed, .open],
+    .closed => [.open],
+  };
 }
 
 class RequestStatusConverter extends WireConverter<RequestStatus> {

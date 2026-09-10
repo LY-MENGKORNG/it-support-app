@@ -8,16 +8,18 @@ enum RequestHistoryAction implements WireEnum {
   unassigned('unassigned'),
   categoryChanged('category_changed');
 
-  const RequestHistoryAction(this.wire);
-
   @override
   final String wire;
 
-  static RequestHistoryAction? tryFromWire(String? value) =>
-      values.tryByWire(value);
+  const RequestHistoryAction(this.wire);
 
-  static RequestHistoryAction fromWire(String value) =>
-      values.byWire(value, label: 'history action');
+  static RequestHistoryAction? tryFromWire(String? value) {
+    return values.tryByWire(value);
+  }
+
+  static RequestHistoryAction fromWire(String value) {
+    return values.byWire(value, label: 'history action');
+  }
 }
 
 class RequestHistoryActionConverter

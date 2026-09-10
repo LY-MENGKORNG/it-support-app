@@ -3,6 +3,17 @@ import 'request_sort.dart';
 import 'request_status.dart';
 
 class RequestFilters {
+  final String? query;
+  final RequestStatus? status;
+  final Priority? priority;
+  final int? categoryId;
+  final int? requesterId;
+  final int? assigneeId;
+  final bool unassignedOnly;
+  final RequestSort sort;
+  final int limit;
+  final int offset;
+
   const RequestFilters({
     this.query,
     this.status,
@@ -15,17 +26,6 @@ class RequestFilters {
     this.limit = 20,
     this.offset = 0,
   });
-
-  final String? query;
-  final RequestStatus? status;
-  final Priority? priority;
-  final int? categoryId;
-  final int? requesterId;
-  final int? assigneeId;
-  final bool unassignedOnly;
-  final RequestSort sort;
-  final int limit;
-  final int offset;
 
   bool get isFiltering =>
       (query != null && query!.isNotEmpty) ||

@@ -6,11 +6,10 @@ import 'package:app/utils/result.dart';
 import 'user_repository.dart';
 
 class RemoteUserRepository implements UserRepository {
-  RemoteUserRepository({required this._users});
-
   final UserApi _users;
-
   List<User>? _assignableCache;
+
+  RemoteUserRepository({required this._users});
 
   @override
   Future<Result<List<User>>> getUsers({
@@ -18,7 +17,9 @@ class RemoteUserRepository implements UserRepository {
     UserRole? role,
     int limit = 50,
     int offset = 0,
-  }) => _users.list(query: query, role: role, limit: limit, offset: offset);
+  }) {
+    return _users.list(query: query, role: role, limit: limit, offset: offset);
+  }
 
   @override
   Future<Result<List<User>>> getAssignableUsers({bool refresh = false}) async {

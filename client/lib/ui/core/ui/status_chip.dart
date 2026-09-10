@@ -1,9 +1,9 @@
+import 'package:app/ui/core/styles/painting.dart';
 import 'package:flutter/material.dart';
 
 import 'package:app/domain/models/priority.dart';
 import 'package:app/domain/models/request_status.dart';
 import 'package:app/ui/core/styles/semantic_color.dart';
-import 'package:app/ui/core/styles/theme.dart';
 
 class _Badge extends StatelessWidget {
   const _Badge({required this.label, required this.color, this.dense = false});
@@ -22,7 +22,7 @@ class _Badge extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.14),
         border: Border.all(color: color.withValues(alpha: 0.55)),
-        borderRadius: AppTheme.radius,
+        borderRadius: Painting.radius,
       ),
       child: Text(
         label.toUpperCase(),

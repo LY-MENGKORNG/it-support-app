@@ -11,6 +11,32 @@ part 'generated/request.g.dart';
 
 @JsonSerializable(checked: true, createToJson: false)
 class Request {
+  final int id;
+  final String title;
+  final String description;
+  final RequestCategory category;
+
+  @PriorityConverter()
+  final Priority priority;
+
+  @RequestStatusConverter()
+  final RequestStatus status;
+
+  final User requester;
+  final User? assignee;
+
+  @LocalDateTime()
+  final DateTime createdAt;
+
+  @LocalDateTime()
+  final DateTime updatedAt;
+
+  @LocalDateTimeOrNull()
+  final DateTime? resolvedAt;
+
+  @LocalDateTimeOrNull()
+  final DateTime? closedAt;
+
   const Request({
     required this.id,
     required this.title,
@@ -28,41 +54,11 @@ class Request {
 
   factory Request.fromJson(JsonType json) => _$RequestFromJson(json);
 
-  final int id;
-  final String title;
-  final String description;
-  final RequestCategory category;
-
-  @PriorityConverter()
-  final Priority priority;
-  @RequestStatusConverter()
-  final RequestStatus status;
-
-  final User requester;
-  final User? assignee;
-
-  @LocalDateTime()
-  final DateTime createdAt;
-  @LocalDateTime()
-  final DateTime updatedAt;
-  @LocalDateTimeOrNull()
-  final DateTime? resolvedAt;
-  @LocalDateTimeOrNull()
-  final DateTime? closedAt;
-
   bool get isAssigned => assignee != null;
 }
 
 @JsonSerializable(checked: true, createToJson: false)
 class RequestPage {
-  const RequestPage({
-    required this.items,
-    required this.total,
-    required this.hasMore,
-  });
-
-  factory RequestPage.fromJson(JsonType json) => _$RequestPageFromJson(json);
-
   @JsonKey(defaultValue: <Request>[])
   final List<Request> items;
 
@@ -70,18 +66,18 @@ class RequestPage {
 
   @JsonKey(defaultValue: false)
   final bool hasMore;
+
+  const RequestPage({
+    required this.items,
+    required this.total,
+    required this.hasMore,
+  });
+
+  factory RequestPage.fromJson(JsonType json) => _$RequestPageFromJson(json);
 }
 
 @JsonSerializable(createFactory: false, includeIfNull: false)
 class NewRequest {
-  const NewRequest({
-    required this.title,
-    required this.description,
-    required this.categoryId,
-    required this.priority,
-    this.assigneeId,
-  });
-
   final String title;
   final String description;
   final int categoryId;
@@ -91,11 +87,27 @@ class NewRequest {
 
   final int? assigneeId;
 
+  const NewRequest({
+    required this.title,
+    required this.description,
+    required this.categoryId,
+    required this.priority,
+    this.assigneeId,
+  });
+
   JsonType toJson() => _$NewRequestToJson(this);
 }
 
 /// Hand-written, because a patch's absent and null keys mean different things.
 class RequestPatch {
+  final String? title;
+  final String? description;
+  final int? categoryId;
+  final Priority? priority;
+  final RequestStatus? status;
+  final int? assigneeId;
+  final bool unassign;
+
   const RequestPatch({
     this.title,
     this.description,
@@ -105,14 +117,6 @@ class RequestPatch {
     this.assigneeId,
     this.unassign = false,
   });
-
-  final String? title;
-  final String? description;
-  final int? categoryId;
-  final Priority? priority;
-  final RequestStatus? status;
-  final int? assigneeId;
-  final bool unassign;
 
   JsonType toJson() => {
     if (title != null) 'title': title,

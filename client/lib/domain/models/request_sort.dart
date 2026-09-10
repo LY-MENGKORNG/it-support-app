@@ -5,9 +5,9 @@ enum RequestSort implements WireEnum {
   oldest('oldest', 'Oldest first'),
   priority('priority', 'Priority');
 
-  const RequestSort(this.wire, this.label);
-
   @override
   final String wire;
   final String label;
+
+  const RequestSort(this.wire, this.label);
 }

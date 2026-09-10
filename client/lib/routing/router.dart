@@ -2,7 +2,6 @@ import 'package:app/routing/route_guard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:app/data/repositories/session/session_repository.dart';
 import 'package:app/domain/models/request.dart';
 import 'package:app/ui/core/ui/home_shell.dart';

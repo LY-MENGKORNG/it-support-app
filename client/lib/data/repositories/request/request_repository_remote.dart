@@ -18,23 +18,25 @@ class RemoteRequestRepository implements RequestRepository {
   });
 
   @override
-  Future<Result<RequestPage>> getRequests(RequestFilters filters) =>
-      _requests.list(filters);
+  Future<Result<RequestPage>> getRequests(RequestFilters filters) {
+    return _requests.list(filters);
+  }
 
   @override
   Future<Result<RequestDetail>> getRequest(int id) => _requests.get(id);
 
   @override
-  Future<Result<RequestDetail>> createRequest(NewRequest draft) =>
-      _requests.create(draft);
+  Future<Result<RequestDetail>> createRequest(NewRequest draft) {
+    return _requests.create(draft);
+  }
 
   @override
-  Future<Result<RequestDetail>> updateRequest(int id, RequestPatch patch) =>
-      _requests.update(id, patch);
+  Future<Result<RequestDetail>> updateRequest(int id, RequestPatch patch) {
+    return _requests.update(id, patch);
+  }
 
   @override
-  Future<Result<Comment>> addComment(
-    int requestId, {
-    required String content,
-  }) => _comments.create(requestId, content: content);
+  Future<Result<Comment>> addComment(int requestId, {required String content}) {
+    return _comments.create(requestId, content: content);
+  }
 }

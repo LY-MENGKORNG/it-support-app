@@ -6,6 +6,13 @@ part 'generated/request_category.g.dart';
 
 @JsonSerializable(checked: true, createToJson: false)
 class RequestCategory {
+  final int id;
+  final String name;
+  final String? description;
+
+  @LocalDateTimeOrNull()
+  final DateTime? createdAt;
+
   const RequestCategory({
     required this.id,
     required this.name,
@@ -15,14 +22,6 @@ class RequestCategory {
 
   factory RequestCategory.fromJson(JsonType json) =>
       _$RequestCategoryFromJson(json);
-
-  final int id;
-  final String name;
-
-  final String? description;
-
-  @LocalDateTimeOrNull()
-  final DateTime? createdAt;
 
   @override
   bool operator ==(Object other) =>

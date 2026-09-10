@@ -5,17 +5,17 @@ enum UserRole implements WireEnum {
   staff('staff', 'IT Staff'),
   admin('admin', 'Admin');
 
-  const UserRole(this.wire, this.label);
-
   @override
   final String wire;
   final String label;
 
+  const UserRole(this.wire, this.label);
+
+  bool get isSupportStaff => this != UserRole.employee;
+
   static UserRole? tryFromWire(String? value) => values.tryByWire(value);
 
   static UserRole fromWire(String value) => values.byWire(value, label: 'role');
-
-  bool get isSupportStaff => this != UserRole.employee;
 }
 
 class UserRoleConverter extends WireConverter<UserRole> {

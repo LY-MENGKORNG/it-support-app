@@ -9,15 +9,6 @@ part 'generated/request_detail.g.dart';
 
 @JsonSerializable(checked: true, createToJson: false)
 class RequestDetail {
-  const RequestDetail({
-    required this.request,
-    required this.comments,
-    required this.history,
-  });
-
-  factory RequestDetail.fromJson(JsonType json) =>
-      _$RequestDetailFromJson(json);
-
   /// The detail payload is flat: the request's own fields sit alongside
   /// `comments` and `history` rather than nested under a `request` key, so
   /// this field is read from the whole payload instead of from one key of it.
@@ -26,12 +17,23 @@ class RequestDetail {
 
   @JsonKey(defaultValue: <Comment>[])
   final List<Comment> comments;
+
   @JsonKey(defaultValue: <RequestHistory>[])
   final List<RequestHistory> history;
 
-  static Object? _wholePayload(Map<dynamic, dynamic> json, String key) => json;
+  const RequestDetail({
+    required this.request,
+    required this.comments,
+    required this.history,
+  });
 
   int get id => request.id;
+
+  factory RequestDetail.fromJson(JsonType json) {
+    return _$RequestDetailFromJson(json);
+  }
+
+  static Object? _wholePayload(Map<dynamic, dynamic> json, String key) => json;
 
   RequestDetail copyWith({
     Request? request,
