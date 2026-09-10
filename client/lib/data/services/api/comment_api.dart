@@ -1,7 +1,6 @@
 import 'package:app/domain/models/comment.dart';
 import 'package:app/utils/result.dart';
-
-import 'rest_client.dart';
+import 'package:app/utils/api.dart';
 
 class CommentApi {
   const CommentApi(this._client);

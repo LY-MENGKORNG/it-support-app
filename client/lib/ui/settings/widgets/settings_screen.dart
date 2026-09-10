@@ -1,6 +1,6 @@
+import 'package:app/utils/api.dart';
 import 'package:flutter/material.dart';
 
-import 'package:app/data/services/api/rest_client.dart';
 import 'package:app/ui/core/ui/user_avatar.dart';
 import 'package:app/ui/settings/view_models/settings_viewmodel.dart';
 

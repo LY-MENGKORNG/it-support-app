@@ -9,13 +9,13 @@ import 'package:app/utils/result.dart';
 import 'request_repository.dart';
 
 class RemoteRequestRepository implements RequestRepository {
+  final RequestApi _requests;
+  final CommentApi _comments;
+
   const RemoteRequestRepository({
     required this._requests,
     required this._comments,
   });
-
-  final RequestApi _requests;
-  final CommentApi _comments;
 
   @override
   Future<Result<RequestPage>> getRequests(RequestFilters filters) =>

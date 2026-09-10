@@ -1,7 +1,6 @@
 import 'package:app/domain/models/request_category.dart';
 import 'package:app/utils/result.dart';
-
-import 'rest_client.dart';
+import 'package:app/utils/api.dart';
 
 class CategoryApi {
   const CategoryApi(this._client);

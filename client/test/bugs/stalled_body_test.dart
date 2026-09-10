@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:app/data/services/api/rest_client.dart';
+import 'package:app/utils/api.dart';
 
 /// `_payload` puts `.timeout()` on `_client.send(...)` only. Reading the body
 /// with `http.Response.fromStream` is left outside it, so a server that sends

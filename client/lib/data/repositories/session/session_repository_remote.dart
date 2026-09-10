@@ -7,14 +7,14 @@ import 'package:app/utils/result.dart';
 import 'session_repository.dart';
 
 class RemoteSessionRepository extends SessionRepository {
-  RemoteSessionRepository({required this._auth, required this._preferences});
-
   final AuthApi _auth;
   final SharedPreferencesService _preferences;
 
   User? _currentUser;
   String? _accessToken;
   bool _isRestoring = true;
+
+  RemoteSessionRepository({required this._auth, required this._preferences});
 
   @override
   User? get currentUser => _currentUser;

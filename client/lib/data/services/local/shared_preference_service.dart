@@ -6,18 +6,20 @@ class SharedPreferencesService {
 
   static const _tokenKey = 'access_token';
 
+  Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
+
   Future<Result<String?>> fetchToken() => Result.safeTryAsync(() async {
-    final pref = await SharedPreferences.getInstance();
-    return pref.getString(_tokenKey);
+    final prefs = await _prefs;
+    return prefs.getString(_tokenKey);
   });
 
   Future<Result<void>> saveToken(String token) => Result.safeTryAsync(() async {
-    final pref = await SharedPreferences.getInstance();
-    await pref.setString(_tokenKey, token);
+    final prefs = await _prefs;
+    await prefs.setString(_tokenKey, token);
   });
 
   Future<Result<void>> removeToken() => Result.safeTryAsync(() async {
-    final pref = await SharedPreferences.getInstance();
-    await pref.remove(_tokenKey);
+    final prefs = await _prefs;
+    await prefs.remove(_tokenKey);
   });
 }

@@ -26,7 +26,6 @@ String? guard(GoRouterState state, SessionRepository session) {
   return null;
 }
 
-
 /// Wraps a widget in a ChangeNotifierProvider, and disposes the notifier when the widget is removed from the tree.
 Widget owned<T extends ChangeNotifier>(
   T Function() create,

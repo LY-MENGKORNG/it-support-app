@@ -2,8 +2,7 @@ import 'package:app/domain/models/request.dart';
 import 'package:app/domain/models/request_detail.dart';
 import 'package:app/domain/models/request_filters.dart';
 import 'package:app/utils/result.dart';
-
-import 'rest_client.dart';
+import 'package:app/utils/api.dart';
 
 class RequestApi {
   const RequestApi(this._client);

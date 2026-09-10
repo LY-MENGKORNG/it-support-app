@@ -1,3 +1,4 @@
+import 'package:app/utils/api.dart';
 import 'package:get/get.dart';
 import 'package:app/data/services/local/shared_preference_service.dart';
 import 'package:app/data/repositories/category/category_repository.dart';
@@ -12,13 +13,14 @@ import 'package:app/data/services/api/auth_api.dart';
 import 'package:app/data/services/api/category_api.dart';
 import 'package:app/data/services/api/comment_api.dart';
 import 'package:app/data/services/api/request_api.dart';
-import 'package:app/data/services/api/rest_client.dart';
 import 'package:app/data/services/api/user_api.dart';
 
+/// 🧪 🛠️ Registers all dependencies for the app, including services, repositories, and API endpoints.
 void registerDeps() {
+  const preferences = SharedPreferencesService();
   // NOTE: services
   Get.put(RestClient(), permanent: true);
-  Get.put(const SharedPreferencesService(), permanent: true);
+  Get.put(preferences, permanent: true);
 
   // NOTE: api endpoints
   Get.put(AuthApi(Get.find()), permanent: true);
@@ -41,10 +43,10 @@ void registerDeps() {
     permanent: true,
   );
 
-  // NOTE: change notifiers
+  /// NOTE: session repository
   final session = RemoteSessionRepository(
     auth: Get.find(),
-    preferences: Get.find(),
+    preferences: preferences,
   );
   final client = Get.find<RestClient>();
 

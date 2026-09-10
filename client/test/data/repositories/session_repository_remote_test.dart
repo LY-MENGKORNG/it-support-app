@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app/data/repositories/session/session_repository_remote.dart';
 import 'package:app/data/services/api/auth_api.dart';
 import 'package:app/data/services/api/request_api.dart';
-import 'package:app/data/services/api/rest_client.dart';
+import 'package:app/utils/api.dart';
 import 'package:app/domain/models/user.dart';
 import 'package:app/utils/result.dart';
 

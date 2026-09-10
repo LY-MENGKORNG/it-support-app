@@ -1,8 +1,7 @@
 import 'package:app/domain/models/user.dart';
 import 'package:app/domain/models/user_role.dart';
 import 'package:app/utils/result.dart';
-
-import 'rest_client.dart';
+import 'package:app/utils/api.dart';
 
 class UserApi {
   const UserApi(this._client);

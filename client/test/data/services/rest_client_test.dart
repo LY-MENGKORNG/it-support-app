@@ -2,15 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:app/domain/models/request_detail.dart';
+import 'package:app/utils/exception.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
-import 'package:app/data/services/api/api_exception.dart';
+import 'package:app/utils/api.dart';
 import 'package:app/data/services/api/auth_api.dart';
 import 'package:app/data/services/api/comment_api.dart';
 import 'package:app/data/services/api/request_api.dart';
-import 'package:app/data/services/api/rest_client.dart';
 import 'package:app/domain/models/priority.dart';
 import 'package:app/domain/models/request.dart';
 import 'package:app/domain/models/request_filters.dart';

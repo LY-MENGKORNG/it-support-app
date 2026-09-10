@@ -1,9 +1,9 @@
 import 'package:app/domain/models/request_detail.dart';
 import 'package:app/ui/requests/widgets/commnet_composer.dart';
+import 'package:app/utils/exception.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:app/data/services/api/api_exception.dart';
 import 'package:app/domain/models/comment.dart';
 import 'package:app/domain/models/priority.dart';
 import 'package:app/domain/models/request.dart';

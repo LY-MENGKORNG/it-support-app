@@ -123,7 +123,6 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
   errorBuilder: (context, state) => _RouteErrorScreen(error: state.error),
 );
 
-
 class _RouteErrorScreen extends StatelessWidget {
   const _RouteErrorScreen({this.error});
 

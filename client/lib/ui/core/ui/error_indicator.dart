@@ -1,6 +1,5 @@
+import 'package:app/utils/exception.dart';
 import 'package:flutter/material.dart';
-
-import 'package:app/data/services/api/api_exception.dart';
 
 class ErrorIndicator extends StatelessWidget {
   const ErrorIndicator({

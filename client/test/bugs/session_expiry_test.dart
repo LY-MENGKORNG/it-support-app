@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:app/utils/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -8,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:app/data/repositories/session/session_repository_remote.dart';
 import 'package:app/data/services/api/auth_api.dart';
-import 'package:app/data/services/api/rest_client.dart';
 import 'package:app/data/services/local/shared_preference_service.dart';
 import 'package:app/routing/router.dart';
 import 'package:app/utils/result.dart';

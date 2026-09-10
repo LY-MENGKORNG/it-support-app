@@ -1,3 +1,4 @@
+/// An exception that occurs when an API call fails.
 sealed class ApiException implements Exception {
   const ApiException(this.message);
 
@@ -7,6 +8,7 @@ sealed class ApiException implements Exception {
   String toString() => '$runtimeType: $message';
 }
 
+/// An exception that occurs when the API returns a response that cannot be parsed.
 final class NetworkException extends ApiException {
   const NetworkException([
     super.message =
@@ -14,16 +16,16 @@ final class NetworkException extends ApiException {
   ]);
 }
 
+/// An exception that occurs when the API returns a response that cannot be parsed.
 final class HttpException extends ApiException {
+  final int statusCode;
+  final Map<String, String> fieldErrors;
+
   const HttpException(
     this.statusCode,
     super.message, {
     this.fieldErrors = const {},
   });
-
-  final int statusCode;
-
-  final Map<String, String> fieldErrors;
 
   bool get isUnauthorized => statusCode == 401;
   bool get isForbidden => statusCode == 403;
@@ -32,6 +34,7 @@ final class HttpException extends ApiException {
   bool get isValidation => statusCode == 400 || statusCode == 422;
 }
 
+/// An exception that occurs when the API returns a response that cannot be parsed.
 final class ParseException extends ApiException {
   const ParseException(super.message);
 }

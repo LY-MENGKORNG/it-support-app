@@ -1,6 +1,6 @@
+import 'package:app/utils/exception.dart';
 import 'package:flutter/material.dart';
 
-import 'package:app/data/services/api/api_exception.dart';
 import 'package:app/ui/auth/view_models/login_viewmodel.dart';
 import 'package:app/ui/core/ui/content_column.dart';
 

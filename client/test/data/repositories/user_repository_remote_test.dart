@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
 import 'package:app/data/repositories/user/user_repository_remote.dart';
-import 'package:app/data/services/api/rest_client.dart';
+import 'package:app/utils/api.dart';
 import 'package:app/data/services/api/user_api.dart';
 import 'package:app/utils/result.dart';
 

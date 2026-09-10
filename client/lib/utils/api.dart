@@ -2,13 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show SocketException;
 
+import 'package:app/utils/exception.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:app/utils/json.dart';
 import 'package:app/utils/result.dart';
-
-import 'api_exception.dart';
 
 typedef Query = Map<String, dynamic>;
 

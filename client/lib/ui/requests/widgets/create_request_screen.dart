@@ -1,7 +1,7 @@
+import 'package:app/utils/exception.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:app/data/services/api/api_exception.dart';
 import 'package:app/domain/models/request_category.dart';
 import 'package:app/domain/models/priority.dart';
 import 'package:app/ui/core/ui/content_column.dart';
