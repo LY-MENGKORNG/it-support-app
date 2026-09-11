@@ -4,9 +4,9 @@ import 'package:app/ui/auth/view_models/login_viewmodel.dart';
 import 'package:app/ui/core/ui/content_column.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, required this.viewModel});
-
   final LoginViewModel viewModel;
+
+  const LoginScreen({super.key, required this.viewModel});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();

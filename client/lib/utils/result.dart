@@ -1,6 +1,8 @@
 import 'dart:core';
 import 'dart:core' as core;
 
+typedef ErrorMapper = Exception Function(Object error, StackTrace stackTrace);
+
 /// Utility class that simplifies handling errors.
 ///
 /// Return a [Result] from a function to indicate success or failure.
@@ -23,10 +25,10 @@ import 'dart:core' as core;
 /// }
 /// ```
 sealed class Result<T> {
-  const Result();
-
   const factory Result.ok(T value) = Ok._;
   const factory Result.error(Exception error) = Error._;
+
+  const Result();
 
   static Result<T> safeTry<T>(
     T Function() body, {
@@ -52,39 +54,34 @@ sealed class Result<T> {
 }
 
 final class Ok<T> extends Result<T> {
-  const Ok._(this.value);
-
   final T value;
+
+  const Ok._(this.value);
 
   @override
   String toString() => 'Result<$T>.ok($value)';
 }
 
 final class Error<T> extends Result<T> {
-  const Error._(this.error);
-
   final Exception error;
+
+  const Error._(this.error);
 
   @override
   String toString() => 'Result<$T>.error($error)';
 }
 
-typedef ErrorMapper = Exception Function(Object error, StackTrace stackTrace);
-
 Never rethrowWithStack(Object error, StackTrace stackTrace) {
   return core.Error.throwWithStackTrace(error, stackTrace);
 }
-
 Exception _asExceptionOrRethrow(Object error, StackTrace stackTrace) {
   return error is Exception ? error : rethrowWithStack(error, stackTrace);
 }
 
 extension ResultCast<T> on Result<T> {
   Ok<T> get asOk => this as Ok<T>;
-
   Error<T> get asError => this as Error<T>;
 }
-
 extension ResultMap<T> on Result<T> {
   Result<R> map<R>(R Function(T value) transform) => switch (this) {
     Ok<T>(:final value) => Result.ok(transform(value)),

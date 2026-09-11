@@ -4,11 +4,6 @@ import 'command.dart';
 
 /// A reload that the user triggers over and over: typing, filtering, sorting.
 class DebouncedRefresh {
-  DebouncedRefresh(
-    this._command, {
-    this.delay = const Duration(milliseconds: 350),
-  });
-
   final Command0<void> _command;
 
   /// How quiet the trigger has to be before [schedule] fires.
@@ -16,6 +11,11 @@ class DebouncedRefresh {
 
   Timer? _timer;
   bool _queued = false;
+
+  DebouncedRefresh(
+    this._command, {
+    this.delay = const Duration(milliseconds: 350),
+  });
 
   /// Applies [change], then reloads, once [delay] has passed with no further
   /// call — each call restarting the wait.

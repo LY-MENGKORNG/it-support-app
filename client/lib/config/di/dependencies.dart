@@ -18,18 +18,19 @@ import 'package:app/data/services/api/user_api.dart';
 /// 🧪 🛠️ Registers all dependencies for the app, including services, repositories, and API endpoints.
 void registerDeps() {
   const preferences = SharedPreferencesService();
-  // NOTE: services
+
+  /// NOTE: services
   Get.put(RestClient(), permanent: true);
   Get.put(preferences, permanent: true);
 
-  // NOTE: api endpoints
+  /// NOTE: api endpoints
   Get.put(AuthApi(Get.find()), permanent: true);
   Get.put(CategoryApi(Get.find()), permanent: true);
   Get.put(CommentApi(Get.find()), permanent: true);
   Get.put(RequestApi(Get.find()), permanent: true);
   Get.put(UserApi(Get.find()), permanent: true);
 
-  // NOTE: repos
+  /// NOTE: repos
   Get.put<CategoryRepository>(
     RemoteCategoryRepository(categories: Get.find()),
     permanent: true,
