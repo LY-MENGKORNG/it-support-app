@@ -3,7 +3,7 @@ description: Scaffolding for Flutter Widget Previews
 publish_to: none
 version: 0.0.1
 environment:
-  sdk: ^3.13.2
+  sdk: ^3.13.3
 dependencies:
   app:
     path: /Users/mengkorngly/personal/learning/it-support-app/client
