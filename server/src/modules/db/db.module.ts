@@ -12,7 +12,7 @@ import { safeTry } from '@common/utils/exception';
     {
       provide: DRIZZLE,
       inject: [ConfigService],
-      useFactory: (_config: ConfigService): DrizzleDB => db,
+      useFactory: (_config: ConfigService) => db,
     },
   ],
   exports: [DRIZZLE],
