@@ -26,6 +26,7 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
   initialLocation: Routes.splash,
   refreshListenable: sessionRepository,
   redirect: (context, state) => guard(state, sessionRepository),
+  /// The app's routes, and the guard that decides which of them you may see.
   routes: [
     GoRoute(
       path: Routes.splash,
@@ -73,6 +74,7 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
       },
     ),
 
+    /// The main shell of the app, which contains the bottom navigation bar and the navigation rail.
     StatefulShellRoute.indexedStack(
       builder: (context, state, shell) => HomeShell(shell: shell),
       branches: [

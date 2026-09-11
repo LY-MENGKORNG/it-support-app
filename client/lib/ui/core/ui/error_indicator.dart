@@ -60,6 +60,11 @@ class ErrorIndicator extends StatelessWidget {
 }
 
 class EmptyIndicator extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String? message;
+  final VoidCallback? onPressed;
+
   const EmptyIndicator({
     super.key,
     required this.icon,
@@ -67,11 +72,6 @@ class EmptyIndicator extends StatelessWidget {
     this.message,
     this.onPressed,
   });
-
-  final IconData icon;
-  final String title;
-  final String? message;
-  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
