@@ -36,6 +36,7 @@ export const envSchema = z
     { path: ['JWT_SECRET'], message: 'JWT_SECRET must be set in production' },
   );
 
-export const env = envSchema.parse(Bun.env);
-
 export type Env = z.infer<typeof envSchema>;
+
+export const env = Bun.env as Readonly<Env>;
+
