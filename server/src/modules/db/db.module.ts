@@ -18,7 +18,7 @@ import { safeTry } from '@common/utils/exception';
   exports: [DRIZZLE],
 })
 export class DBModule {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
 
   onApplicationShutdown() {
     safeTry(() => this.db.$client.close());

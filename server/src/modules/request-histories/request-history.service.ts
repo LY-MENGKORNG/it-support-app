@@ -3,7 +3,7 @@ import { RequestHistoryRepository } from './request-history.repository';
 
 @Injectable()
 export class RequestHistoryService {
-  constructor(private readonly repository: RequestHistoryRepository) { }
+  constructor(private readonly repository: RequestHistoryRepository) {}
 
   list(requestId: number) {
     return this.repository.findByRequest(requestId);

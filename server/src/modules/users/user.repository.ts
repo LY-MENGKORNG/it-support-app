@@ -6,7 +6,7 @@ import { CreateUserDto, ListUserQuery } from './user.dto';
 
 @Injectable()
 export class UserRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
 
   findMany({ q, role, limit, offset }: ListUserQuery) {
     return this.db.query.user.findMany({
@@ -15,8 +15,8 @@ export class UserRepository {
         ...(role ? { role } : {}),
         ...(q
           ? {
-            OR: [{ name: { like: `%${q}%` } }, { email: { like: `%${q}%` } }],
-          }
+              OR: [{ name: { like: `%${q}%` } }, { email: { like: `%${q}%` } }],
+            }
           : {}),
       },
       orderBy: { name: 'asc', id: 'asc' },

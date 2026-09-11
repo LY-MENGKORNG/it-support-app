@@ -8,7 +8,7 @@ export class CommentService {
   constructor(
     private readonly repository: CommentRepository,
     private readonly requests: RequestRepository,
-  ) { }
+  ) {}
 
   list(requestId: number) {
     return this.repository.findByRequest(requestId);

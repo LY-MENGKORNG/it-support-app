@@ -4,7 +4,7 @@ import { CategoryRepository } from './category.repository';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly repository: CategoryRepository) { }
+  constructor(private readonly repository: CategoryRepository) {}
 
   list() {
     return this.repository.findAll();

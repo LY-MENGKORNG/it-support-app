@@ -4,7 +4,7 @@ import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly repository: UserRepository) { }
+  constructor(private readonly repository: UserRepository) {}
 
   list(query: ListUserQuery) {
     return this.repository.findMany(query);

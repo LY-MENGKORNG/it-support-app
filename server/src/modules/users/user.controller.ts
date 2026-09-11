@@ -16,7 +16,7 @@ import { CreateUserDto, ListUserQuery } from './user.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly users: UserService) { }
+  constructor(private readonly users: UserService) {}
 
   @Get()
   @ApiQuery({ type: ListUserQuery })

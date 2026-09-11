@@ -38,7 +38,7 @@ export type RequestPatch = Partial<NewRequest>;
 
 @Injectable()
 export class RequestRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
 
   async findPage(query: ListRequestQuery) {
     const { limit, offset } = query;

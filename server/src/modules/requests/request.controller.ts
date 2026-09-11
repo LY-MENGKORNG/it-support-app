@@ -22,12 +22,18 @@ import {
   ListRequestQuery,
   UpdateRequestDto,
 } from './request.dto';
+import { ApiBody, ApiOperation, ApiQuery } from '@nestjs/swagger';
 
 @Controller('request')
 export class RequestController {
-  constructor(private readonly requests: RequestService) {}
+  constructor(private readonly requests: RequestService) { }
 
   @Get()
+  @ApiQuery({ type: ListRequestQuery })
+  @ApiOperation({
+    summary: 'List of requests 📦',
+    description: 'List all of the requests limited by query',
+  })
   list(
     @Query(new ZodValidationPipe(listRequestQuerySchema))
     query: ListRequestQuery,
@@ -36,11 +42,17 @@ export class RequestController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'A request by its ID' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.requests.findOne(id);
   }
 
   @Post()
+  @ApiOperation({
+    summary: 'Create new request 🎫',
+    description: 'Creating a new request without assignee!',
+  })
+  @ApiBody({ type: CreateRequestDto })
   create(
     @Body(new ZodValidationPipe(createRequestSchema)) dto: CreateRequestDto,
     @CurrentUser() actor: AuthenticatedUser,
@@ -49,6 +61,11 @@ export class RequestController {
   }
 
   @Patch(':id')
+  @ApiOperation({
+    summary: 'Update a request',
+    description: 'Update a request by the required DTO',
+  })
+  @ApiBody({ type: UpdateRequestDto })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ZodValidationPipe(updateRequestSchema)) dto: UpdateRequestDto,

@@ -15,7 +15,7 @@ import { ApiBody, ApiOperation } from '@nestjs/swagger';
 
 @Controller('request/:requestId/comment')
 export class CommentController {
-  constructor(private readonly comments: CommentService) { }
+  constructor(private readonly comments: CommentService) {}
 
   @Get()
   list(@Param('requestId', ParseIntPipe) requestId: number) {

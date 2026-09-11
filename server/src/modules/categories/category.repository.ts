@@ -7,7 +7,7 @@ import { type CreateCategoryDto } from './category.dto';
 
 @Injectable()
 export class CategoryRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
 
   findAll() {
     return this.db.select().from(category).orderBy(asc(category.name));

@@ -13,7 +13,7 @@ export class AuthService {
   constructor(
     private readonly users: UserRepository,
     private readonly jwt: JwtService,
-  ) { }
+  ) {}
 
   async login({ email, password }: LoginDto) {
     const found = await this.users.findByEmailWithSecret(email);

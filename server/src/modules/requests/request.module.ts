@@ -8,4 +8,4 @@ import { RequestController } from './request.controller';
   controllers: [RequestController],
   exports: [RequestService, RequestRepository],
 })
-export class RequestModule { }
+export class RequestModule {}

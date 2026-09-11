@@ -33,7 +33,8 @@ import { DrizzleQueryError } from 'drizzle-orm';
 @Catch(DrizzleQueryError, LibsqlError)
 export class SQLiteExceptionFilter
   extends BaseExceptionFilter
-  implements ExceptionFilter {
+  implements ExceptionFilter
+{
   private readonly logger = new Logger(SQLiteExceptionFilter.name);
 
   catch(error: Error, host: ArgumentsHost) {

@@ -5,7 +5,7 @@ import { publicUserColumns } from '../users/user.schema';
 
 @Injectable()
 export class RequestHistoryRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
 
   findByRequest(requestId: number) {
     return this.db.query.requestHistory.findMany({

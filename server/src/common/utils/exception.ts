@@ -9,8 +9,8 @@ export type Result<T, E = Error> = T | E;
 export type SafeResult<R, E = Error> = [R] extends [never]
   ? Result<never, E>
   : R extends PromiseLike<infer U>
-  ? Promise<Result<U, E>>
-  : Result<R, E>;
+    ? Promise<Result<U, E>>
+    : Result<R, E>;
 
 /** Promises are not the only thenables: drizzle's query builders are too. */
 function isThenable(value: unknown): value is PromiseLike<unknown> {

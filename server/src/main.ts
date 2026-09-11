@@ -15,7 +15,7 @@ async function bootstrap() {
 
   await app.listen(Bun.env.PORT ?? 3000);
 }
-bootstrap().catch(error => {
+bootstrap().catch((error) => {
   console.error(error);
   process.exit(1);
 });

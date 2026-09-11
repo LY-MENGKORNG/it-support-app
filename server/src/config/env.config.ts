@@ -39,4 +39,3 @@ export const envSchema = z
 export type Env = z.infer<typeof envSchema>;
 
 export const env = Bun.env as Readonly<Env>;
-

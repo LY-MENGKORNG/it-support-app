@@ -23,7 +23,7 @@ const STAFF_ONLY_FIELDS = [
 
 @Injectable()
 export class RequestService {
-  constructor(private readonly repository: RequestRepository) { }
+  constructor(private readonly repository: RequestRepository) {}
 
   async list(query: ListRequestQuery) {
     const { rows, total } = await this.repository.findPage(query);
@@ -63,13 +63,13 @@ export class RequestService {
       ...(assignee == null
         ? []
         : [
-          {
-            userId: requesterId,
-            action: 'assigned' as const,
-            oldValue: null,
-            newValue: String(assignee),
-          },
-        ]),
+            {
+              userId: requesterId,
+              action: 'assigned' as const,
+              oldValue: null,
+              newValue: String(assignee),
+            },
+          ]),
     ];
 
     const id = await this.repository.insertWithHistory(

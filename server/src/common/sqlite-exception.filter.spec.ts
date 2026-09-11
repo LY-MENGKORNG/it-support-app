@@ -35,7 +35,11 @@ const local = (detail: string, extended: string) => {
   const native = Object.assign(new Error(detail), { code: extended });
   const driver = new LibsqlError(detail, 'SQLITE_CONSTRAINT', extended, 787);
   driver.cause = native;
-  return new DrizzleQueryError('insert into "c" ("pid") values (?)', [999], driver);
+  return new DrizzleQueryError(
+    'insert into "c" ("pid") values (?)',
+    [999],
+    driver,
+  );
 };
 
 describe('asConflict', () => {
@@ -179,7 +183,7 @@ describe('SQLiteExceptionFilter', () => {
       this.replies.push({ body, status });
     }
 
-    end() { }
+    end() {}
   }
 
   const host = {
@@ -209,7 +213,7 @@ describe('SQLiteExceptionFilter', () => {
     });
   });
 
-  it('still answers 500 for a database failure that is nobody\'s fault', () => {
+  it("still answers 500 for a database failure that is nobody's fault", () => {
     expect(answer(remote('database is locked'))?.status).toBe(500);
   });
 });

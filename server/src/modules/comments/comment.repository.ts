@@ -7,7 +7,7 @@ import { type CreateCommentDto } from './comment.dto';
 
 @Injectable()
 export class CommentRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
 
   findByRequest(requestId: number) {
     return this.db.query.comment.findMany({
