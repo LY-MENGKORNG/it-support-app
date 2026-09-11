@@ -1,10 +1,11 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app/utils/result.dart';
 
+/// 🛠️ A service for managing shared preferences, specifically for storing and retrieving the access token.
 class SharedPreferencesService {
-  const SharedPreferencesService();
+  final String _tokenKey;
 
-  static const _tokenKey = 'access_token';
+  const SharedPreferencesService(this._tokenKey);
 
   Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
 

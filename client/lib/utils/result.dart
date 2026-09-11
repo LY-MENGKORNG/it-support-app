@@ -74,6 +74,7 @@ final class Error<T> extends Result<T> {
 Never rethrowWithStack(Object error, StackTrace stackTrace) {
   return core.Error.throwWithStackTrace(error, stackTrace);
 }
+
 Exception _asExceptionOrRethrow(Object error, StackTrace stackTrace) {
   return error is Exception ? error : rethrowWithStack(error, stackTrace);
 }
@@ -82,6 +83,7 @@ extension ResultCast<T> on Result<T> {
   Ok<T> get asOk => this as Ok<T>;
   Error<T> get asError => this as Error<T>;
 }
+
 extension ResultMap<T> on Result<T> {
   Result<R> map<R>(R Function(T value) transform) => switch (this) {
     Ok<T>(:final value) => Result.ok(transform(value)),

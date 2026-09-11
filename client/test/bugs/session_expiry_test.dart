@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:app/constants/auth.dart';
 import 'package:app/utils/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -41,7 +42,7 @@ void main() {
     );
     final session = RemoteSessionRepository(
       auth: AuthApi(client),
-      preferences: const SharedPreferencesService(),
+      preferences: const SharedPreferencesService(tokenKey),
     );
     // Same wiring as config/di/dependencies.dart
     client.authTokenProvider = () => session.accessToken;
@@ -97,7 +98,7 @@ void main() {
         reason: 'a 401 during normal use must clear the session',
       );
       expect(
-        await const SharedPreferencesService().fetchToken(),
+        await const SharedPreferencesService(tokenKey).fetchToken(),
         isA<Ok<String?>>().having((r) => r.value, 'stored token', isNull),
         reason: 'the dead token must not survive on disk',
       );

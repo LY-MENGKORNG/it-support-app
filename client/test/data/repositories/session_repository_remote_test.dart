@@ -12,6 +12,7 @@ import 'package:app/data/services/api/request_api.dart';
 import 'package:app/utils/api.dart';
 import 'package:app/domain/models/user.dart';
 import 'package:app/utils/result.dart';
+import 'package:app/constants/auth.dart';
 
 import '../../fakes/fixtures.dart';
 
@@ -36,7 +37,7 @@ void main() {
     final client = RestClient(client: mock, baseUrl: 'http://test');
     final session = RemoteSessionRepository(
       auth: AuthApi(client),
-      preferences: const SharedPreferencesService(),
+      preferences: const SharedPreferencesService(tokenKey),
     );
 
     // Closing the loop the way `config/dependencies.dart` does, so a restored
@@ -76,7 +77,8 @@ void main() {
       expect(session.accessToken, 'jwt-123');
       expect(session.currentUser?.name, 'Bopha Lim');
 
-      final stored = await const SharedPreferencesService().fetchToken();
+      final stored = await const SharedPreferencesService(tokenKey)
+          .fetchToken();
       expect(stored.asOk.value, 'jwt-123');
     });
 
@@ -92,7 +94,8 @@ void main() {
       expect(session.isSignedIn, isFalse);
       expect(session.accessToken, isNull);
 
-      final stored = await const SharedPreferencesService().fetchToken();
+      final stored = await const SharedPreferencesService(tokenKey)
+          .fetchToken();
       expect(stored.asOk.value, isNull);
     });
 
@@ -123,7 +126,7 @@ void main() {
     });
 
     test('a stored token is exchanged for the user it belongs to', () async {
-      await const SharedPreferencesService().saveToken('jwt-123');
+      await const SharedPreferencesService(tokenKey).saveToken('jwt-123');
       final (:session, client: _) = build((_) => ok(userJson()));
 
       final result = await session.restore();
@@ -137,7 +140,7 @@ void main() {
     // A dead token must not wedge the app: the session has to end up cleanly
     // signed out, with nothing left on disk to fail the same way next launch.
     test('a rejected token is discarded rather than kept', () async {
-      await const SharedPreferencesService().saveToken('expired');
+      await const SharedPreferencesService(tokenKey).saveToken('expired');
       final (:session, client: _) = build((_) => unauthorized());
 
       final result = await session.restore();
@@ -147,12 +150,13 @@ void main() {
       expect(session.isSignedIn, isFalse);
       expect(session.accessToken, isNull);
 
-      final stored = await const SharedPreferencesService().fetchToken();
+      final stored = await const SharedPreferencesService(tokenKey)
+          .fetchToken();
       expect(stored.asOk.value, isNull);
     });
 
     test('isRestoring is false once it finishes, even on failure', () async {
-      await const SharedPreferencesService().saveToken('expired');
+      await const SharedPreferencesService(tokenKey).saveToken('expired');
       final (:session, client: _) = build((_) => unauthorized());
 
       expect(session.isRestoring, isTrue);
@@ -173,7 +177,8 @@ void main() {
       expect(session.isSignedIn, isFalse);
       expect(session.accessToken, isNull);
 
-      final stored = await const SharedPreferencesService().fetchToken();
+      final stored = await const SharedPreferencesService(tokenKey)
+          .fetchToken();
       expect(stored.asOk.value, isNull);
     });
   });
