@@ -1,7 +1,7 @@
 import 'dart:core';
 import 'dart:core' as core;
 
-typedef ErrorMapper = Exception Function(Object error, StackTrace stackTrace);
+import 'package:app/type.dart';
 
 /// Utility class that simplifies handling errors.
 ///

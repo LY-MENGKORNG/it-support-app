@@ -4,8 +4,8 @@ import { relations } from './relation.config';
 import { env } from '@config/env.config';
 
 export const connection = {
-  url: env.TURSO_CONNECTION_URL!,
-  authToken: env.TURSO_AUTH_TOKEN!,
+  url: env.TURSO_CONNECTION_URL,
+  authToken: env.TURSO_AUTH_TOKEN,
 } as const;
 
 const client = createClient({

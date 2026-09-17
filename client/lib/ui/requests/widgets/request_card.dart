@@ -3,18 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:app/utils/date_format.dart';
 import 'package:app/ui/core/ui/status_chip.dart';
 import 'package:app/domain/models/request.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class RequestCard extends StatelessWidget {
-  const RequestCard({super.key, required this.request, required this.onTap});
-
   final Request request;
   final VoidCallback onTap;
 
+  const RequestCard({super.key, required this.request, required this.onTap});
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final muted = theme.textTheme.bodySmall?.copyWith(
-      color: theme.colorScheme.onSurfaceVariant,
+    final theme = ShadTheme.of(context);
+    final textStyle = theme.textTheme.p.copyWith(
+      color: theme.colorScheme.foreground,
     );
 
     return InkWell(
@@ -32,13 +33,13 @@ class RequestCard extends StatelessWidget {
                     request.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleSmall?.copyWith(
+                    style: theme.textTheme.h4.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text('#${request.id}', style: muted),
+                Text('#${request.id}', style: textStyle),
               ],
             ),
             const SizedBox(height: 8),
@@ -46,7 +47,7 @@ class RequestCard extends StatelessWidget {
               request.description,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: muted,
+              style: textStyle,
             ),
             const SizedBox(height: 12),
             Wrap(
@@ -56,7 +57,7 @@ class RequestCard extends StatelessWidget {
               children: [
                 StatusChip(request.status, dense: true),
                 PriorityChip(request.priority, dense: true),
-                Text(request.category.name, style: muted),
+                Text(request.category.name, style: textStyle),
               ],
             ),
             const SizedBox(height: 10),
@@ -65,14 +66,14 @@ class RequestCard extends StatelessWidget {
                 Icon(
                   Icons.person_outline,
                   size: 14,
-                  color: theme.colorScheme.onSurfaceVariant,
+                  color: theme.colorScheme.foreground,
                 ),
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(
                     request.requester.name,
                     overflow: TextOverflow.ellipsis,
-                    style: muted,
+                    style: textStyle,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -82,8 +83,8 @@ class RequestCard extends StatelessWidget {
                       : Icons.person_off_outlined,
                   size: 14,
                   color: request.isAssigned
-                      ? theme.colorScheme.onSurfaceVariant
-                      : theme.colorScheme.error,
+                      ? theme.colorScheme.foreground
+                      : theme.colorScheme.destructive,
                 ),
                 const SizedBox(width: 4),
                 Flexible(
@@ -91,12 +92,14 @@ class RequestCard extends StatelessWidget {
                     request.assignee?.name ?? 'Unassigned',
                     overflow: TextOverflow.ellipsis,
                     style: request.isAssigned
-                        ? muted
-                        : muted?.copyWith(color: theme.colorScheme.error),
+                        ? textStyle
+                        : textStyle.copyWith(
+                            color: theme.colorScheme.destructive,
+                          ),
                   ),
                 ),
                 const Spacer(),
-                Text(formatRelative(request.createdAt), style: muted),
+                Text(formatRelative(request.createdAt), style: textStyle),
               ],
             ),
           ],

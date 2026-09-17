@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:app/ui/core/styles/theme.dart';
 import 'package:app/ui/core/ui/content_column.dart';
 import 'package:app/ui/core/ui/home_shell.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// The shell is chosen by window width, so these tests set a window size and
 /// check which navigation appeared. That is the whole contract: same routes,
@@ -38,7 +39,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp.router(theme: AppTheme.dark(), routerConfig: buildRouter()),
+      ShadApp.router(theme: AppTheme.dark(), routerConfig: buildRouter()),
     );
     await tester.pumpAndSettle();
   }

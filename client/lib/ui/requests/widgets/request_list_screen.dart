@@ -1,11 +1,11 @@
 import 'package:app/domain/models/request_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:app/domain/models/request.dart';
 import 'package:app/routing/route.dart';
 import 'package:app/ui/core/ui/error_indicator.dart';
 import 'package:app/ui/requests/view_models/request_list_viewmodel.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import 'request_card.dart';
 import 'request_filter_sheet.dart';
@@ -63,24 +63,18 @@ class _RequestListScreenState extends State<RequestListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final viewModel = widget.viewModel;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Requests'),
         actions: [
-          IconButton(
-            tooltip: 'Filter',
-            onPressed: _openFilters,
-            icon: ListenableBuilder(
-              listenable: viewModel,
-              builder: (context, child) => Badge(
-                isLabelVisible: viewModel.isFiltering,
-                backgroundColor: theme.colorScheme.primary,
-                child: child,
-              ),
-              child: const Icon(Icons.filter_list),
+          ShadTooltip(
+            padding: const EdgeInsetsGeometry.symmetric(horizontal: 8),
+            builder: (ctx) => const Text('Filter requests'),
+            child: ShadIconButton.ghost(
+              icon: const Icon(Icons.filter_list),
+              onPressed: _openFilters,
             ),
           ),
         ],
@@ -90,25 +84,23 @@ class _RequestListScreenState extends State<RequestListScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-            child: TextField(
+            child: ShadInputFormField(
               controller: _searchController,
               onChanged: viewModel.search,
               textInputAction: TextInputAction.search,
-              decoration: InputDecoration(
-                hintText: 'Search title and description',
-                prefixIcon: const Icon(Icons.search, size: 20),
-                suffixIcon: ListenableBuilder(
-                  listenable: _searchController,
-                  builder: (context, _) => _searchController.text.isEmpty
-                      ? const SizedBox.shrink()
-                      : IconButton(
-                          icon: const Icon(Icons.close, size: 18),
-                          onPressed: () {
-                            _searchController.clear();
-                            viewModel.search('');
-                          },
-                        ),
-                ),
+              placeholder: const Text('Search title and description'),
+              leading: const Icon(Icons.search, size: 20),
+              trailing: ListenableBuilder(
+                listenable: _searchController,
+                builder: (context, _) => _searchController.text.isEmpty
+                    ? const SizedBox.shrink()
+                    : IconButton(
+                        icon: const Icon(Icons.close, size: 18),
+                        onPressed: () {
+                          _searchController.clear();
+                          viewModel.search('');
+                        },
+                      ),
               ),
             ),
           ),
@@ -206,9 +198,9 @@ class _ResultBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final style = theme.textTheme.bodySmall?.copyWith(
-      color: theme.colorScheme.onSurfaceVariant,
+    final theme = ShadTheme.of(context);
+    final style = theme.textTheme.p.copyWith(
+      color: theme.colorScheme.primary,
     );
 
     return Padding(
@@ -224,10 +216,10 @@ class _ResultBar extends StatelessWidget {
             ),
           ),
           if (viewModel.isFiltering)
-            TextButton.icon(
+            ShadButton.ghost(
               onPressed: viewModel.clearFilters,
-              icon: const Icon(Icons.close, size: 16),
-              label: const Text('Clear filters'),
+              leading: const Icon(Icons.close, size: 16),
+              child: const Text('Clear filters'),
             ),
         ],
       ),

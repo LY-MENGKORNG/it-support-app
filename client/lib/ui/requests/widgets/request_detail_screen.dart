@@ -19,11 +19,12 @@ import 'package:app/ui/core/ui/status_chip.dart';
 import 'package:app/ui/core/ui/user_avatar.dart';
 import 'package:app/ui/requests/view_models/request_detail_viewmodel.dart';
 import 'package:app/utils/date_format.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class RequestDetailScreen extends StatefulWidget {
-  const RequestDetailScreen({super.key, required this.viewModel});
-
   final RequestDetailViewModel viewModel;
+
+  const RequestDetailScreen({super.key, required this.viewModel});
 
   @override
   State<RequestDetailScreen> createState() => _RequestDetailScreenState();
@@ -326,7 +327,7 @@ class _Actions extends StatelessWidget {
                 runSpacing: 8,
                 children: [
                   for (final next in request.status.nextOptions)
-                    OutlinedButton(
+                    ShadButton.outline(
                       onPressed: busy
                           ? null
                           : () => viewModel.changeStatus.execute(next),
@@ -342,10 +343,10 @@ class _Actions extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton.icon(
+                    child: ShadButton.outline(
                       onPressed: busy ? null : () => _pickAssignee(context),
-                      icon: const Icon(Icons.person_add_alt, size: 18),
-                      label: Text(
+                      leading: const Icon(Icons.person_add_alt, size: 18),
+                      child: Text(
                         request.assignee == null ? 'Assign' : 'Reassign',
                       ),
                     ),
@@ -371,10 +372,10 @@ class _Actions extends StatelessWidget {
                           ),
                       ],
                       child: IgnorePointer(
-                        child: OutlinedButton.icon(
+                        child: ShadButton.outline(
                           onPressed: busy ? null : () {},
-                          icon: const Icon(Icons.flag_outlined, size: 18),
-                          label: const Text('Priority'),
+                          leading: const Icon(Icons.flag_outlined, size: 18),
+                          child: const Text('Priority'),
                         ),
                       ),
                     ),

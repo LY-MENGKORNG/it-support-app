@@ -7,15 +7,15 @@ import 'package:app/utils/result.dart';
 import 'package:app/utils/safe_notifier.dart';
 
 class SettingsViewModel extends ChangeNotifier with SafeNotifier {
+  final SessionRepository _sessionRepository;
+
+  late final Command0<void> signOut;
+
   SettingsViewModel({required this._sessionRepository}) {
     signOut = Command0(_signOut);
 
     _sessionRepository.addListener(notifyListeners);
   }
-
-  final SessionRepository _sessionRepository;
-
-  late final Command0<void> signOut;
 
   User? get currentUser => _sessionRepository.currentUser;
 

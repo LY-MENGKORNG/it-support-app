@@ -18,6 +18,7 @@ import 'package:app/ui/settings/view_models/settings_viewmodel.dart';
 import 'package:app/ui/settings/widgets/settings_screen.dart';
 import 'package:app/ui/users/view_models/user_list_viewmodel.dart';
 import 'package:app/ui/users/widgets/user_list_screen.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import 'route.dart';
 
@@ -26,6 +27,7 @@ GoRouter router(SessionRepository sessionRepository) => GoRouter(
   initialLocation: Routes.splash,
   refreshListenable: sessionRepository,
   redirect: (context, state) => guard(state, sessionRepository),
+
   /// The app's routes, and the guard that decides which of them you may see.
   routes: [
     GoRoute(
@@ -144,7 +146,7 @@ class _RouteErrorScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
-            FilledButton(
+            ShadButton(
               onPressed: () => context.go(Routes.requests),
               child: const Text('Back to requests'),
             ),

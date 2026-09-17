@@ -3,10 +3,6 @@ import type { NextFunction, Request, Response } from 'express';
 
 /**
  * Logs one line per HTTP request: method, path, status and duration.
- *
- * Nest logs nothing about traffic by default, which makes "is the app even
- * reaching the server?" surprisingly hard to answer. This is the cheapest way
- * to see the client and server talking.
  */
 @Injectable()
 export class RequestLoggerMiddleware implements NestMiddleware {

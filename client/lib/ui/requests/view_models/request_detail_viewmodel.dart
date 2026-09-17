@@ -1,8 +1,5 @@
-import 'dart:collection';
-
 import 'package:app/domain/models/request_detail.dart';
 import 'package:flutter/foundation.dart';
-
 import 'package:app/data/repositories/category/category_repository.dart';
 import 'package:app/data/repositories/request/request_repository.dart';
 import 'package:app/data/repositories/session/session_repository.dart';
@@ -15,8 +12,44 @@ import 'package:app/domain/models/user.dart';
 import 'package:app/utils/command.dart';
 import 'package:app/utils/result.dart';
 import 'package:app/utils/safe_notifier.dart';
+import 'package:app/type.dart';
 
 class RequestDetailViewModel extends ChangeNotifier with SafeNotifier {
+  final RequestRepository _requestRepository;
+  final UserRepository _userRepository;
+  final CategoryRepository _categoryRepository;
+  final SessionRepository _sessionRepository;
+  final int requestId;
+
+  late final Command0<void> load;
+  late final Command0<void> loadActionOptions;
+  late final Command1<void, RequestStatus> changeStatus;
+  late final Command1<void, Priority> changePriority;
+
+  /// `null` unassigns.
+  late final Command1<void, int?> assign;
+  late final Command1<void, String> addComment;
+
+  RequestDetail? _detail;
+  List<User> _assignableUsers = const [];
+  List<RequestCategory> _categoryOptions = const [];
+
+  /// The four mutating commands as one listenable, built once.
+  ///
+  /// `Listenable.merge` returns a new object on every call and defines no `==`,
+  /// so a getter would hand `ListenableBuilder` an unequal listenable on every
+  /// build — which tears down and re-adds a listener on all four commands each
+  /// time, including on every keystroke in the comment composer. It is also
+  /// what makes `addListener`/`removeListener` on this balance: a screen that
+  /// subscribes and unsubscribes would otherwise be doing so through two
+  /// different objects.
+  late final Listenable mutations = Listenable.merge([
+    changeStatus,
+    changePriority,
+    assign,
+    addComment,
+  ]);
+
   RequestDetailViewModel({
     required this._requestRepository,
     required this._userRepository,
@@ -44,59 +77,19 @@ class RequestDetailViewModel extends ChangeNotifier with SafeNotifier {
     }
   }
 
-  final RequestRepository _requestRepository;
-  final UserRepository _userRepository;
-  final CategoryRepository _categoryRepository;
-  final SessionRepository _sessionRepository;
-  final int requestId;
-
-  late final Command0<void> load;
-  late final Command0<void> loadActionOptions;
-  late final Command1<void, RequestStatus> changeStatus;
-  late final Command1<void, Priority> changePriority;
-
-  /// `null` unassigns.
-  late final Command1<void, int?> assign;
-  late final Command1<void, String> addComment;
-
-  RequestDetail? _detail;
-  List<User> _assignableUsers = const [];
-  List<RequestCategory> _categoryOptions = const [];
-
   RequestDetail? get detail => _detail;
   Request? get request => _detail?.request;
-
-  UnmodifiableListView<User> get assignableUsers =>
-      UnmodifiableListView(_assignableUsers);
-
-  UnmodifiableListView<RequestCategory> get categoryOptions =>
-      UnmodifiableListView(_categoryOptions);
+  ImmutableLV<User> get assignableUsers => ImmutableLV(_assignableUsers);
+  ImmutableLV<RequestCategory> get categoryOptions =>
+      ImmutableLV(_categoryOptions);
 
   bool get canManage => _sessionRepository.canManageRequests;
-
   bool get isPreviewOnly => _detail != null && load.running;
-
   bool get isMutating =>
       changeStatus.running ||
       changePriority.running ||
       assign.running ||
       addComment.running;
-
-  /// The four mutating commands as one listenable, built once.
-  ///
-  /// `Listenable.merge` returns a new object on every call and defines no `==`,
-  /// so a getter would hand `ListenableBuilder` an unequal listenable on every
-  /// build — which tears down and re-adds a listener on all four commands each
-  /// time, including on every keystroke in the comment composer. It is also
-  /// what makes `addListener`/`removeListener` on this balance: a screen that
-  /// subscribes and unsubscribes would otherwise be doing so through two
-  /// different objects.
-  late final Listenable mutations = Listenable.merge([
-    changeStatus,
-    changePriority,
-    assign,
-    addComment,
-  ]);
 
   Future<Result<void>> _load() async {
     final result = await _requestRepository.getRequest(requestId);

@@ -281,7 +281,7 @@ const STATUS_POOL: readonly RequestStatus[] = [
 
 async function main() {
   console.log('resetting…');
-  await reset(db, schema);
+  void (await reset(db, schema));
 
   const passwordHash = await Bun.password.hash('password-123');
 

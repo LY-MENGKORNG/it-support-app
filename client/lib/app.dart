@@ -1,10 +1,11 @@
+import 'package:app/ui/core/styles/theme.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:app/data/repositories/session/session_repository.dart';
 import 'package:app/routing/router.dart';
-import 'package:app/ui/core/styles/theme.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -28,14 +29,21 @@ class _AppState extends State<App> {
 
   @override
   Widget build(context) {
-    return MaterialApp.router(
+    return ShadApp.router(
       title: '🚨 IT Support',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.dark,
       routerConfig: _router,
     );
+  }
+
+  // NOTE: Check if the current executing was on the Desktop or Web.
+  bool get isOnDesktopAndWeb {
+    return kIsWeb ||
+        switch (defaultTargetPlatform) {
+          .macOS || .linux || .windows => true,
+          .android || .iOS || .fuchsia => false,
+        };
   }
 
   @override

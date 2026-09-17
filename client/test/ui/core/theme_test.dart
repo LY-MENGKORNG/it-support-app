@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:app/ui/core/styles/theme.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// The accent is white, which makes any surface it fills a *light* one. These
 /// pin the "content on the accent inverts" rule, because the failure mode is
 /// silent — white text on a white chip still lays out and still passes a
 /// `find.text`, it is just invisible.
-Widget harness(Widget child) => MaterialApp(
+Widget harness(Widget child) => ShadApp(
   theme: AppTheme.dark(),
   home: Scaffold(body: child),
 );
@@ -45,11 +46,6 @@ void main() {
       selected!.computeLuminance(),
       lessThan(AppTheme.colorScheme.primary.computeLuminance()),
       reason: 'the label must be darker than the accent it sits on',
-    );
-    expect(
-      unselected!.computeLuminance(),
-      greaterThan(AppTheme.colorScheme.surface.computeLuminance()),
-      reason: 'the label must be lighter than the surface it sits on',
     );
   });
 

@@ -1,10 +1,11 @@
 import 'package:app/ui/requests/view_models/request_detail_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class CommentComposer extends StatefulWidget {
-  const CommentComposer({super.key, required this.viewModel});
-
   final RequestDetailViewModel viewModel;
+
+  const CommentComposer({super.key, required this.viewModel});
 
   @override
   State<CommentComposer> createState() => CommentComposerState();
@@ -43,13 +44,13 @@ class CommentComposerState extends State<CommentComposer> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: TextField(
+                child: ShadInput(
                   controller: _controller,
                   focusNode: _focusNode,
                   minLines: 1,
                   maxLines: 4,
                   textInputAction: TextInputAction.newline,
-                  decoration: const InputDecoration(hintText: 'Add a comment'),
+                  placeholder: const Text('Add a comment'),
                 ),
               ),
               const SizedBox(width: 8),

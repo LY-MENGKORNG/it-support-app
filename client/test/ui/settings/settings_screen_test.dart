@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:app/ui/core/styles/theme.dart';
 import 'package:app/ui/settings/view_models/settings_viewmodel.dart';
 import 'package:app/ui/settings/widgets/settings_screen.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../fakes/fixtures.dart';
 import '../../fakes/repositories/fake_session_repository.dart';
@@ -21,7 +21,7 @@ void main() {
     tearDown(() => viewModel.dispose());
 
     Future<void> pumpScreen(WidgetTester tester) => tester.pumpWidget(
-      MaterialApp(
+      ShadApp(
         theme: AppTheme.dark(),
         home: SettingsScreen(viewModel: viewModel),
       ),

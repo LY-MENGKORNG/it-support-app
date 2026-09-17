@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:app/type.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:app/data/repositories/user/user_repository.dart';
@@ -25,7 +26,7 @@ class UserListViewModel extends ChangeNotifier with SafeNotifier {
   UserRole? _role;
   String _query = '';
 
-  UnmodifiableListView<User> get users => UnmodifiableListView(_items);
+  ImmutableLV<User> get users => ImmutableLV(_items);
   UserRole? get role => _role;
   bool get isEmpty => _items.isEmpty;
 

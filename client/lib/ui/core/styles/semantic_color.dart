@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:app/domain/models/priority.dart';
 import 'package:app/domain/models/request_history_action.dart';
 import 'package:app/domain/models/request_status.dart';

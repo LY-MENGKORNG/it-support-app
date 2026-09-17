@@ -1,7 +1,9 @@
-import 'package:app/utils/exception.dart';
+import 'package:app/ui/auth/widgets/login_error_banner.dart';
+import 'package:app/ui/auth/widgets/login_header.dart';
 import 'package:flutter/material.dart';
 import 'package:app/ui/auth/view_models/login_viewmodel.dart';
 import 'package:app/ui/core/ui/content_column.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class LoginScreen extends StatefulWidget {
   final LoginViewModel viewModel;
@@ -13,13 +15,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _passwordFocus = FocusNode();
+  final _formKey = GlobalKey<ShadFormState>();
 
   bool _obscurePassword = true;
-
   String? _error;
 
   @override
@@ -34,37 +32,29 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (command.error) {
       final exception = command.exception;
-      // Consume the result so the same failure is not reported twice.
       command.clearResult();
-      setState(() => _error = _messageFor(exception));
-      // Wrong credentials means the password is what needs fixing.
-      _passwordController.clear();
-      _passwordFocus.requestFocus();
+      setState(() => _error = widget.viewModel.messageFor(exception));
     } else if (command.running && _error != null) {
       setState(() => _error = null);
     }
   }
 
-  String _messageFor(Exception? exception) => switch (exception) {
-    HttpException(:final isUnauthorized) when isUnauthorized =>
-      'Incorrect email or password.',
-    final Exception error => messageFor(error),
-    null => 'Could not sign in.',
-  };
-
   void _submit() {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    final formState = _formKey.currentState!;
+
+    if (!formState.saveAndValidate()) return;
 
     FocusScope.of(context).unfocus();
+
     widget.viewModel.signIn.execute((
-      email: _emailController.text,
-      password: _passwordController.text,
+      email: formState.getFieldValue('email'),
+      password: formState.getFieldValue('password'),
     ));
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = ShadTheme.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -77,105 +67,88 @@ class _LoginScreenState extends State<LoginScreen> {
                 listenable: widget.viewModel.signIn,
                 builder: (context, _) {
                   final busy = widget.viewModel.signIn.running;
+                  final viewModel = widget.viewModel;
 
-                  return Form(
+                  return ShadForm(
                     key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Icon(
-                          Icons.support_agent,
-                          size: 40,
-                          color: theme.colorScheme.primary,
-                        ),
-                        const SizedBox(height: 20),
-                        Text('IT Support', style: theme.textTheme.titleLarge),
-                        const SizedBox(height: 6),
-                        Text(
-                          'Sign in to raise and track requests.',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: 28),
+                        const LoginHeader(),
 
                         if (_error != null) ...[
-                          _ErrorBanner(message: _error!),
+                          ErrorBanner(message: _error!),
                           const SizedBox(height: 16),
                         ],
 
-                        TextFormField(
-                          controller: _emailController,
+                        ShadInputFormField(
+                          id: 'email',
                           enabled: !busy,
                           autofocus: true,
                           keyboardType: TextInputType.emailAddress,
                           autofillHints: const [AutofillHints.username],
                           textInputAction: TextInputAction.next,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            hintText: 'you@example.com',
-                            prefixIcon: Icon(Icons.alternate_email, size: 20),
-                          ),
-                          validator: (value) =>
-                              (value ?? '').trim().contains('@')
-                              ? null
-                              : 'Enter your work email address.',
-                          onFieldSubmitted: (_) =>
-                              _passwordFocus.requestFocus(),
+                          placeholder: const Text('you@example.com'),
+                          leading: const Icon(Icons.alternate_email, size: 20),
+                          validator: viewModel.validator.validateEmail,
                         ),
+
                         const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _passwordController,
-                          focusNode: _passwordFocus,
+                        ShadInputFormField(
+                          id: 'password',
                           enabled: !busy,
                           obscureText: _obscurePassword,
                           autofillHints: const [AutofillHints.password],
                           textInputAction: TextInputAction.done,
-                          decoration: InputDecoration(
-                            labelText: 'Password',
-                            prefixIcon: const Icon(
-                              Icons.lock_outline,
-                              size: 20,
-                            ),
-                            suffixIcon: IconButton(
-                              tooltip: _obscurePassword ? 'Show' : 'Hide',
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                size: 20,
-                              ),
-                              onPressed: () => setState(
-                                () => _obscurePassword = !_obscurePassword,
+                          placeholder: const Text('Password'),
+                          leading: const Icon(Icons.lock_outline),
+                          trailing: SizedBox.square(
+                            dimension: 24,
+                            child: OverflowBox(
+                              maxWidth: 28,
+                              maxHeight: 28,
+                              child: ShadIconButton(
+                                iconSize: 20,
+                                padding: EdgeInsets.all(2),
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? LucideIcons.eyeOff
+                                      : LucideIcons.eye,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
                               ),
                             ),
                           ),
-                          validator: (value) => (value ?? '').isEmpty
-                              ? 'Enter your password.'
-                              : null,
-                          onFieldSubmitted: (_) => _submit(),
+                          validator: viewModel.validator.validatePassword,
                         ),
-                        const SizedBox(height: 24),
 
-                        FilledButton(
+                        const SizedBox(height: 24),
+                        ShadButton(
                           onPressed: busy ? null : _submit,
-                          child: busy
-                              ? const SizedBox(
-                                  height: 18,
-                                  width: 18,
+                          enabled: !busy,
+                          leading: busy
+                              ? SizedBox.square(
+                                  dimension: 16,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
+                                    color: theme.colorScheme.primaryForeground,
                                   ),
                                 )
-                              : const Text('Sign in'),
+                              : null,
+                          child: const Text('Sign in'),
                         ),
-                        const SizedBox(height: 20),
+
+                        const SizedBox(height: 12),
                         Text(
                           'Seeded demo accounts all use the password '
                           '“password-123”.',
                           textAlign: TextAlign.center,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                          style: theme.textTheme.blockquote.copyWith(
+                            color: theme.colorScheme.primary,
                           ),
                         ),
                       ],
@@ -193,45 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void dispose() {
     widget.viewModel.signIn.removeListener(_onSignInChanged);
-    _emailController.dispose();
-    _passwordController.dispose();
-    _passwordFocus.dispose();
+    _formKey.currentState?.dispose();
     super.dispose();
-  }
-}
-
-class _ErrorBanner extends StatelessWidget {
-  const _ErrorBanner({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        // Tinted rather than solid: an error should read as urgent without
-        // becoming the brightest thing on a dark screen.
-        color: theme.colorScheme.error.withValues(alpha: 0.12),
-        border: Border.all(color: theme.colorScheme.error),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.error_outline, size: 18, color: theme.colorScheme.error),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              message,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.error,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

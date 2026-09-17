@@ -2,6 +2,11 @@ import 'package:app/utils/exception.dart';
 import 'package:flutter/material.dart';
 
 class ErrorIndicator extends StatelessWidget {
+  final String title;
+  final Object? error;
+  final VoidCallback? onPressed;
+  final String label;
+
   const ErrorIndicator({
     super.key,
     required this.title,
@@ -9,12 +14,6 @@ class ErrorIndicator extends StatelessWidget {
     this.onPressed,
     this.label = 'Try again',
   });
-
-  final String title;
-
-  final Object? error;
-  final VoidCallback? onPressed;
-  final String label;
 
   @override
   Widget build(BuildContext context) {

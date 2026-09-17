@@ -1,4 +1,4 @@
-import 'package:app/utils/json.dart';
+import 'package:app/utils/enum.dart';
 
 enum RequestSort implements WireEnum {
   newest('newest', 'Newest first'),

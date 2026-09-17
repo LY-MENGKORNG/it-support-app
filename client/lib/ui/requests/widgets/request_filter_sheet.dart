@@ -6,8 +6,13 @@ import 'package:app/domain/models/request_status.dart';
 import 'package:app/domain/models/request_category.dart';
 import 'package:app/domain/models/user.dart';
 import 'package:app/domain/models/request_filters.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class RequestFilterSheet extends StatefulWidget {
+  final RequestFilters initial;
+  final List<RequestCategory> categories;
+  final User currentUser;
+
   const RequestFilterSheet({
     super.key,
     required this.initial,
@@ -15,18 +20,14 @@ class RequestFilterSheet extends StatefulWidget {
     required this.currentUser,
   });
 
-  final RequestFilters initial;
-  final List<RequestCategory> categories;
-  final User currentUser;
-
   static Future<RequestFilters?> show(
     BuildContext context, {
     required RequestFilters initial,
     required List<RequestCategory> categories,
     required User currentUser,
-  }) => showModalBottomSheet<RequestFilters>(
+  }) => showShadSheet<RequestFilters>(
+    side: ShadSheetSide.bottom,
     context: context,
-    isScrollControlled: true,
     builder: (context) => RequestFilterSheet(
       initial: initial,
       categories: categories,
@@ -46,9 +47,12 @@ class _RequestFilterSheetState extends State<RequestFilterSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = ShadTheme.of(context);
 
-    return SafeArea(
+    return ShadSheet(
+      expandable: true,
+      snap: true,
+      isScrollControlled: true,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         child: SingleChildScrollView(
@@ -56,14 +60,14 @@ class _RequestFilterSheetState extends State<RequestFilterSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Filter requests', style: theme.textTheme.titleMedium),
+              Text('Filter requests', style: theme.textTheme.h3),
               const SizedBox(height: 20),
 
               _Group(
                 label: 'Status',
                 child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 4,
+                  runSpacing: 4,
                   children: [
                     for (final status in RequestStatus.values)
                       FilterChip(
@@ -129,10 +133,11 @@ class _RequestFilterSheetState extends State<RequestFilterSheet> {
                 label: 'People',
                 child: Column(
                   children: [
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Raised by me'),
+                    ShadSwitch(
+                      padding: EdgeInsets.zero,
+                      label: const Text('Raised by me'),
                       value: _minesOnly,
+                      sublabel: const Text('Requests that requested by you.'),
                       onChanged: (on) => setState(() {
                         _draft = on
                             ? _draft.copyWith(
@@ -141,9 +146,11 @@ class _RequestFilterSheetState extends State<RequestFilterSheet> {
                             : _draft.copyWith(clearRequester: true);
                       }),
                     ),
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Assigned to me'),
+                    SizedBox(height: 8),
+                    ShadSwitch(
+                      padding: EdgeInsets.zero,
+                      label: const Text('Assigned to me'),
+                      sublabel: const Text('Requests that assigned to you.'),
                       value: _assignedToMe,
                       onChanged: (on) => setState(() {
                         _draft = on
@@ -154,9 +161,13 @@ class _RequestFilterSheetState extends State<RequestFilterSheet> {
                             : _draft.copyWith(clearAssignee: true);
                       }),
                     ),
-                    SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Unassigned only'),
+                    SizedBox(height: 8),
+                    ShadSwitch(
+                      padding: EdgeInsets.zero,
+                      label: const Text('Unassigned only'),
+                      sublabel: const Text(
+                        "Requests haven't assigned to anyone yet.",
+                      ),
                       value: _draft.unassignedOnly,
                       onChanged: (on) => setState(() {
                         _draft = _draft.copyWith(
@@ -191,7 +202,7 @@ class _RequestFilterSheetState extends State<RequestFilterSheet> {
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton(
+                    child: ShadButton.outline(
                       onPressed: () => Navigator.of(context).pop(
                         // Keep the search text; this button clears *filters*.
                         RequestFilters(query: widget.initial.query),
@@ -201,7 +212,7 @@ class _RequestFilterSheetState extends State<RequestFilterSheet> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: FilledButton(
+                    child: ShadButton(
                       onPressed: () => Navigator.of(context).pop(_draft),
                       child: const Text('Apply'),
                     ),

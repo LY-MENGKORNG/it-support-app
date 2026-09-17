@@ -1,3 +1,4 @@
+import 'package:app/type.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:app/utils/json.dart';
 

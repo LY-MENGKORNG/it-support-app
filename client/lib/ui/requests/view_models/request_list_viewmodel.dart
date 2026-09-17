@@ -16,17 +16,6 @@ import 'package:app/utils/result.dart';
 import 'package:app/utils/safe_notifier.dart';
 
 class RequestListViewModel extends ChangeNotifier with SafeNotifier {
-  RequestListViewModel({
-    required this._requestRepository,
-    required this._categoryRepository,
-    required this._sessionRepository,
-  }) {
-    load = Command0(_load)..execute();
-    loadMore = Command0(_loadMore);
-    loadCategories = Command0(_loadCategories)..execute();
-    _refresh = DebouncedRefresh(load);
-  }
-
   final RequestRepository _requestRepository;
   final CategoryRepository _categoryRepository;
   final SessionRepository _sessionRepository;
@@ -45,12 +34,18 @@ class RequestListViewModel extends ChangeNotifier with SafeNotifier {
   int _total = 0;
   bool _hasMore = false;
 
-  /// Who is filtering, which the filter sheet needs to offer "assigned to me".
-  ///
-  /// Exposed here so the screen reads its view model rather than reaching into
-  /// the repository layer for one field.
-  User? get currentUser => _sessionRepository.currentUser;
+  RequestListViewModel({
+    required this._requestRepository,
+    required this._categoryRepository,
+    required this._sessionRepository,
+  }) {
+    load = Command0(_load)..execute();
+    loadMore = Command0(_loadMore);
+    loadCategories = Command0(_loadCategories)..execute();
+    _refresh = DebouncedRefresh(load);
+  }
 
+  User? get currentUser => _sessionRepository.currentUser;
   RequestFilters get filters => _filters;
   UnmodifiableListView<Request> get items => UnmodifiableListView(_items);
   UnmodifiableListView<RequestCategory> get categoryOptions =>

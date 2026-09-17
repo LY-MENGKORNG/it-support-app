@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, type NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { RequestLoggerMiddleware } from './common/request-logger.middleware';
 import { envSchema } from './config/env.config';
 import { DBModule } from './modules/db/db.module';
@@ -18,6 +19,24 @@ import { UserModule } from './modules/users/user.module';
       ignoreEnvFile: true,
       validate: (raw) => envSchema.parse(raw),
     }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000,
+        limit: 3,
+      },
+      {
+        name: 'medium',
+        ttl: 10000,
+        limit: 20,
+      },
+      {
+        name: 'log',
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
+
     DBModule,
 
     AuthModule,

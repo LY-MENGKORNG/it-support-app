@@ -2,18 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show SocketException;
 
+import 'package:app/type.dart';
 import 'package:app/utils/exception.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:json_annotation/json_annotation.dart';
-import 'package:app/utils/json.dart';
 import 'package:app/utils/result.dart';
 
-typedef Query = Map<String, dynamic>;
-
-typedef Decoder<T> = T Function(Object? payload);
-
-Decoder<T> asObject<T>(ParseFn<T> parse) {
+Decoder<T> asObject<T>(JsonParse<T> parse) {
   return (payload) {
     if (payload is JsonType) {
       return parse(payload);
@@ -22,7 +18,7 @@ Decoder<T> asObject<T>(ParseFn<T> parse) {
   };
 }
 
-Decoder<List<T>> asList<T>(ParseFn<T> parse) {
+Decoder<List<T>> asList<T>(JsonParse<T> parse) {
   return (payload) {
     if (payload is List) {
       return payload.cast<JsonType>().map(parse).toList(growable: false);

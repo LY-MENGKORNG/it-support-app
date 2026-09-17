@@ -1,9 +1,8 @@
+import 'package:app/type.dart';
 import 'package:json_annotation/json_annotation.dart';
-
 import 'package:app/domain/models/comment.dart';
 import 'package:app/domain/models/request.dart';
 import 'package:app/domain/models/request_history.dart';
-import 'package:app/utils/json.dart';
 
 part 'generated/request_detail.g.dart';
 

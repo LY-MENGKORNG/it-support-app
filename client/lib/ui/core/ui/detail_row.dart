@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class DetailRow extends StatelessWidget {
-  const DetailRow({super.key, required this.label, required this.child});
-
   final String label;
   final Widget child;
+
+  const DetailRow({super.key, required this.label, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +37,10 @@ class DetailRow extends StatelessWidget {
 }
 
 class SectionHeader extends StatelessWidget {
-  const SectionHeader(this.title, {super.key, this.trailing});
-
   final String title;
   final Widget? trailing;
+
+  const SectionHeader(this.title, {super.key, this.trailing});
 
   @override
   Widget build(BuildContext context) {

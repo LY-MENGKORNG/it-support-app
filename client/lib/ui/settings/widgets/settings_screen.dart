@@ -3,15 +3,16 @@ import 'package:flutter/material.dart';
 
 import 'package:app/ui/core/ui/user_avatar.dart';
 import 'package:app/ui/settings/view_models/settings_viewmodel.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key, required this.viewModel});
-
   final SettingsViewModel viewModel;
+
+  const SettingsScreen({super.key, required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = ShadTheme.of(context);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
@@ -33,18 +34,18 @@ class SettingsScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(user.name, style: theme.textTheme.titleMedium),
+                            Text(user.name, style: theme.textTheme.large),
                             const SizedBox(height: 2),
                             Text(
                               user.email,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
+                              style: theme.textTheme.p.copyWith(
+                                color: theme.colorScheme.primary,
                               ),
                             ),
                             const SizedBox(height: 6),
                             Text(
                               user.role.label,
-                              style: theme.textTheme.labelSmall?.copyWith(
+                              style: theme.textTheme.p.copyWith(
                                 color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -55,7 +56,8 @@ class SettingsScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Divider(),
+
+                const ShadSeparator.horizontal(),
                 ListTile(
                   leading: const Icon(Icons.logout_outlined),
                   title: const Text('Sign out'),
@@ -72,7 +74,9 @@ class SettingsScreen extends StatelessWidget {
                       : viewModel.signOut.execute,
                 ),
               ],
-              const Divider(),
+
+              const ShadSeparator.horizontal(),
+
               ListTile(
                 leading: const Icon(Icons.dns_outlined),
                 title: const Text('API server'),

@@ -18,9 +18,9 @@ const _destinations = [
 ];
 
 class HomeShell extends StatelessWidget {
-  const HomeShell({super.key, required this.shell});
-
   final StatefulNavigationShell shell;
+
+  const HomeShell({super.key, required this.shell});
 
   void _onTap(int index) {
     shell.goBranch(index, initialLocation: index == shell.currentIndex);

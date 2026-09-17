@@ -5,12 +5,13 @@ import 'package:app/domain/models/priority.dart';
 import 'package:app/domain/models/request_status.dart';
 import 'package:app/ui/core/styles/theme.dart';
 import 'package:app/ui/requests/widgets/request_card.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../fakes/fixtures.dart';
 
 /// Wraps a widget in the minimum the framework needs (a Directionality, a
 /// Theme, a Material ancestor) so one widget can be pumped in isolation.
-Widget harness(Widget child) => MaterialApp(
+Widget harness(Widget child) => ShadApp(
   theme: AppTheme.dark(),
   home: Scaffold(body: child),
 );

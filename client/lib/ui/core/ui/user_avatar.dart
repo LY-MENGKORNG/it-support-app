@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:app/domain/models/user.dart';
 
 class UserAvatar extends StatelessWidget {
-  const UserAvatar(this.user, {super.key, this.size = 36});
-
   final User user;
   final double size;
+
+  const UserAvatar(this.user, {super.key, this.size = 36});
 
   static const _palette = [
     Color(0xFF4C8DFF),

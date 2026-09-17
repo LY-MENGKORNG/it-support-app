@@ -2,6 +2,7 @@
 sealed class ApiException implements Exception {
   const ApiException(this.message);
 
+  /// [message] - message to be throw
   final String message;
 
   @override

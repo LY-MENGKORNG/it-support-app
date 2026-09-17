@@ -1,5 +1,5 @@
+import 'package:app/type.dart';
 import 'package:json_annotation/json_annotation.dart';
-
 import 'package:app/utils/json.dart';
 
 part 'generated/request_category.g.dart';
@@ -20,12 +20,14 @@ class RequestCategory {
     this.createdAt,
   });
 
-  factory RequestCategory.fromJson(JsonType json) =>
-      _$RequestCategoryFromJson(json);
+  factory RequestCategory.fromJson(JsonType json) {
+    return _$RequestCategoryFromJson(json);
+  }
 
   @override
-  bool operator ==(Object other) =>
-      other is RequestCategory && other.id == id && other.name == name;
+  bool operator ==(Object other) {
+    return other is RequestCategory && other.id == id && other.name == name;
+  }
 
   @override
   int get hashCode => Object.hash(id, name);

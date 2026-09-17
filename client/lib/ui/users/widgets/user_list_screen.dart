@@ -4,6 +4,7 @@ import 'package:app/domain/models/user_role.dart';
 import 'package:app/ui/core/ui/error_indicator.dart';
 import 'package:app/ui/core/ui/user_avatar.dart';
 import 'package:app/ui/users/view_models/user_list_viewmodel.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class UserListScreen extends StatelessWidget {
   const UserListScreen({super.key, required this.viewModel});
@@ -20,12 +21,10 @@ class UserListScreen extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: TextField(
+            child: ShadInput(
               onChanged: viewModel.search,
-              decoration: const InputDecoration(
-                hintText: 'Search people',
-                prefixIcon: Icon(Icons.search, size: 20),
-              ),
+              placeholder: const Text('Search people'),
+              leading: const Icon(Icons.search, size: 20),
             ),
           ),
           SizedBox(

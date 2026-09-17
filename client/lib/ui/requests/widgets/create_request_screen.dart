@@ -1,29 +1,25 @@
-import 'package:app/utils/exception.dart';
+import 'package:app/ui/core/ui/field_label.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:app/domain/models/request_category.dart';
 import 'package:app/domain/models/priority.dart';
-import 'package:app/ui/core/ui/content_column.dart';
 import 'package:app/ui/core/ui/error_indicator.dart';
 import 'package:app/ui/core/ui/status_chip.dart';
 import 'package:app/ui/requests/view_models/create_request_viewmodel.dart';
 import 'package:app/utils/result.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class CreateRequestScreen extends StatefulWidget {
-  const CreateRequestScreen({super.key, required this.viewModel});
-
   final CreateRequestViewModel viewModel;
+
+  const CreateRequestScreen({super.key, required this.viewModel});
 
   @override
   State<CreateRequestScreen> createState() => _CreateRequestScreenState();
 }
 
 class _CreateRequestScreenState extends State<CreateRequestScreen> {
-  /// Identifies the form so `validate()` can drive every field at once.
-  final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  final _formKey = GlobalKey<ShadFormState>();
 
   @override
   void initState() {
@@ -36,19 +32,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     if (!mounted) return;
 
     if (command.error) {
-      final error = command.exception;
+      // final error = command.exception;
       command.clearResult();
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(
-              error == null
-                  ? 'Could not create the request.'
-                  : messageFor(error),
-            ),
-          ),
-        );
       return;
     }
 
@@ -57,53 +42,30 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       command.clearResult();
       if (created == null) return;
 
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(content: Text('Request #${created.id} created')),
-        );
       context.pop(created);
     }
   }
 
   void _submit() {
-    // `validate()` runs every validator and repaints their error text.
-    if (!_formKey.currentState!.validate()) return;
+    final formState = _formKey.currentState!;
+
+    if (!formState.saveAndValidate()) return;
 
     widget.viewModel.submit.execute((
-      title: _titleController.text,
-      description: _descriptionController.text,
+      title: formState.getFieldValue('title'),
+      description: formState.getFieldValue('description'),
     ));
-  }
-
-  String? _validateTitle(String? value) {
-    final text = value?.trim() ?? '';
-    if (text.isEmpty) return 'Give the request a short title';
-    // Mirrors the server's `min(3).max(120)` so the user finds out here first.
-    if (text.length < 3) return 'Use at least 3 characters';
-    if (text.length > 120) return 'Keep the title under 120 characters';
-    return null;
-  }
-
-  String? _validateDescription(String? value) {
-    final text = value?.trim() ?? '';
-    if (text.isEmpty) return 'Describe what is happening';
-    if (text.length < 10) {
-      return 'Add a little more detail — at least 10 characters';
-    }
-    if (text.length > 5000) return 'That is too long for one request';
-    return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = ShadTheme.of(context);
     final viewModel = widget.viewModel;
 
     return Scaffold(
       appBar: AppBar(title: const Text('New request')),
-      body: ContentColumn(
-        maxWidth: 640,
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         child: ListenableBuilder(
           listenable: viewModel.load,
           builder: (context, child) {
@@ -121,108 +83,109 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
           },
           child: ListenableBuilder(
             listenable: Listenable.merge([viewModel, viewModel.submit]),
-            builder: (context, _) => Form(
+            builder: (context, _) => ShadForm(
               key: _formKey,
-              // Show errors once a field has been touched and changed, rather
-              // than only after the first failed submit.
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  Text(
-                    'Raised as ${viewModel.requesterName ?? 'unknown'}',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  const _FieldLabel('Title'),
-                  TextFormField(
-                    controller: _titleController,
-                    validator: _validateTitle,
-                    textInputAction: TextInputAction.next,
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: const InputDecoration(
-                      hintText: 'Laptop cannot connect to Wi-Fi',
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  const _FieldLabel('Description'),
-                  TextFormField(
-                    controller: _descriptionController,
-                    validator: _validateDescription,
-                    minLines: 4,
-                    maxLines: 8,
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(
-                      hintText: viewModel.selectedCategory?.description ?? 'What happened, when it started, and anything you have already tried.',
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  const _FieldLabel('Category'),
-                  DropdownButtonFormField<RequestCategory>(
-                    initialValue: viewModel.selectedCategory,
-                    isExpanded: true,
-                    validator: (value) =>
-                        value == null ? 'Pick a category' : null,
-                    items: [
-                      for (final category in viewModel.categoryOptions)
-                        DropdownMenuItem(
-                          value: category,
-                          child: Text(
-                            category.name,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                    ],
-                    onChanged: viewModel.selectCategory,
-                  ),
-                  const SizedBox(height: 20),
-
-                  const _FieldLabel('Priority'),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      for (final priority in Priority.values)
-                        ChoiceChip(
-                          label: Text(priority.label),
-                          selected: viewModel.priority == priority,
-                          onSelected: (_) => viewModel.selectPriority(priority),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      PriorityChip(viewModel.priority, dense: true),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _priorityHint(viewModel.priority),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints.expand(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Raised as ${viewModel.requesterName ?? 'unknown'}',
+                      style: theme.textTheme.p.copyWith(
+                        color: theme.colorScheme.accent,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 32),
+                    ),
 
-                  FilledButton(
-                    onPressed: viewModel.canSubmit ? _submit : null,
-                    child: viewModel.submit.running
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Submit request'),
-                  ),
-                ],
+                    ShadInputFormField(
+                      id: 'title',
+                      label: const Text('Title'),
+                      validator: viewModel.validator['title'],
+                      textInputAction: TextInputAction.next,
+                      textCapitalization: TextCapitalization.sentences,
+                      placeholder: const Text('Laptop cannot connect to Wi-Fi'),
+                    ),
+                    const SizedBox(height: 16),
+
+                    ShadTextareaFormField(
+                      id: 'description',
+                      label: const Text('Description'),
+                      validator: viewModel.validator['description'],
+                      placeholder: Text(
+                        viewModel.selectedCategory?.description ?? 'What happened, when it started, and anything you have already tried.',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    Expanded(
+                      child: ShadSelectFormField<RequestCategory>(
+                        id: 'category',
+                        label: const Text('Category'),
+                        placeholder: const Text('Pick a category'),
+                        initialValue: viewModel.selectedCategory,
+                        options: [
+                          ...viewModel.categoryOptions.map(
+                            (el) => ShadOption(value: el, child: Text(el.name)),
+                          ),
+                        ],
+                        selectedOptionBuilder: (ctx, value) => Text(value.name),
+                        onChanged: viewModel.selectCategory,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    const FieldLabel('Priority'),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final priority in Priority.values)
+                          ChoiceChip(
+                            label: Text(priority.label),
+                            selected: viewModel.priority == priority,
+                            onSelected: (_) =>
+                                viewModel.selectPriority(priority),
+                          ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        PriorityChip(viewModel.priority, dense: true),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            viewModel.priority.hint,
+                            style: theme.textTheme.p.copyWith(
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 32),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ShadButton(
+                            onPressed: viewModel.canSubmit ? _submit : null,
+                            child: viewModel.submit.running
+                                ? const SizedBox.square(
+                                    dimension: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text('Submit request'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -231,18 +194,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     );
   }
 
-  static String _priorityHint(Priority priority) => switch (priority) {
-    Priority.low => 'Inconvenient, but you can keep working.',
-    Priority.medium => 'Slowing you down. The default for most requests.',
-    Priority.high => 'You are blocked on this.',
-    Priority.critical => 'Several people are blocked, or something is unsafe.',
-  };
-
   @override
   void dispose() {
     widget.viewModel.submit.removeListener(_onSubmitChanged);
-    _titleController.dispose();
-    _descriptionController.dispose();
     super.dispose();
   }
 }
@@ -255,27 +209,4 @@ class InvalidRequestScreen extends StatelessWidget {
     appBar: AppBar(title: const Text('Request')),
     body: const Center(child: Text('That request id is not valid.')),
   );
-}
-
-class _FieldLabel extends StatelessWidget {
-  const _FieldLabel(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        text.toUpperCase(),
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
-        ),
-      ),
-    );
-  }
 }

@@ -26,7 +26,7 @@ import { ApiBody, ApiOperation, ApiQuery } from '@nestjs/swagger';
 
 @Controller('request')
 export class RequestController {
-  constructor(private readonly requests: RequestService) { }
+  constructor(private readonly requests: RequestService) {}
 
   @Get()
   @ApiQuery({ type: ListRequestQuery })

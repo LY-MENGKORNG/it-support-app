@@ -1,4 +1,4 @@
-import 'package:app/utils/json.dart';
+import 'package:app/utils/enum.dart';
 
 enum UserRole implements WireEnum {
   employee('employee', 'Employee'),
