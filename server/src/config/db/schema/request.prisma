@@ -1,0 +1,49 @@
+// Postgres sorts a native enum by declaration order, not alphabetically.
+// Declaring `critical` first is what makes `orderBy: { priority: 'asc' }`
+// reproduce the old "most urgent first" sort with no raw SQL.
+enum Priority {
+  critical
+  high
+  medium
+  low
+}
+
+enum RequestStatus {
+  open
+  in_progress
+  resolved
+  closed
+}
+
+model Request {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  priority Priority      @default(medium)
+  status   RequestStatus @default(open)
+
+  requesterId Int
+  requester   User @relation("request_requester", fields: [requesterId], references: [id])
+
+  assigneeId Int?
+  assignee   User? @relation("request_assignee", fields: [assigneeId], references: [id])
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  resolvedAt DateTime?
+  closedAt   DateTime?
+
+  comments Comment[]
+  history  RequestHistory[]
+
+  @@index([requesterId])
+  @@index([assigneeId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([priority])
+  @@index([createdAt])
+}

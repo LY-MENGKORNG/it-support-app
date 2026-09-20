@@ -8,8 +8,8 @@ function unsafeParse(str: string): Msg {
 }
 
 /**
- * Stands in for a thenable that is not a real promise, which is what drizzle's
- * query builders are: `instanceof Promise` is false for them.
+ * Stands in for a thenable that is not a real promise: `instanceof Promise`
+ * is false for it, the way it is for some query builders.
  */
 class FakeQuery<T> implements PromiseLike<T> {
   constructor(private readonly source: Promise<T>) {}

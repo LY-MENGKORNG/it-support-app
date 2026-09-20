@@ -1,17 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { DRIZZLE } from '@common/constants';
-import { type DrizzleDB } from '@config/db';
+import { PRISMA } from '@common/constants';
+import { type PrismaDB } from '@config/db';
 import { publicUserColumns } from '../users/user.schema';
 
 @Injectable()
 export class RequestHistoryRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+  constructor(@Inject(PRISMA) private readonly db: PrismaDB) {}
 
   findByRequest(requestId: number) {
-    return this.db.query.requestHistory.findMany({
+    return this.db.requestHistory.findMany({
       where: { requestId },
-      with: { user: { columns: publicUserColumns } },
-      orderBy: { createdAt: 'desc', id: 'desc' },
+      include: { user: { select: publicUserColumns } },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
     });
   }
 }

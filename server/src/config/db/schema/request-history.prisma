@@ -1,0 +1,24 @@
+enum HistoryAction {
+  created
+  status_changed
+  priority_changed
+  assigned
+  unassigned
+  category_changed
+}
+
+model RequestHistory {
+  id        Int           @id @default(autoincrement())
+  requestId Int
+  request   Request       @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User          @relation(fields: [userId], references: [id])
+  action    HistoryAction
+  oldValue  String?
+  newValue  String?
+  createdAt DateTime      @default(now())
+
+  @@index([requestId])
+  @@index([userId])
+  @@index([createdAt])
+}

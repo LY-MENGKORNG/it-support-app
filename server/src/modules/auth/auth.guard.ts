@@ -6,7 +6,7 @@ import {
   type ExecutionContext,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 import type { Role } from '@common/constants';
 import { AuthService } from './auth.service';
 import { IS_PUBLIC, REQUIRED_ROLES } from './auth.decorator';
@@ -26,13 +26,13 @@ export class AuthGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<FastifyRequest>();
     const token = bearerTokenFrom(request.headers.authorization);
     if (!token) throw new UnauthorizedException('Missing bearer token');
 
     const user = await this.auth.verify(token);
 
-    (request as Request & { user: AuthenticatedUser }).user = user;
+    (request as FastifyRequest & { user: AuthenticatedUser }).user = user;
 
     const required = this.reflector.getAllAndOverride<Role[]>(REQUIRED_ROLES, [
       context.getHandler(),

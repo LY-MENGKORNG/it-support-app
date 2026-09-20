@@ -8,8 +8,8 @@ export const envSchema = z
       .readonly(),
     PORT: z.coerce.number().int().positive().default(3000).readonly(),
 
-    TURSO_CONNECTION_URL: z.url().readonly(),
-    TURSO_AUTH_TOKEN: z.string().readonly(),
+    /** Database connection string 🔌 */
+    DATABASE_URL: z.string().readonly(),
 
     /**
      * The HMAC key every access token is signed with. Changing it invalidates

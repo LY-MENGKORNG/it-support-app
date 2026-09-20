@@ -1,21 +1,7 @@
-import { integer, snakeCase, text } from 'drizzle-orm/sqlite-core';
 import { ROLES } from '@common/constants';
-import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { commonColumns } from '@common/helpers/schema.helper';
 
-export const user = snakeCase.table('user', {
-  id: commonColumns.id,
-  ...commonColumns.timespamps,
-  name: text().notNull(),
-  email: text().notNull().unique(),
-  password_hash: text().notNull(),
-  role: text({ enum: ROLES }).notNull().default('employee'),
-  isActive: integer({ mode: 'boolean' }).notNull().default(true),
-});
-
-export type User = typeof user.$inferSelect;
-export type NewUser = typeof user.$inferInsert;
+export type { User } from '@config/db/generated/prisma/client';
 
 export const publicUserColumns = {
   id: true,
@@ -36,8 +22,15 @@ export const createUserSchema = z.object({
 });
 
 export const updateUserSchema = createUserSchema.partial();
-export const userResponseSchema = createSelectSchema(user).omit({
-  password_hash: true,
+
+export const userResponseSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  email: z.email(),
+  role: z.enum(ROLES),
+  isActive: z.boolean(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 });
 
 export const listUserQuerySchema = z.object({

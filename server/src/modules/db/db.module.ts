@@ -1,7 +1,7 @@
 import { Global, Inject, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { DRIZZLE } from '@common/constants';
-import { db, type DrizzleDB } from '@config/db';
+import { PRISMA } from '@common/constants';
+import { db, type PrismaDB } from '@config/db';
 import { safeTry } from '@common/utils/exception';
 
 @Global()
@@ -10,17 +10,17 @@ import { safeTry } from '@common/utils/exception';
   controllers: [],
   providers: [
     {
-      provide: DRIZZLE,
+      provide: PRISMA,
       inject: [ConfigService],
       useFactory: (_config: ConfigService) => db,
     },
   ],
-  exports: [DRIZZLE],
+  exports: [PRISMA],
 })
 export class DBModule {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+  constructor(@Inject(PRISMA) private readonly db: PrismaDB) {}
 
-  onApplicationShutdown() {
-    safeTry(() => this.db.$client.close());
+  async onApplicationShutdown() {
+    await safeTry(() => this.db.$disconnect());
   }
 }

@@ -4,7 +4,7 @@ export type SafeResult<R, E = Error> = [R] extends [never]
     ? Promise<U | E>
     : R | E;
 
-/** Promises are not the only thenables: drizzle's query builders are too. */
+/** Promises are not the only thenables: a query builder can return one too. */
 function isThenable(value: unknown): value is PromiseLike<unknown> {
   return (
     typeof (value as PromiseLike<unknown> | null | undefined)?.then ===

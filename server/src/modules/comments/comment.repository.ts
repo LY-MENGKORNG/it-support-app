@@ -1,34 +1,31 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { DRIZZLE } from '@common/constants';
-import { type DrizzleDB } from '@config/db';
+import { PRISMA } from '@common/constants';
+import { type PrismaDB } from '@config/db';
 import { publicUserColumns } from '../users/user.schema';
-import { comment } from './comment.schema';
 import { type CreateCommentDto } from './comment.dto';
 
 @Injectable()
 export class CommentRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+  constructor(@Inject(PRISMA) private readonly db: PrismaDB) {}
 
   findByRequest(requestId: number) {
-    return this.db.query.comment.findMany({
+    return this.db.comment.findMany({
       where: { requestId },
-      with: { user: { columns: publicUserColumns } },
-      orderBy: { createdAt: 'asc', id: 'asc' },
+      include: { user: { select: publicUserColumns } },
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
     });
   }
 
   findById(id: number) {
-    return this.db.query.comment.findFirst({
+    return this.db.comment.findUnique({
       where: { id },
-      with: { user: { columns: publicUserColumns } },
+      include: { user: { select: publicUserColumns } },
     });
   }
 
   insert(requestId: number, values: CreateCommentDto & { userId: number }) {
-    return this.db
-      .insert(comment)
-      .values({ requestId, userId: values.userId, content: values.content })
-      .returning()
-      .get();
+    return this.db.comment.create({
+      data: { requestId, userId: values.userId, content: values.content },
+    });
   }
 }

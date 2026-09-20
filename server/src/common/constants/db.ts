@@ -1,1 +1,1 @@
-export const DRIZZLE = Symbol('DRIZZLE');
+export const PRISMA = Symbol('PRISMA');

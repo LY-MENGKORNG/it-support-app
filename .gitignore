@@ -37,6 +37,9 @@ db.sqlite
 db.sqlite-shm
 db.sqlite-wal
 
+# Prisma generated client
+server/src/config/db/generated/
+
 ############# app ##############
 # Miscellaneous
 *.class

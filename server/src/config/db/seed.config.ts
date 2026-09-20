@@ -1,13 +1,7 @@
 #!/usr/bin/env bun
 
-import { reset } from 'drizzle-seed';
-import { schema } from './relation.config';
 import { db } from '.';
-import { category } from '@modules/categories/category.schema';
-import { comment } from '@modules/comments/comment.schema';
-import { requestHistory } from '@modules/request-histories/request-history.schema';
-import { request } from '@modules/requests/request.schema';
-import { user } from '@modules/users/user.schema';
+import type { Prisma } from './generated/prisma/client';
 import type { Priority, RequestStatus, Role } from '@common/constants';
 
 function rng(seed: number) {
@@ -281,36 +275,30 @@ const STATUS_POOL: readonly RequestStatus[] = [
 
 async function main() {
   console.log('resetting…');
-  void (await reset(db, schema));
+  await db.$executeRaw`TRUNCATE TABLE "Comment", "RequestHistory", "Request", "Category", "User" RESTART IDENTITY CASCADE`;
 
   const passwordHash = await Bun.password.hash('password-123');
 
-  const categories = await db
-    .insert(category)
-    .values(
-      CATEGORIES.map(([name, description]) => ({
-        name,
-        description,
-        createdAt: daysAgo(400),
-      })),
-    )
-    .returning();
+  const categories = await db.category.createManyAndReturn({
+    data: CATEGORIES.map(([name, description]) => ({
+      name,
+      description,
+      createdAt: daysAgo(400),
+    })),
+  });
   console.log(`categories: ${categories.length}`);
 
-  const users = await db
-    .insert(user)
-    .values(
-      PEOPLE.map(([name, role], index) => ({
-        name,
-        // Deterministic and collision-free, unlike a random email generator.
-        email: `${name.toLowerCase().replace(/[^a-z]+/g, '.') || `user${index}`}${index}@example.com`,
-        password_hash: passwordHash,
-        role,
-        isActive: role === 'employee' ? !chance(0.1) : true,
-        createdAt: daysAgo(500),
-      })),
-    )
-    .returning();
+  const users = await db.user.createManyAndReturn({
+    data: PEOPLE.map(([name, role], index) => ({
+      name,
+      // Deterministic and collision-free, unlike a random email generator.
+      email: `${name.toLowerCase().replace(/[^a-z]+/g, '.') || `user${index}`}${index}@example.com`,
+      password_hash: passwordHash,
+      role,
+      isActive: role === 'employee' ? !chance(0.1) : true,
+      createdAt: daysAgo(500),
+    })),
+  });
   console.log(`users: ${users.length}`);
 
   const staff = users.filter((u) => u.role !== 'employee');
@@ -351,9 +339,8 @@ async function main() {
             : null;
         const updatedAt = closedAt ?? resolvedAt ?? createdAt;
 
-        const created = await db
-          .insert(request)
-          .values({
+        const created = await db.request.create({
+          data: {
             title,
             description,
             categoryId: cat.id,
@@ -365,12 +352,11 @@ async function main() {
             updatedAt,
             resolvedAt,
             closedAt,
-          })
-          .returning()
-          .get();
+          },
+        });
         requestCount++;
 
-        const history: (typeof requestHistory.$inferInsert)[] = [
+        const history: Prisma.RequestHistoryUncheckedCreateInput[] = [
           {
             requestId: created.id,
             userId: requester.id,
@@ -435,10 +421,10 @@ async function main() {
           });
         }
 
-        await db.insert(requestHistory).values(history);
+        await db.requestHistory.createMany({ data: history });
         historyCount += history.length;
 
-        const thread: (typeof comment.$inferInsert)[] = [];
+        const thread: Prisma.CommentUncheckedCreateInput[] = [];
         const author = assignee ?? pick(staff);
 
         if (!isOpen || chance(0.4)) {
@@ -475,7 +461,7 @@ async function main() {
         }
 
         if (thread.length) {
-          await db.insert(comment).values(thread);
+          await db.comment.createMany({ data: thread });
           commentCount += thread.length;
         }
       }

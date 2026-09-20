@@ -1,142 +1,98 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  and,
-  asc,
-  count,
-  desc,
-  eq,
-  like,
-  or,
-  sql,
-  type SQL,
-} from 'drizzle-orm';
-import { alias } from 'drizzle-orm/sqlite-core';
-
-import { DRIZZLE } from '@common/constants';
-import { type DrizzleDB } from '@config/db';
-import { category } from '../categories/category.schema';
-import {
-  type RequestHistoryDraft,
-  requestHistory,
-} from '../request-histories/request-history.schema';
-import { publicUserColumns, user } from '../users/user.schema';
-import { type NewRequest, request } from './request.schema';
+import { PRISMA } from '@common/constants';
+import { type PrismaDB } from '@config/db';
+import type { Prisma } from '@config/db/generated/prisma/client';
+import { type RequestHistoryDraft } from '../request-histories/request-history.schema';
+import { publicUserColumns } from '../users/user.schema';
+import { type NewRequest } from './request.schema';
 import { ListRequestQuery } from './request.dto';
 
-const escapeLike = (value: string) =>
-  value.replace(/[\\%_]/g, (char) => `\\${char}`);
+const REQUEST_LIST_SUMMARY_COLUMNS = {
+  id: true,
+  name: true,
+  email: true,
+  role: true,
+} as const;
 
-const PRIORITY_RANK = sql`
-  case ${request.priority}
-    when 'critical' then 0
-    when 'high' then 1
-    when 'medium' then 2
-    else 3
-  end`;
-
-export type RequestPatch = Partial<NewRequest>;
+export type RequestPatch = Prisma.RequestUncheckedUpdateInput;
 
 @Injectable()
 export class RequestRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+  constructor(@Inject(PRISMA) private readonly db: PrismaDB) {}
 
   async findPage(query: ListRequestQuery) {
     const { limit, offset } = query;
-    const requester = alias(user, 'requester');
-    const assignee = alias(user, 'assignee');
     const where = this.buildFilters(query);
 
-    const rows = await this.db
-      .select({
-        id: request.id,
-        title: request.title,
-        description: request.description,
-        priority: request.priority,
-        status: request.status,
-        createdAt: request.createdAt,
-        updatedAt: request.updatedAt,
-        resolvedAt: request.resolvedAt,
-        closedAt: request.closedAt,
-        categoryId: request.categoryId,
-        requesterId: request.requesterId,
-        assigneeId: request.assigneeId,
-        category: { id: category.id, name: category.name },
-        requester: {
-          id: requester.id,
-          name: requester.name,
-          email: requester.email,
-          role: requester.role,
+    const [rows, total] = await Promise.all([
+      this.db.request.findMany({
+        where,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          priority: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          resolvedAt: true,
+          closedAt: true,
+          categoryId: true,
+          requesterId: true,
+          assigneeId: true,
+          category: { select: { id: true, name: true } },
+          requester: { select: REQUEST_LIST_SUMMARY_COLUMNS },
+          assignee: { select: REQUEST_LIST_SUMMARY_COLUMNS },
         },
-        assignee: {
-          id: assignee.id,
-          name: assignee.name,
-          email: assignee.email,
-          role: assignee.role,
-        },
-      })
-      .from(request)
-      .innerJoin(category, eq(request.categoryId, category.id))
-      .innerJoin(requester, eq(request.requesterId, requester.id))
-      .leftJoin(assignee, eq(request.assigneeId, assignee.id))
-      .where(where)
-      .orderBy(...this.buildOrderBy(query.sort))
-      .limit(limit)
-      .offset(offset);
+        orderBy: this.buildOrderBy(query.sort),
+        take: limit,
+        skip: offset,
+      }),
+      this.db.request.count({ where }),
+    ]);
 
-    const [{ total }] = await this.db
-      .select({ total: count() })
-      .from(request)
-      .where(where);
-
-    return {
-      rows: rows.map((row) => ({
-        ...row,
-        assignee: row.assignee?.id == null ? null : row.assignee,
-      })),
-      total,
-    };
+    return { rows, total };
   }
 
   findDetail(id: number) {
-    return this.db.query.request.findFirst({
+    return this.db.request.findUnique({
       where: { id },
-      with: {
+      include: {
         category: true,
-        requester: { columns: publicUserColumns },
-        assignee: { columns: publicUserColumns },
+        requester: { select: publicUserColumns },
+        assignee: { select: publicUserColumns },
         comments: {
-          with: { user: { columns: publicUserColumns } },
-          orderBy: { createdAt: 'asc', id: 'asc' },
+          include: { user: { select: publicUserColumns } },
+          orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
         },
         history: {
-          with: { user: { columns: publicUserColumns } },
-          orderBy: { createdAt: 'desc', id: 'desc' },
+          include: { user: { select: publicUserColumns } },
+          orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         },
       },
     });
   }
 
   findById(id: number) {
-    return this.db.query.request.findFirst({ where: { id } });
+    return this.db.request.findUnique({ where: { id } });
   }
 
   async exists(id: number) {
-    const found = await this.db.query.request.findFirst({
+    const found = await this.db.request.findUnique({
       where: { id },
-      columns: { id: true },
+      select: { id: true },
     });
     return found != null;
   }
 
   insertWithHistory(values: NewRequest, entries: RequestHistoryDraft[]) {
-    return this.db.transaction(async (tx) => {
-      const created = await tx.insert(request).values(values).returning().get();
+    return this.db.$transaction(async (tx) => {
+      const created = await tx.request.create({ data: values });
 
       if (entries.length) {
-        await tx
-          .insert(requestHistory)
-          .values(entries.map((entry) => ({ ...entry, requestId: created.id })))
-          .run();
+        await tx.requestHistory.createMany({
+          data: entries.map((entry) => ({ ...entry, requestId: created.id })),
+        });
       }
 
       return created.id;
@@ -148,51 +104,49 @@ export class RequestRepository {
     patch: RequestPatch,
     entries: RequestHistoryDraft[],
   ) {
-    await this.db.transaction(async (tx) => {
-      await tx.update(request).set(patch).where(eq(request.id, id)).run();
+    await this.db.$transaction(async (tx) => {
+      await tx.request.update({ where: { id }, data: patch });
 
       if (entries.length) {
-        await tx
-          .insert(requestHistory)
-          .values(entries.map((entry) => ({ ...entry, requestId: id })))
-          .run();
+        await tx.requestHistory.createMany({
+          data: entries.map((entry) => ({ ...entry, requestId: id })),
+        });
       }
     });
   }
 
-  private buildFilters(query: ListRequestQuery): SQL | undefined {
-    const conditions: SQL[] = [];
+  private buildFilters(query: ListRequestQuery): Prisma.RequestWhereInput {
+    const where: Prisma.RequestWhereInput = {};
 
     if (query.q) {
-      const pattern = `%${escapeLike(query.q)}%`;
-      conditions.push(
-        or(like(request.title, pattern), like(request.description, pattern))!,
-      );
+      where.OR = [
+        { title: { contains: query.q } },
+        { description: { contains: query.q } },
+      ];
     }
-    if (query.status) conditions.push(eq(request.status, query.status));
-    if (query.priority) conditions.push(eq(request.priority, query.priority));
-    if (query.categoryId)
-      conditions.push(eq(request.categoryId, query.categoryId));
-    if (query.requesterId)
-      conditions.push(eq(request.requesterId, query.requesterId));
+    if (query.status) where.status = query.status;
+    if (query.priority) where.priority = query.priority;
+    if (query.categoryId) where.categoryId = query.categoryId;
+    if (query.requesterId) where.requesterId = query.requesterId;
 
-    if (query.unassigned) {
-      conditions.push(sql`${request.assigneeId} is null`);
-    } else if (query.assigneeId) {
-      conditions.push(eq(request.assigneeId, query.assigneeId));
-    }
+    if (query.unassigned) where.assigneeId = null;
+    else if (query.assigneeId) where.assigneeId = query.assigneeId;
 
-    return conditions.length ? and(...conditions) : undefined;
+    return where;
   }
 
-  private buildOrderBy(sort: ListRequestQuery['sort']) {
+  private buildOrderBy(
+    sort: ListRequestQuery['sort'],
+  ): Prisma.RequestOrderByWithRelationInput[] {
     switch (sort) {
       case 'oldest':
-        return [asc(request.createdAt), asc(request.id)];
+        return [{ createdAt: 'asc' }, { id: 'asc' }];
       case 'priority':
-        return [PRIORITY_RANK, desc(request.createdAt)];
+        // Postgres sorts the native `Priority` enum by declaration order
+        // (critical → low), so this alone reproduces "most urgent first".
+        return [{ priority: 'asc' }, { createdAt: 'desc' }];
       default:
-        return [desc(request.createdAt), desc(request.id)];
+        return [{ createdAt: 'desc' }, { id: 'desc' }];
     }
   }
 }

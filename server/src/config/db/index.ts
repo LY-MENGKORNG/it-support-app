@@ -1,20 +1,9 @@
-import { drizzle, LibSQLDatabase } from 'drizzle-orm/libsql';
-import { type Client, createClient } from '@libsql/client';
-import { relations } from './relation.config';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { env } from '@config/env.config';
+import { PrismaClient } from './generated/prisma/client';
 
-export const connection = {
-  url: env.TURSO_CONNECTION_URL,
-  authToken: env.TURSO_AUTH_TOKEN,
-} as const;
+const adapter = new PrismaPg({ connectionString: env.DATABASE_URL });
 
-const client = createClient({
-  url: connection.url,
-  authToken: connection.authToken,
-});
+export const db = new PrismaClient({ adapter });
 
-export const db = drizzle({ relations, client, logger: true });
-
-export type DrizzleDB = LibSQLDatabase<typeof relations> & {
-  $client: Client;
-};
+export type PrismaDB = typeof db;

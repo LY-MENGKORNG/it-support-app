@@ -18,6 +18,8 @@ dependencies:
   json_annotation: ^4.12.0
   get: ^4.7.3
   shadcn_ui: ^0.56.3
+  sqflite: ^2.4.4
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:

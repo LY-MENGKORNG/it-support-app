@@ -18,5 +18,6 @@ export function apiReference(app: INestApplication<any>) {
   return reference({
     content: () => SwaggerModule.createDocument(app, config),
     theme: 'saturn',
+    withFastify: true,
   });
 }
