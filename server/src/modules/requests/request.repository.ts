@@ -1,11 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { PRISMA } from '@common/constants';
-import { type PrismaDB } from '@config/db';
 import type { Prisma } from '@config/db/generated/prisma/client';
 import { type RequestHistoryDraft } from '../request-histories/request-history.schema';
 import { publicUserColumns } from '../users/user.schema';
 import { type NewRequest } from './request.schema';
 import { ListRequestQuery } from './request.dto';
+import { InjectedRespository } from '@common/helpers/repository.helper';
 
 const REQUEST_LIST_SUMMARY_COLUMNS = {
   id: true,
@@ -16,10 +14,7 @@ const REQUEST_LIST_SUMMARY_COLUMNS = {
 
 export type RequestPatch = Prisma.RequestUncheckedUpdateInput;
 
-@Injectable()
-export class RequestRepository {
-  constructor(@Inject(PRISMA) private readonly db: PrismaDB) {}
-
+export class RequestRepository extends InjectedRespository {
   async findPage(query: ListRequestQuery) {
     const { limit, offset } = query;
     const where = this.buildFilters(query);

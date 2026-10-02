@@ -1,6 +1,10 @@
 import { INestApplication } from '@nestjs/common';
+import type { ServerResponse } from 'node:http';
+import type { FastifyRequest } from 'fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference as reference } from '@scalar/nestjs-api-reference';
+
+type FastifyHandler = (req: FastifyRequest, res: ServerResponse) => void;
 
 const config = new DocumentBuilder()
   .setTitle('IT Support Documentation')
@@ -19,5 +23,5 @@ export function apiReference(app: INestApplication<any>) {
     content: () => SwaggerModule.createDocument(app, config),
     theme: 'saturn',
     withFastify: true,
-  });
+  }) as FastifyHandler;
 }

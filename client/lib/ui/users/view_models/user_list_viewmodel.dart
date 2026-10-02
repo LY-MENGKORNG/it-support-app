@@ -1,10 +1,8 @@
-import 'dart:collection';
-
-import 'package:app/type.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:app/data/repositories/user/user_repository.dart';
 import 'package:app/domain/models/user.dart';
+import 'package:app/type.dart';
 import 'package:app/domain/models/user_role.dart';
 import 'package:app/utils/command.dart';
 import 'package:app/utils/debounced_refresh.dart';
@@ -12,11 +10,6 @@ import 'package:app/utils/result.dart';
 import 'package:app/utils/safe_notifier.dart';
 
 class UserListViewModel extends ChangeNotifier with SafeNotifier {
-  UserListViewModel({required this._userRepository}) {
-    load = Command0(_load)..execute();
-    _refresh = DebouncedRefresh(load);
-  }
-
   final UserRepository _userRepository;
 
   late final Command0<void> load;
@@ -26,7 +19,12 @@ class UserListViewModel extends ChangeNotifier with SafeNotifier {
   UserRole? _role;
   String _query = '';
 
-  ImmutableLV<User> get users => ImmutableLV(_items);
+  UserListViewModel({required this._userRepository}) {
+    load = Command0(_load)..execute();
+    _refresh = DebouncedRefresh(load);
+  }
+
+  ImmutListView<User> get users => ImmutListView(_items);
   UserRole? get role => _role;
   bool get isEmpty => _items.isEmpty;
 

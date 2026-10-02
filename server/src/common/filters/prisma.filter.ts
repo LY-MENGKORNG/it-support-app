@@ -29,9 +29,6 @@ export class PrismaExceptionFilter
 
     this.logger.error(`${error.code}: ${error.message}`, error.stack);
 
-    // Falls through to the same 500, but as an `IntrinsicException` — Nest's
-    // marker for "already logged". Handing `super` the original would log it
-    // a second time.
     return super.catch(new IntrinsicException(error.message), host);
   }
 }

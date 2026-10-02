@@ -79,9 +79,9 @@ class RequestDetailViewModel extends ChangeNotifier with SafeNotifier {
 
   RequestDetail? get detail => _detail;
   Request? get request => _detail?.request;
-  ImmutableLV<User> get assignableUsers => ImmutableLV(_assignableUsers);
-  ImmutableLV<RequestCategory> get categoryOptions =>
-      ImmutableLV(_categoryOptions);
+  ImmutListView<User> get assignableUsers => ImmutListView(_assignableUsers);
+  ImmutListView<RequestCategory> get categoryOptions =>
+      ImmutListView(_categoryOptions);
 
   bool get canManage => _sessionRepository.canManageRequests;
   bool get isPreviewOnly => _detail != null && load.running;

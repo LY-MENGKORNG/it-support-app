@@ -1,13 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { PRISMA } from '@common/constants';
-import { type PrismaDB } from '@config/db';
 import { publicUserColumns } from './user.schema';
 import { CreateUserDto, ListUserQuery } from './user.dto';
+import { InjectedRespository } from '@common/helpers/repository.helper';
 
-@Injectable()
-export class UserRepository {
-  constructor(@Inject(PRISMA) private readonly db: PrismaDB) {}
-
+export class UserRepository extends InjectedRespository {
   findMany({ q, role, limit, offset }: ListUserQuery) {
     return this.db.user.findMany({
       select: publicUserColumns,

@@ -1,12 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { PRISMA } from '@common/constants';
-import { type PrismaDB } from '@config/db';
 import { type CreateCategoryDto } from './category.dto';
+import { InjectedRespository } from '@common/helpers/repository.helper';
 
-@Injectable()
-export class CategoryRepository {
-  constructor(@Inject(PRISMA) private readonly db: PrismaDB) {}
-
+export class CategoryRepository extends InjectedRespository {
   findAll() {
     return this.db.category.findMany({ orderBy: { name: 'asc' } });
   }

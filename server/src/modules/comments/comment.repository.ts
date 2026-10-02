@@ -1,13 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { PRISMA } from '@common/constants';
-import { type PrismaDB } from '@config/db';
 import { publicUserColumns } from '../users/user.schema';
 import { type CreateCommentDto } from './comment.dto';
+import { InjectedRespository } from '@common/helpers/repository.helper';
 
-@Injectable()
-export class CommentRepository {
-  constructor(@Inject(PRISMA) private readonly db: PrismaDB) {}
-
+export class CommentRepository extends InjectedRespository {
   findByRequest(requestId: number) {
     return this.db.comment.findMany({
       where: { requestId },

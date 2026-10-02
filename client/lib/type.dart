@@ -15,8 +15,4 @@ typedef Query = Map<String, dynamic>;
 
 typedef Decoder<T> = T Function(Object? payload);
 
-typedef ImmutableLV<T> = UnmodifiableListView<T>;
-
-typedef MyMap<K extends String, V> = Map<K, V>;
-
-/// chanthou.kim5@example.com, password-123
+typedef ImmutListView<T> = UnmodifiableListView<T>;

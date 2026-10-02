@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { isError, safeTry } from './exception';
+import { isError, safeTry } from './exception.util';
 
 type Msg = { msg: string };
 

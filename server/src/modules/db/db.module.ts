@@ -2,7 +2,7 @@ import { Global, Inject, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PRISMA } from '@common/constants';
 import { db, type PrismaDB } from '@config/db';
-import { safeTry } from '@common/utils/exception';
+import { safeTry } from '@common/utils/exception.util';
 
 @Global()
 @Module({
