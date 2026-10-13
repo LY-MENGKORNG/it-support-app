@@ -9,7 +9,7 @@ export const envSchema = z
       .readonly(),
 
     /** The running port 🚪 */
-    PORT: z.coerce.number().int().positive().default(3000).readonly(),
+    PORT: z.coerce.number().int().positive().default(3001).readonly(),
 
     /** Database connection string 🔌 */
     DATABASE_URL: z.string().readonly(),

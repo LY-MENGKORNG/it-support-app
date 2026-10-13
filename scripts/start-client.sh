@@ -14,7 +14,7 @@ cd "$(dirname "$0")/../client"
 if [[ -z "${API_BASE_URL:-}" ]]; then
   for iface in en0 en1 en5; do
     if lan_ip=$(ipconfig getifaddr "$iface" 2>/dev/null) && [[ -n $lan_ip ]]; then
-      API_BASE_URL="http://${lan_ip}:${PORT:-3000}"
+      API_BASE_URL="http://${lan_ip}:${PORT:-3001}"
       break
     fi
   done
